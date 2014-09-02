@@ -4,7 +4,8 @@ import logging
 
 from contracts import ContractsMeta
 
-from conf_tools.utils import indent, termcolor_colored
+from contracts.utils import indent
+from compmake.utils import termcolor_colored
 from decent_params import UserError
 from reprep.utils import deprecated
 

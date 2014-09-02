@@ -7,7 +7,7 @@ import traceback
 
 from contracts import contract, describe_value, ContractsMeta
 
-from conf_tools.utils import indent
+from contracts.utils import indent
 from decent_params import DecentParams, UserError, DecentParamsUserError
 from quickapp import logger
 

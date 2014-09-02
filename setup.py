@@ -40,7 +40,7 @@ setup(name='QuickApp',
       },
       package_dir={'':'src'},
       packages=find_packages('src'),
-      install_requires=['compmake', 'reprep', 'PyContracts', 'DecentLogs'],
+      install_requires=['compmake', 'reprep', 'PyContracts', 'DecentLogs', 'ConfTools'],
       tests_require=['nose'],
 )
 
