@@ -6,11 +6,11 @@ from conf_tools import GlobalConfig
 from contracts import contract, describe_type
 from types import NoneType
 import os
-import warnings
 
+__all__ = [
+    'CompmakeContext',
+]
 
-
-__all__ = ['CompmakeContext']
 
 
 class CompmakeContext(Context):
@@ -22,7 +22,9 @@ class CompmakeContext(Context):
                  report_manager=None):
         Context.__init__(self, db=db, currently_executing=currently_executing)
         assert isinstance(parent, (CompmakeContext, NoneType))
+        # can be removed once subtask() is removed
         self._qapp = qapp
+        # only used for count invocation
         self._parent = parent
         self._job_prefix = job_prefix
         
@@ -48,14 +50,13 @@ class CompmakeContext(Context):
         self.extra_report_keys = extra_report_keys
         
         self._promise = None
-
-    def finalize_jobs(self):
-        """ After all jobs have been defined, we create index jobs. """
-        if self.private_report_manager:
-            self.get_report_manager().create_index_job(self)
         
+
+        self.branched_contexts = []
+        self.branched_children = []
+ 
     def __str__(self):
-        return 'CC(%s, %s)' % (type(self._qapp).__name__, self._job_prefix)
+        return 'CompmakeContext(%s)' % ( self._job_prefix)
     
     def all_jobs(self):
         return list(self._jobs.values())
@@ -66,18 +67,21 @@ class CompmakeContext(Context):
     @contract(job_name='str', returns=Promise)
     def checkpoint(self, job_name):
         """ 
+        
+            (DEPRECATED)
+            
             Creates a dummy job called "job_name" that depends on all jobs
             previously defined; further, this new job is put into _extra_dep.
             This means that all successive jobs will require that the previous 
             ones be done.
-            
+             
             Returns the checkpoint job (CompmakePromise).
         """
         job_checkpoint = self.comp(checkpoint, job_name, prev_jobs=list(self._jobs.values()),
                                    job_id=job_name)
         self._extra_dep.append(job_checkpoint)
         return job_checkpoint
-    
+     
     #
     # Wrappers form Compmake's "comp".
     #
@@ -109,11 +113,6 @@ class CompmakeContext(Context):
         # so that compmake can use a good name
         kwargs['command_name'] = f.__name__
         return self.comp(wrap_state, config_state, f, *args, **kwargs)
-
-    @contract(returns=Promise)
-    def comp_dynamic(self, f, *args, **kwargs):
-        context = self._get_promise()
-        return self.comp(f, context, *args, **kwargs)
 
     @contract(returns=Promise)
     def comp_config_dynamic(self, f, *args, **kwargs):
@@ -183,8 +182,7 @@ class CompmakeContext(Context):
             output_dir = os.path.join(self._output_dir, name)
         else:
             output_dir = self._output_dir
-            
-        warnings.warn('add prefix to report manager')
+
         if separate_report_manager:
             if add_outdir == '':
                 msg = ('Asked for separate report manager, but without changing output dir. '
@@ -216,6 +214,7 @@ class CompmakeContext(Context):
                            extra_report_keys=extra_report_keys_,
                            output_dir=output_dir,
                            extra_dep=_extra_dep)
+        self.branched_children.append(c1)
         return c1
 
     @contract(job_id=str)
@@ -245,7 +244,6 @@ class CompmakeContext(Context):
         return self._resource_manager
     
     def needs(self, rtype, **params):
-        # print('%s %s %s %s %s' % (id(self), self._qapp, self._job_prefix, rtype, params))
         rm = self.get_resource_manager()
         res = rm.get_resource_job(self, rtype, **params)
         assert isinstance(res, Promise), describe_type(res)
@@ -254,12 +252,7 @@ class CompmakeContext(Context):
     def get_resource(self, rtype, **params):
         rm = self.get_resource_manager()
         return rm.get_resource_job(self, rtype, **params)
-    
-    # Reports    
-
-    def activate_dynamic_reports(self):
-        self._report_manager.activate_dynamic_reports()
-
+     
     @contract(report=Promise, report_type='str')
     def add_report(self, report, report_type, **params):
         rm = self.get_report_manager()
@@ -276,41 +269,35 @@ class CompmakeContext(Context):
         return self._report_manager
     
     def add_extra_report_keys(self, **keys):
-        warnings.warn('check conflict')
-        self.extra_report_keys.update(keys)
-        
-    def create_dynamic_index_job(self):
-        """ 
-            Creates the dynamic index job for the Report manager.
-            
-            This is necessary if your report are created dynamically
-            (i.e. inside delayed comp_dynamic() jobs).
-        """
-        self._report_manager.create_dynamic_index_job(context=self)
+        for k in keys:
+            if k in self.extra_report_keys:
+                msg = 'key %r already in %s' % (k, list(self.extra_report_keys))
+                raise ValueError(msg) 
+        self.extra_report_keys.update(keys) 
 
     @contract(returns=Promise)
     def _get_promise(self):
         """ Returns the promise object representing this context. """
         if self._promise is None:
-            warnings.warn('Need IDs for contexts, using job_prefix.')
-            warnings.warn('XXX: Note that this sometimes creates a context '
-                          'with depth 1; then "delete not root" deletes it.')
-            self._promise_job_id = 'context'  # -%s' % self._job_prefix
-            self._promise = self.comp(load_static_storage, self, job_id=self._promise_job_id)
+            #warnings.warn('Need IDs for contexts, using job_prefix.')
+            #warnings.warn('XXX: Note that this sometimes creates a context '
+            #              'with depth 1; then "delete not root" deletes it.')
+            self._promise_job_id = 'context'
+            self._promise = self.comp(load_static_storage, self, 
+                                      job_id=self._promise_job_id)
         return self._promise
 
-    def jobid_minus_prefix(self, want):
-        prefix = self.get_comp_prefix()
-        if prefix is not None:
-            pref = prefix + '-'
-            if want.startswith(pref):
-                res = want[len(pref):]
-            else:
-                res = want
-        else:
-            res = want
-        return res
-
+    
+    @contract(returns=Promise)
+    def comp_dynamic(self, f, *args, **kwargs):
+        return context_comp_dynamic(self, f, *args, **kwargs)
+       
+    def has_branched(self):
+        """ Returns True if any comp_dynamic was issued. """
+        return (len(self.branched_contexts)> 0 or 
+                any([c.has_branched() for c in self.branched_children]))
+    
+       
 def wrap_state(config_state, f, *args, **kwargs):
     """ Used internally by comp_config() """
     config_state.restore()
@@ -321,6 +308,103 @@ def wrap_state_dynamic(context, config_state, f, *args, **kwargs):
     config_state.restore()
     return f(context, *args, **kwargs)
 
-    
 def checkpoint(name, prev_jobs):
     pass
+
+@contract(returns=Promise)
+def context_comp_dynamic(self, f, *args, **kwargs):
+    context = self._get_promise()
+    
+    compmake_args = {}
+    compmake_args_name = ['job_id', 'extra_dep', 'command_name']
+    for n in compmake_args_name:
+        if n in kwargs:
+            compmake_args[n] = kwargs[n]
+            del kwargs[n]
+            
+    if not 'command_name' in compmake_args:
+        compmake_args['command_name'] = f.__name__
+    #:arg:job_id:   sets the job id (respects job_prefix)
+    #:arg:extra_dep: extra dependencies (not passed as arguments)
+    #:arg:command_name: used to define job name if job_id not provided.
+    
+    
+    if False:    
+        both = self.comp(_dynreports_wrap_dynamic, context, 
+                         function=f, args=args, kw=kwargs,
+                         **compmake_args)
+    else:
+        both = Context.comp_dynamic(self, _dynreports_wrap_dynamic, cc=context, 
+                         function=f, args=args, kw=kwargs,
+                         **compmake_args)
+    
+    result = self.comp(_dynreports_getres, both)
+    data = self.comp(_dynreports_getbra, both)
+    self.branched_contexts.append(data)
+    return result
+    
+@contract(context=Context, returns='dict')
+def _dynreports_wrap_dynamic(context, cc, function, args, kw):
+    """
+
+    """
+ 
+         
+    cc2 = CompmakeContext(currently_executing=context.currently_executing, 
+                          db=context.get_compmake_db(), 
+                          qapp=getattr(cc, '_qapp'), 
+                          parent=getattr(cc, '_parent'), 
+                          job_prefix=getattr(cc, '_job_prefix'),
+                          output_dir=getattr(cc, '_output_dir'), 
+                          extra_dep=getattr(cc, '_extra_dep'), 
+                          resource_manager=getattr(cc, '_resource_manager'),
+                          extra_report_keys=getattr(cc, 'extra_report_keys'),
+                          report_manager=getattr(cc, '_report_manager'))
+    
+    
+    res = {}
+    res['f-result'] = function(cc2, *args, **kw)
+    res['context-res'] = context_get_merge_data(cc2)
+    return res
+
+@contract(branched='list(dict)')
+def _dynreports_merge(branched):
+    rm = None
+    for i, b in enumerate(branched):
+        if i == 0:
+            rm = b['report_manager']
+        else:
+            rm.merge(b['report_manager'])
+    return dict(report_manager=rm)
+    
+@contract(res='dict')
+def _dynreports_getres(res):    
+    """ gets only the result """
+    return res['f-result']
+
+@contract(res='dict')
+def _dynreports_getbra(res):    
+    """ gets only the result """
+    return res['context-res']
+
+def get_branched_contexts(context):
+    """ Returns all promises created by context_comp_dynamic() for this and children. """
+    res = list(context.branched_contexts)
+    for c in context.branched_children:
+        res.extend(get_branched_contexts(c))
+    return res  
+        
+def context_get_merge_data(context): 
+    rm = context.get_report_manager()
+    data = [dict(report_manager=rm)]
+    
+    data.extend(get_branched_contexts(context))    
+    
+    if len(data) > 1:    
+        return context.comp(_dynreports_merge, data)
+    else:
+        return data[0]
+    
+
+
+

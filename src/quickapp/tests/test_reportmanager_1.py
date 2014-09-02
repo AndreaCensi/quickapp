@@ -37,7 +37,7 @@ class QuickAppDemoReport(QuickApp):
                 c2.add_report(r, 'report_example1')
                 r = c2.comp(report_example2, param1=param1, param2=param2)
                 c2.add_report(r, 'report_example2')
-        context.create_dynamic_index_job()
+        
 
 
 @istest
@@ -49,8 +49,6 @@ class CompappTest1(QuickappTest):
         self.assert_cmd_success('make')
         print('---- result of first make')
         self.assert_cmd_success('ls')
-        print('---- now remake')
-        self.assert_cmd_success('remake create_dynamic_index_job')
         print('---- result of remake')
         self.assert_cmd_success('ls')
         self.assert_cmd_success('make')

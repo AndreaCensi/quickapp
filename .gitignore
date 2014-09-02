@@ -8,3 +8,4 @@ quickapp_test1
 quickapp_test2
 .coverage
 coverage_information
+out-example_recursive_reports.py

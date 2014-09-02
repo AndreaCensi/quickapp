@@ -76,6 +76,12 @@ class QuickAppBase(HasLogger):
         return entry
     
     @classmethod
+    def __call__(cls, *args, **kwargs):
+        print('call')
+        main = cls.get_sys_main()
+        return main(*args, **kwargs)
+    
+    @classmethod
     def get_program_description(cls):
         """     
             Returns a description for the program. This is by default

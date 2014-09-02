@@ -44,7 +44,9 @@ class TestDynamic3(QuickappTest):
                                      'b-m-define_jobs1',
                                      'a-n-define_jobs1',
                                      'b-n-define_jobs1'])
-        self.assert_cmd_success('make;ls')
+        self.assert_cmd_success('make *-define_jobs1')
+
+        self.assert_cmd_success('ls')
         self.assertJobsEqual('all', ['a-m-context',
                                      'a-n-context',
                                      'b-m-context',

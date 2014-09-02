@@ -1,21 +1,17 @@
-import os
-from pprint import pformat
-import time
-import warnings
-
-from contracts import contract, describe_type, describe_value
-
+from .rm import write_report_single
 from compmake import Context, Promise
-from compmake.jobs import clean_target, job_exists
 from compmake.utils import duration_human
 from conf_tools.utils import friendly_path
-import numpy as np
+from contracts import contract, describe_type, describe_value
+from pprint import pformat
 from quickapp import logger
 from reprep import Report
 from reprep.report_utils import StoreResults
 from reprep.utils import frozendict2, natsorted
-
-from .rm import create_job_index_dynamic, write_report_single, write_report_yaml
+import numpy as np
+import os
+import time
+import warnings
 
 
 __all__ = ['ReportManager']
@@ -40,13 +36,29 @@ class ReportManager(object):
         
         # check if we are called more than once; would be a bug
         self.index_job_created = False
-        
-        self._dynamic_reports = False
 
         self.static_dir = os.path.join(self.outdir, 'reprep-static')
+        
+    def merge(self, other):
+        assert isinstance(other, ReportManager)
+        """ Merges into this scructure the data from another reportmanager. """
+        #print('I have: %d reports' % len(self.allreports))
+        #print('merging with another with %d reports' % len(other.allreports))
 
-    def activate_dynamic_reports(self):
-        self._dynamic_reports = True
+        for key in other.allreports:
+            report = other.allreports[key]
+            
+            if key in self.allreports:
+                selfreport=  self.allreports[key]
+                msg = 'Found duplicate report %r' % key
+                msg += ' jobs %s and %s' % (report, selfreport)
+                #print(msg)
+                if report.job_id != selfreport.job_id:
+                    raise ValueError(msg)
+            
+            filename = other.allreports_filename[key]
+            self.allreports[key] = report
+            self.allreports_filename[key] = filename
 
     def set_html_resources_prefix(self, prefix):
         """ 
@@ -118,36 +130,34 @@ class ReportManager(object):
         filename = os.path.join(dirname, basename) 
         self.allreports_filename[key] = filename + '.html'
         
-        is_root = context.currently_executing == ['root']
+        write_singles = False
 
-        if self._dynamic_reports and not is_root:
-            # don't create the single report for the ones that are
-            # defined in the root session
-
-            # Add also a single report independent of a global index
-            filename_single = os.path.join(dirname, basename) + '_s.html'
-            filename_index_dyn = os.path.join(dirname, basename) + '_dyn.html'
-
-            report_nid = self.html_resources_prefix + report_type_sane
-            if key:
-                report_nid += '-' + basename_from_key(key)
-            write_job_id = context.jobid_minus_prefix(report.job_id + '-writes')
-
-            write_report_yaml(report_nid, report_job_id=report.job_id,
-                              key=key, html_filename=filename_single,
-                              report_html_indexed=filename_index_dyn)
-                
-            context.comp(write_report_single,
-#                          report_job_id=report.job_id,
-                          report=report, report_nid=report_nid,
-                          report_html=filename_single,
-#                           report_html_indexed=filename_index_dyn,
-                          write_pickle=False,
-                          static_dir=self.static_dir,
-#                           key=key,
-                          job_id=write_job_id)
-
-            self._mark_remake_dynamic_index(context)
+        if write_singles:
+            is_root = context.currently_executing == ['root']
+            if not is_root:
+                # Add also a single report independent of a global index
+    
+                # don't create the single report for the ones that are
+                # defined in the root session
+    
+                filename_single = os.path.join(dirname, basename) + '_s.html'
+                #filename_index_dyn = os.path.join(dirname, basename) + '_dyn.html'
+    
+                report_nid = self.html_resources_prefix + report_type_sane
+                if key:
+                    report_nid += '-' + basename_from_key(key)
+                write_job_id = jobid_minus_prefix(context, report.job_id + '-writes')
+    
+#                 write_report_yaml(report_nid, report_job_id=report.job_id,
+#                                   key=key, html_filename=filename_single,
+#                                   report_html_indexed=filename_index_dyn)
+                    
+                context.comp(write_report_single,
+                              report=report, report_nid=report_nid,
+                              report_html=filename_single,
+                              write_pickle=False,
+                              static_dir=self.static_dir,
+                              job_id=write_job_id) 
 
     @contract(context=Context)
     def create_index_job(self, context):
@@ -160,7 +170,6 @@ class ReportManager(object):
             # no report necessary
             return
 
-
         create_write_jobs(context=context,
                           allreports_filename=self.allreports_filename,
                           allreports=self.allreports,
@@ -168,32 +177,6 @@ class ReportManager(object):
                           index_filename=self.index_filename,
                           static_dir=self.static_dir,
                           suffix='write')
-
-    dynamic_index_job_id = 'create_dynamic_index_job'
-    def create_dynamic_index_job(self, context):
-        job_id = ReportManager.dynamic_index_job_id
-        # XXX: make sure prefix is None
-        index_filename = os.path.join(os.path.dirname(self.outdir),
-                                      'reports_dynamic.html')
-        context.comp_dynamic(create_job_index_dynamic,
-                             dirname=self.outdir,
-                             index_filename=index_filename,
-                             html_resources_prefix=self.html_resources_prefix,
-                             job_id=job_id,
-                             static_dir=self.static_dir)
-
-    def _mark_remake_dynamic_index(self, context):
-        try:
-            job_id = ReportManager.dynamic_index_job_id
-            db = context.get_compmake_db()
-            if job_exists(job_id, db=db):
-                clean_target(job_id, db=db)
-        except:
-            # we'll think it is a race condition
-            # XXX: need to change this mechanism
-            pass
-
-
 
 def create_write_jobs(context, allreports_filename, allreports,
                       html_resources_prefix, index_filename, suffix,
@@ -213,7 +196,7 @@ def create_write_jobs(context, allreports_filename, allreports,
         job_report = allreports[key]
         filename = allreports_filename[key]
 
-        write_job_id = context.jobid_minus_prefix(job_report.job_id + '-' + suffix)
+        write_job_id = jobid_minus_prefix(context, job_report.job_id + '-' + suffix)
 
         # Create the links to report of the same type
         report_type = key['report']
@@ -231,12 +214,8 @@ def create_write_jobs(context, allreports_filename, allreports,
         del key['report']
         
         warnings.warn('not sure why this was here in the first place')
-#         db = context.get_compmake_db()
-#         if job_exists(write_job_id, db=db):
-#             # print('Re-defining job %s' % write_job_id)
-#             delete_all_job_data(write_job_id, db=db)
-        
-        promise = context.comp(write_report_and_update,
+
+        context.comp(write_report_and_update,
              report=job_report, report_nid=report_nid,
              report_html=filename, all_reports=allreports_filename,
              index_filename=index_filename,
@@ -246,12 +225,20 @@ def create_write_jobs(context, allreports_filename, allreports,
              other_reports_same_type=other_reports_same_type,
              most_similar_other_type=others,
              job_id=write_job_id)
+ 
 
 
-        # let's clean it --- in an ideal world compmake should detect that
-        # the arguments changed
-#         db = context.get_compmake_db()
-#         clean_target(promise.job_id, db=db)
+def jobid_minus_prefix(context, want):
+    prefix = context.get_comp_prefix()
+    if prefix is not None:
+        pref = prefix + '-'
+        if want.startswith(pref):
+            res = want[len(pref):]
+        else:
+            res = want
+    else:
+        res = want
+    return res
 
 
 def sort_by_type(allreports_filename):
@@ -273,8 +260,6 @@ def find_others(type2reports, key):
             continue
         best = get_most_similar(other_type_reports, key)
         if best is not None:
-#                     print('Best match:\n-%s %s\n- %s %s' % (report_type, key,
-#                                                             other_type, best))
             others.append((other_type, best, other_type_reports[best]))
 
     return others
@@ -635,7 +620,10 @@ def make_sections(allruns, common=None):
     return dict(type='division', field=field,
                 division=division, common=common)
 
-    
+def _dynreports_create_index(context, merged_data):
+    rm = merged_data['report_manager']
+    rm.create_index_job(context)
+
     
 @contract(key=dict, returns='str')
 def basename_from_key(key):

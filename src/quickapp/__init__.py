@@ -5,15 +5,11 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-
-# return values
-
 # error in computation
 QUICKAPP_COMPUTATION_ERROR = 2
 
 # error in passing parameters
 QUICKAPP_USER_ERROR = 1
-
 
 from .utils import col_logging
 from decent_params import UserError
@@ -26,7 +22,8 @@ from .quick_app import *
 from .compmake_context import *
 from .app_utils import *
 
+symbols = [QuickMultiCmdApp, QuickApp, 
+           QuickAppBase, add_subcommand, ResourceManager]
 
-symbols = [QuickMultiCmdApp, QuickApp, QuickAppBase, add_subcommand, ResourceManager]
 for s in symbols: 
     s.__module__ = 'quickapp'

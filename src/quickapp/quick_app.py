@@ -1,23 +1,21 @@
+from .compmake_context import CompmakeContext, context_get_merge_data
+from .exceptions import QuickAppException
+from .quick_app_base import QuickAppBase
+from .report_manager import _dynreports_create_index
 from abc import abstractmethod
+from compmake import CommandFailed, StorageFilesystem, read_rc_files
+from contracts import ContractsMeta, contract, indent
+from decent_params.utils import UserError, wrap_script_entry_point
+from quickapp import QUICKAPP_COMPUTATION_ERROR, logger
+import contracts
 import os
 import sys
 import traceback
-import warnings
 
-from contracts import ContractsMeta, contract
-import contracts
-
-from compmake import read_rc_files, StorageFilesystem
-from conf_tools.utils import indent
-from decent_params.utils import wrap_script_entry_point, UserError
-from quickapp import logger, QUICKAPP_COMPUTATION_ERROR
-
-from .compmake_context import CompmakeContext
-from .exceptions import QuickAppException
-from .quick_app_base import QuickAppBase
-
-
-__all__ = ['QuickApp', 'quickapp_main']
+__all__ = [
+    'QuickApp', 
+    'quickapp_main',
+]
 
 
 class QuickApp(QuickAppBase):
@@ -72,13 +70,7 @@ class QuickApp(QuickAppBase):
             parent = parent.parent
         return None
         
-    def activate_dynamic_reports(self):
-        self.context.activate_dynamic_reports()
-        self._dynamic_reports = True
-
-    def go(self):
-        self._dynamic_reports = False
-         
+    def go(self): 
         # check that if we have a parent who is a quickapp,
         # then use its context      
         qapp_parent = self.get_qapp_parent()
@@ -108,8 +100,6 @@ class QuickApp(QuickAppBase):
                 self.logger.warning(msg)
                 contracts.disable_all()
 
-        warnings.warn('removed configuration below')  # (start)
-
         output_dir = options.output
         
         # Compmake storage for results        
@@ -126,12 +116,18 @@ class QuickApp(QuickAppBase):
         self.define_jobs_context(context)
         self.context.comp_prefix(original)
         
-        if self._dynamic_reports:
-            context.create_dynamic_index_job()
-
-        context.finalize_jobs()
-        # finally, save the context to the DB
-        # context.compmake_db['context'] = context
+        merged  = context_get_merge_data(context)
+    
+        # Only create the index job if we have reports defined
+        # or some branched context (which might create reports)
+        has_reports = len(context.get_report_manager().allreports) > 0
+        has_branched = context.has_branched()
+        if has_reports or has_branched:
+            self.info('Creating reports')
+            from compmake import Context
+            Context.comp_dynamic(context, _dynreports_create_index, merged)
+        else:
+            self.info('Not creating reports.')
         
         if context.n_comp_invocations == 0:
             # self.comp was never called
@@ -139,17 +135,13 @@ class QuickApp(QuickAppBase):
             raise ValueError(msg)
         else: 
             if not options.console:
-                batch_result = self.context.batch_command(options.command)
-                if isinstance(batch_result, str):
+                try: 
+                    self.context.batch_command(options.command)
+                except CommandFailed:
                     ret = QUICKAPP_COMPUTATION_ERROR
-                elif isinstance(batch_result, int):
-                    if batch_result == 0:
-                        ret = 0
-                    else:
-                        # xxx: discarded information
-                        ret = QUICKAPP_COMPUTATION_ERROR
                 else:
-                    assert False 
+                    ret = 0
+                     
                 return ret
             else:
                 self.context.compmake_console()
@@ -189,8 +181,7 @@ class QuickApp(QuickAppBase):
                 res = instance.go()  
             else:
                 instance.context = child_context
-                res = instance.define_jobs_context(child_context)
-                child_context.finalize_jobs()
+                res = instance.define_jobs_context(child_context)                
                 
             # Add his jobs to our list of jobs
             context._jobs.update(child_context.all_jobs_dict()) 

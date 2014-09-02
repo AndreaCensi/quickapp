@@ -117,13 +117,13 @@ def id_field_heuristics(generated):
 
 
     
-def iterate_context_names_pair(context, it1, it2):
+def iterate_context_names_pair(context, it1, it2, key1=None, key2=None):
     """
     
         Yields tuples of (context, s1, s2).
     """
-    for cc, x1 in iterate_context_names(context, it1):
-        for c, x2 in iterate_context_names(cc, it2):
+    for cc, x1 in iterate_context_names(context, it1, key=key1):
+        for c, x2 in iterate_context_names(cc, it2, key=key2):
             yield c, x1, x2
 
 

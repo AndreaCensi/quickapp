@@ -34,11 +34,17 @@ class TestDynamic2(QuickappTest):
 
     def test_dynamic1(self):
         self.run_quickapp(qapp=QuickAppDemoChild3, cmd='ls')
+        print('ls 1')
+        self.assert_cmd_success('ls not *dynrep*')
         self.assertJobsEqual('all', ['a-context',
                                      'b-context',
                                      'a-define_jobs1',
                                      'b-define_jobs1'])
-        self.assert_cmd_success('make;ls')
+        print('make root') 
+        self.assert_cmd_success('make a-define_jobs1 b-define_jobs1')
+        print('ls 2')
+        self.assert_cmd_success('ls not *dynrep*')
+        
         self.assertJobsEqual('all', ['a-context',
                                      'b-context',
                                      'a-define_jobs1',
@@ -48,7 +54,11 @@ class TestDynamic2(QuickappTest):
                                      'a-define_jobs2',
                                      'b-define_jobs2',
                                      ])
-        self.assert_cmd_success('make;ls')
+        print('make level1')
+        self.assert_cmd_success('make level1 level2')
+        print('ls 3')
+        self.assert_cmd_success('ls not *dynrep*')
+
         self.assertJobsEqual('all', ['a-context',
                                      'b-context',
                                      'a-define_jobs1',
