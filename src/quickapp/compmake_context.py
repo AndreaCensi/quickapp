@@ -4,24 +4,26 @@ from compmake import Context, Promise
 from compmake.context import load_static_storage
 from conf_tools import GlobalConfig
 from contracts import contract, describe_type
+from contracts import check_isinstance
 from types import NoneType
 import os
 
 __all__ = [
     'CompmakeContext',
+    'QuickAppContext',
 ]
 
+ 
+class QuickAppContext(object):
 
-
-class CompmakeContext(Context):
-
-    @contract(extra_dep='list', currently_executing='list(str)')
-    def __init__(self, currently_executing, db, qapp, parent, job_prefix,
+    @contract(extra_dep='list', cc=Context)
+    def __init__(self, cc, qapp, parent, job_prefix,
                  output_dir, extra_dep=[], resource_manager=None,
                  extra_report_keys=None,
                  report_manager=None):
-        Context.__init__(self, db=db, currently_executing=currently_executing)
-        assert isinstance(parent, (CompmakeContext, NoneType))
+        check_isinstance(cc, Context)
+        check_isinstance(parent, (CompmakeContext, NoneType))
+        self.cc = cc
         # can be removed once subtask() is removed
         self._qapp = qapp
         # only used for count invocation
@@ -50,7 +52,6 @@ class CompmakeContext(Context):
         self.extra_report_keys = extra_report_keys
         
         self._promise = None
-        
 
         self.branched_contexts = []
         self.branched_children = []
@@ -58,8 +59,8 @@ class CompmakeContext(Context):
     def __str__(self):
         return 'CompmakeContext(%s)' % ( self._job_prefix)
     
-    def all_jobs(self):
-        return list(self._jobs.values())
+    # def all_jobs(self):
+    #     return list(self._jobs.values())
     
     def all_jobs_dict(self):
         return dict(self._jobs)
@@ -92,7 +93,7 @@ class CompmakeContext(Context):
             Use this instead of "comp". 
         """
         self.count_comp_invocations()
-        self.comp_prefix(self._job_prefix)
+        self.cc.comp_prefix(self._job_prefix)
 
         other_extra = kwargs.get('extra_dep', [])
         if isinstance(other_extra, Promise):
@@ -100,10 +101,38 @@ class CompmakeContext(Context):
 
         extra_dep = self._extra_dep + other_extra
         kwargs['extra_dep'] = extra_dep
-        promise = Context.comp(self, f, *args, **kwargs)
+        promise = self.cc.comp(f, *args, **kwargs)
         self._jobs[promise.job_id] = promise
         return promise
     
+    @contract(returns=Promise)
+    def comp_dynamic(self, f, *args, **kwargs):
+        # XXX: we really dont need it
+        context = self._get_promise()
+#         context = self
+        
+        compmake_args = {}
+        compmake_args_name = ['job_id', 'extra_dep', 'command_name']
+        for n in compmake_args_name:
+            if n in kwargs:
+                compmake_args[n] = kwargs[n]
+                del kwargs[n]
+                
+        if not 'command_name' in compmake_args:
+            compmake_args['command_name'] = f.__name__
+        #:arg:job_id:   sets the job id (respects job_prefix)
+        #:arg:extra_dep: extra dependencies (not passed as arguments)
+        #:arg:command_name: used to define job name if job_id not provided.
+        
+        both =self.cc.comp_dynamic(_dynreports_wrap_dynamic, qc=context, 
+                             function=f, args=args, kw=kwargs,
+                             **compmake_args)
+        
+        result = self.comp(_dynreports_getres, both)
+        data = self.comp(_dynreports_getbra, both)
+        self.branched_contexts.append(data)
+        return result
+
     @contract(returns=Promise)
     def comp_config(self, f, *args, **kwargs):
         """ 
@@ -111,7 +140,8 @@ class CompmakeContext(Context):
         """
         config_state = GlobalConfig.get_state()
         # so that compmake can use a good name
-        kwargs['command_name'] = f.__name__
+        if not 'command_name' in kwargs:
+            kwargs['command_name'] = f.__name__
         return self.comp(wrap_state, config_state, f, *args, **kwargs)
 
     @contract(returns=Promise)
@@ -120,7 +150,8 @@ class CompmakeContext(Context):
             more jobs. """
         config_state = GlobalConfig.get_state()
         # so that compmake can use a good name
-        kwargs['command_name'] = f.__name__
+        if not 'command_name' in kwargs:
+            kwargs['command_name'] = f.__name__
         return self.comp_dynamic(wrap_state_dynamic, config_state, f, *args, **kwargs)
 
     def count_comp_invocations(self):
@@ -205,21 +236,20 @@ class CompmakeContext(Context):
         if extra_report_keys is not None:
             extra_report_keys_.update(extra_report_keys)
         
-        c1 = CompmakeContext(db=self.get_compmake_db(),
-                             currently_executing=list(self.currently_executing),
+        c1 = CompmakeContext(cc=self.cc,
                             qapp=qapp, parent=self,
-                           job_prefix=job_prefix,
-                           report_manager=report_manager,
-                           resource_manager=resource_manager,
-                           extra_report_keys=extra_report_keys_,
-                           output_dir=output_dir,
-                           extra_dep=_extra_dep)
+                            job_prefix=job_prefix,
+                            report_manager=report_manager,
+                            resource_manager=resource_manager,
+                            extra_report_keys=extra_report_keys_,
+                            output_dir=output_dir,
+                            extra_dep=_extra_dep)
         self.branched_children.append(c1)
         return c1
 
     @contract(job_id=str)
     def add_job_defined_in_this_session(self, job_id):
-        self._jobs_defined_in_this_session.add(job_id)
+        self.cc.add_job_defined_in_this_session(self, job_id)
         if self._parent is not None:
             self._parent.add_job_defined_in_this_session(job_id)
 
@@ -288,10 +318,6 @@ class CompmakeContext(Context):
         return self._promise
 
     
-    @contract(returns=Promise)
-    def comp_dynamic(self, f, *args, **kwargs):
-        return context_comp_dynamic(self, f, *args, **kwargs)
-       
     def has_branched(self):
         """ Returns True if any comp_dynamic was issued. """
         return (len(self.branched_contexts)> 0 or 
@@ -309,62 +335,20 @@ def wrap_state_dynamic(context, config_state, f, *args, **kwargs):
     return f(context, *args, **kwargs)
 
 def checkpoint(name, prev_jobs):
-    pass
+    pass 
 
-@contract(returns=Promise)
-def context_comp_dynamic(self, f, *args, **kwargs):
-    context = self._get_promise()
-    
-    compmake_args = {}
-    compmake_args_name = ['job_id', 'extra_dep', 'command_name']
-    for n in compmake_args_name:
-        if n in kwargs:
-            compmake_args[n] = kwargs[n]
-            del kwargs[n]
-            
-    if not 'command_name' in compmake_args:
-        compmake_args['command_name'] = f.__name__
-    #:arg:job_id:   sets the job id (respects job_prefix)
-    #:arg:extra_dep: extra dependencies (not passed as arguments)
-    #:arg:command_name: used to define job name if job_id not provided.
-    
-    
-    if False:    
-        both = self.comp(_dynreports_wrap_dynamic, context, 
-                         function=f, args=args, kw=kwargs,
-                         **compmake_args)
-    else:
-        both = Context.comp_dynamic(self, _dynreports_wrap_dynamic, cc=context, 
-                         function=f, args=args, kw=kwargs,
-                         **compmake_args)
-    
-    result = self.comp(_dynreports_getres, both)
-    data = self.comp(_dynreports_getbra, both)
-    self.branched_contexts.append(data)
-    return result
-    
+
 @contract(context=Context, returns='dict')
-def _dynreports_wrap_dynamic(context, cc, function, args, kw):
+def _dynreports_wrap_dynamic(context, qc, function, args, kw):
     """
 
     """
- 
-         
-    cc2 = CompmakeContext(currently_executing=context.currently_executing, 
-                          db=context.get_compmake_db(), 
-                          qapp=getattr(cc, '_qapp'), 
-                          parent=getattr(cc, '_parent'), 
-                          job_prefix=getattr(cc, '_job_prefix'),
-                          output_dir=getattr(cc, '_output_dir'), 
-                          extra_dep=getattr(cc, '_extra_dep'), 
-                          resource_manager=getattr(cc, '_resource_manager'),
-                          extra_report_keys=getattr(cc, 'extra_report_keys'),
-                          report_manager=getattr(cc, '_report_manager'))
-    
+       
+    qc.cc = context
     
     res = {}
-    res['f-result'] = function(cc2, *args, **kw)
-    res['context-res'] = context_get_merge_data(cc2)
+    res['f-result'] = function(qc, *args, **kw)
+    res['context-res'] = context_get_merge_data(qc)
     return res
 
 @contract(branched='list(dict)')
@@ -401,10 +385,11 @@ def context_get_merge_data(context):
     data.extend(get_branched_contexts(context))    
     
     if len(data) > 1:    
-        return context.comp(_dynreports_merge, data)
+        return context.cc.comp(_dynreports_merge, data)
     else:
         return data[0]
     
+CompmakeContext = QuickAppContext
 
 
 

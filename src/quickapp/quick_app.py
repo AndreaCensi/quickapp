@@ -4,6 +4,7 @@ from .quick_app_base import QuickAppBase
 from .report_manager import _dynreports_create_index
 from abc import abstractmethod
 from compmake import CommandFailed, StorageFilesystem, read_rc_files
+from compmake.context import Context
 from contracts import ContractsMeta, contract, indent
 from decent_params.utils import UserError, wrap_script_entry_point
 from quickapp import QUICKAPP_COMPUTATION_ERROR, logger
@@ -76,8 +77,8 @@ class QuickApp(QuickAppBase):
         qapp_parent = self.get_qapp_parent()
         if qapp_parent is not None:
             # self.info('Found parent: %s' % qapp_parent)
-            context = qapp_parent.child_context  
-            self.define_jobs_context(context)
+            qc = qapp_parent.child_context  
+            self.define_jobs_context(qc)
             return
         else:
             # self.info('Parent not found')
@@ -106,37 +107,39 @@ class QuickApp(QuickAppBase):
         storage = os.path.join(output_dir, 'compmake')
         db = StorageFilesystem(storage, compress=True)
         currently_executing = ['root']
-        context = CompmakeContext(db=db, currently_executing=currently_executing,
+        # The original Compmake context
+        oc = Context(db=db, currently_executing=currently_executing)
+        # Our wrapper
+        qc = CompmakeContext(cc=oc,
                                   parent=None, qapp=self, job_prefix=None,
                                   output_dir=output_dir)
-        read_rc_files(context)
+        read_rc_files(oc)
         
-        self.context = context
-        original = self.context.get_comp_prefix()
-        self.define_jobs_context(context)
-        self.context.comp_prefix(original)
+        original = oc.get_comp_prefix()
+        self.define_jobs_context(qc)
+        oc.comp_prefix(original)
         
-        merged  = context_get_merge_data(context)
+        merged  = context_get_merge_data(qc)
     
         # Only create the index job if we have reports defined
         # or some branched context (which might create reports)
-        has_reports = len(context.get_report_manager().allreports) > 0
-        has_branched = context.has_branched()
+        has_reports = len(qc.get_report_manager().allreports) > 0
+        has_branched = qc.has_branched()
         if has_reports or has_branched:
             self.info('Creating reports')
-            from compmake import Context
-            Context.comp_dynamic(context, _dynreports_create_index, merged)
+            oc.comp_dynamic(_dynreports_create_index, merged)
         else:
             self.info('Not creating reports.')
         
-        if context.n_comp_invocations == 0:
+        ndefined = len(oc.get_jobs_defined_in_this_session())
+        if ndefined == 0:
             # self.comp was never called
             msg = 'No jobs defined.'
             raise ValueError(msg)
         else: 
             if not options.console:
                 try: 
-                    self.context.batch_command(options.command)
+                    oc.batch_command(options.command)
                 except CommandFailed:
                     ret = QUICKAPP_COMPUTATION_ERROR
                 else:
@@ -144,7 +147,7 @@ class QuickApp(QuickAppBase):
                      
                 return ret
             else:
-                self.context.compmake_console()
+                oc.compmake_console()
                 return 0
 
     @contract(args='dict(str:*)|list(str)', extra_dep='list')

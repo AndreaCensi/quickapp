@@ -11,7 +11,6 @@ def f(name):
     return name
 
 def define_jobs(context, id_name):
-    print('in define_jobs(): executing: %s' % context.currently_executing)
     assert isinstance(context, CompmakeContext)
     context.comp(f, id_name)
 
@@ -43,7 +42,6 @@ class QuickAppDemoChild2(QuickApp):
     def define_jobs_context(self, context):
         names = ['a', 'b', 'c']
         for c, id_name in iterate_context_names(context, names):
-            print('in define_jobs_context(): executing: %s' % context.currently_executing)
             c.comp_dynamic(define_jobs, id_name)
 
 

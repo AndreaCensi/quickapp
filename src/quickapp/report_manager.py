@@ -1,6 +1,6 @@
 from .rm import write_report_single
 from compmake import Context, Promise
-from compmake.utils import duration_human
+from compmake.utils import duration_compact
 from conf_tools.utils import friendly_path
 from contracts import contract, describe_type, describe_value
 from pprint import pformat
@@ -14,7 +14,9 @@ import time
 import warnings
 
 
-__all__ = ['ReportManager']
+__all__ = [
+    'ReportManager',
+]
 
 
 class ReportManager(object):
@@ -486,7 +488,7 @@ def index_reports(reports, index, update=None):  # @UnusedVariable
         href = os.path.relpath(os.path.realpath(filename),
                                os.path.dirname(os.path.realpath(index)))
         if os.path.exists(filename):
-            when = duration_human(time.time() - mtime(filename))
+            when = duration_compact(time.time() - mtime(filename))
             span_when = '<span class="when">%s ago</span>' % when
             style = style_order(order(filename))
             a = '<a href="%s">%s</a>' % (href, desc)

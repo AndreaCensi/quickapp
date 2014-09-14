@@ -10,11 +10,9 @@ def f(name):
     return name
 
 def define_jobs2(context, id_name):
-    print('in define_jobs(): executing: %s' % context.currently_executing)
     context.comp(f, id_name)
 
 def define_jobs1(context, id_name):
-    print('in define_jobs(): executing: %s' % context.currently_executing)
     context.comp_dynamic(define_jobs2, id_name)
 
 class QuickAppDemoChild3(QuickApp):
@@ -36,6 +34,9 @@ class TestDynamic3(QuickappTest):
 
     def test_dynamic1(self):
         self.run_quickapp(qapp=QuickAppDemoChild3, cmd='ls')
+        
+        self.assert_cmd_success('check_consistency')
+
         self.assertJobsEqual('all', ['a-m-context',
                                      'a-n-context',
                                      'b-m-context',

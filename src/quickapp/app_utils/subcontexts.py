@@ -1,7 +1,5 @@
-import os
-
 from contracts import contract
-
+import os
 
 __all__ = [
    'iterate_context_names',
@@ -296,7 +294,5 @@ def minimal_names_at_boundaries(objects, separators=['_', '-']):
     
     assert objects == objects2, (objects, objects2, (prefix, minimal, postfix))
     return prefix, minimal, postfix
-    
-    
     
     

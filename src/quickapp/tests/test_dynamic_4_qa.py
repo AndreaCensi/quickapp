@@ -10,15 +10,12 @@ def f(name):
     return name
 
 def define_jobs2(context, id_name):
-    print('in define_jobs2(): context.executing: %s' % context.currently_executing)
     context.comp(f, id_name)
 
 def define_jobs1(context, id_name):
-    print('in define_jobs1(): context.executing: %s' % context.currently_executing)
     names2 = ['m', 'n']
     for c2, name2 in iterate_context_names(context, names2):
-        assert c2.currently_executing == context.currently_executing
-        print('in define_jobs1()/iterate: c2.executing: %s' % c2.currently_executing)
+        #assert c2.currently_executing == context.currently_executing
         c2.comp_dynamic(define_jobs2, id_name + name2)
 
 

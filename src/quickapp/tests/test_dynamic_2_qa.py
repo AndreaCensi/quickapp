@@ -10,11 +10,9 @@ def f(name):
     return name
 
 def define_jobs2(context, id_name):
-    print('in define_jobs(): executing: %s' % context.currently_executing)
     context.comp(f, id_name)
 
 def define_jobs1(context, id_name):
-    print('in define_jobs(): executing: %s' % context.currently_executing)
     context.comp_dynamic(define_jobs2, id_name)
 
 class QuickAppDemoChild3(QuickApp):
