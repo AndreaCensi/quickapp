@@ -3,7 +3,8 @@ from setuptools import setup, find_packages
 
 version = "1.1dev1"
 
-description = """""" 
+description = """Library that composes the functionality of Compmake, 
+Reprep in high-level constructs for extremely rapid development of scientific applications.""" 
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
