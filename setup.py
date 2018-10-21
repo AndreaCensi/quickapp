@@ -61,7 +61,7 @@ setup(name='QuickApp',
       install_requires=[
           'compmake',
           'reprep',
-          'PyContracts',
+          'PyContracts>=1.8.5',
           'DecentLogs',
           'ConfTools',
       ],
