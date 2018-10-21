@@ -3,3 +3,6 @@ RepRep
 DecentLogs==1.2.0
 compmake==3.5.23
 ConfTools
+
+# for compmake
+networkx<2
