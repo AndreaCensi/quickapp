@@ -1,5 +1,5 @@
 PyContracts==1.8.5
 RepRep
-DecentLogs
+DecentLogs==1.2.0
 compmake
 ConfTools
