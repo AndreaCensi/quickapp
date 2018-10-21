@@ -1,3 +1,6 @@
+.. image:: https://circleci.com/gh/AndreaCensi/quickapp.svg?style=svg
+    :target: https://circleci.com/gh/AndreaCensi/quickapp
+
 QuickApp
 ========
 
