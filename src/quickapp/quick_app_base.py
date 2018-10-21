@@ -213,7 +213,7 @@ class QuickAppBase(HasLogger):
 #             if isinstance(e, DecentParamsUserError):
 #                 msg += indent(str(e), '> ')
 #             else:
-            msg += indent(traceback.format_exc(e), '> ')
+            msg += indent(traceback.format_exc(), '> ')
             raise QuickAppException(msg)  # XXX class
          
  
@@ -248,7 +248,7 @@ class QuickAppBase(HasLogger):
             msg += 'according to params spec:\n'
             msg += indent(str(params), '| ') + '\n'
             msg += 'Error is:\n'
-            msg += indent(traceback.format_exc(e), '> ')
+            msg += indent(traceback.format_exc(), '> ')
             raise Exception(msg)  # XXX class
         
  

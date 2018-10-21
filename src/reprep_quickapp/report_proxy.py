@@ -1,3 +1,4 @@
+from __future__ import print_function
 from copy import deepcopy
 
 from contracts import contract
@@ -112,5 +113,5 @@ def execute_proxy(operations):
     resources['report'] = report
     for what, kwargs in operations:
         what(resources=resources, **kwargs)
-    print report.format_tree()
+    print(report.format_tree())
     return report

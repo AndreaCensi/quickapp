@@ -98,33 +98,33 @@ class DecentParam(object):
         option1 = '-%s' % short
         return option1
 
-class DecentParamsResults():
-    
+
+class DecentParamsResults(object):
     def __init__(self, values, given, params, extra=None):
         self._values = values
         self._given = given
         self._params = params
         self._extra = extra
-    
+
         for k, v in values.items():
-            self.__dict__[k] = v 
-    
+            self.__dict__[k] = v
+
     def __repr__(self):
         return 'DecentParamsResults(%r,given=%r,extra=%r)' % (self._values, self._given, self._extra)
-    
+
     def __str__(self):
         return 'DPR(values=%s;given=%s;extra=%s)' % (self._values, self._given, self._extra)
-    
+
     def get_extra(self):
         return self._extra
-    
+
     def get_params(self):
         """ Returns the DecentParams structure which originated these results. """
-        return self._params 
-    
+        return self._params
+
     def __getitem__(self, name):
         return self._values[name]
-        
+
     def given(self, name):
         return name in self._given
     

@@ -59,14 +59,15 @@ class QuickApp(QuickAppBase):
                           help='Output directory',
                                     default=default_output_dir, group=g)
 
-        params.add_flag('reset',
-                        help='Deletes the output directory', group=g)
+        params.add_flag('reset', help='Deletes the output directory', group=g)
+        # params.add_flag('compmake', help='Activates compmake caching (if app is such that set_default_reset())', group=g)
 
         params.add_flag('console', help='Use Compmake console', group=g)
 
         params.add_string('command', short='c',
                       help="Command to pass to compmake for batch mode",
                       default=None, group=g)
+
 
     def define_program_options(self, params):
         self._define_options_compmake(params)
@@ -97,7 +98,7 @@ class QuickApp(QuickAppBase):
         if False:
             import resource
             gbs = 5
-            max_mem = long(gbs * 1000 * 1048576L)
+            max_mem = long(gbs * 1000 * 1048576)
             resource.setrlimit(resource.RLIMIT_AS, (max_mem, -1))
             resource.setrlimit(resource.RLIMIT_DATA, (max_mem, -1))
 
@@ -249,7 +250,7 @@ class QuickApp(QuickAppBase):
             if isinstance(e, QuickAppException):
                 msg += indent(str(e), '> ')
             else:
-                msg += indent(traceback.format_exc(e), '> ')
+                msg += indent(traceback.format_exc(), '> ')
             raise QuickAppException(msg)
 
 

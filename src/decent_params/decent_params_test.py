@@ -1,3 +1,6 @@
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
 import unittest
 
 from nose.tools import raises
@@ -17,7 +20,7 @@ class ParamsTest(unittest.TestCase):
         try:    
             res = p.parse_args(args)
         except SystemExit as e:
-            print e
+            print(e)
             raise Exception(str(e))
         
         self.assertEqual(res.given('floats'), True)
@@ -43,7 +46,7 @@ class ParamsTest(unittest.TestCase):
         try:    
             res = p.parse_args(args)
         except SystemExit as e:
-            print e
+            print(e)
             raise Exception(str(e))
         
         self.assertEqual(res.given('floats'), True)
@@ -62,7 +65,7 @@ class ParamsTest(unittest.TestCase):
         p.add_string('a')
         p.add_string('b')
         res = p.parse_args(['--b', '1'])
-        print res
+        print(res)
         
     
     def decent_params_test_notdefined(self):
