@@ -10,7 +10,7 @@ class QuickappTest(CompmakeTest):
 
     @contract(cmd=str)
     def run_quickapp(self, qapp, cmd):
-        args = ['-o', self.root0, '-c', cmd]
+        args = ['-o', self.root0, '-c', cmd, '--compress']
         self.assertEqual(0, quickapp_main(qapp, args, sys_exit=False))
 
         # tell the context that it's all good

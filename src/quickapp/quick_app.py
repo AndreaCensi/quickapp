@@ -1,9 +1,10 @@
-from abc import abstractmethod
 import os
 import shutil
 import sys
 import traceback
+from abc import abstractmethod
 
+import contracts
 from compmake import CommandFailed, StorageFilesystem, read_rc_files
 from compmake.context import Context
 from compmake.exceptions import ShellExitRequested
@@ -11,7 +12,6 @@ from compmake.jobs.uptodate import CacheQueryDB
 from contracts import ContractsMeta, contract, indent
 from decent_params.utils import UserError, wrap_script_entry_point
 from quickapp import QUICKAPP_COMPUTATION_ERROR, logger
-import contracts
 
 from .compmake_context import CompmakeContext, context_get_merge_data
 from .exceptions import QuickAppException
@@ -25,7 +25,6 @@ __all__ = [
 
 
 class QuickApp(QuickAppBase):
-
     """ Template for an application that uses compmake to define jobs. """
 
     __metaclass__ = ContractsMeta
@@ -34,12 +33,10 @@ class QuickApp(QuickAppBase):
     @abstractmethod
     def define_jobs_context(self, context):
         """ Define jobs in the current context. """
-        pass
 
     @abstractmethod
     def define_options(self, params):
         """ Define options for the application. """
-        pass
 
     # Implementation
 
@@ -55,9 +52,10 @@ class QuickApp(QuickAppBase):
         # params.add_flag('help', short='-h', help='Shows help message')
         params.add_flag('contracts', help='Activate PyContracts', group=g)
         params.add_flag('profile', help='Use Python Profiler', group=g)
+        params.add_flag('compress', help='Compress stored data', group=g)
         params.add_string('output', short='o',
                           help='Output directory',
-                                    default=default_output_dir, group=g)
+                          default=default_output_dir, group=g)
 
         params.add_flag('reset', help='Deletes the output directory', group=g)
         # params.add_flag('compmake', help='Activates compmake caching (if app is such that set_default_reset())', group=g)
@@ -65,9 +63,8 @@ class QuickApp(QuickAppBase):
         params.add_flag('console', help='Use Compmake console', group=g)
 
         params.add_string('command', short='c',
-                      help="Command to pass to compmake for batch mode",
-                      default=None, group=g)
-
+                          help="Command to pass to compmake for batch mode",
+                          default=None, group=g)
 
     def define_program_options(self, params):
         self._define_options_compmake(params)
@@ -95,12 +92,12 @@ class QuickApp(QuickAppBase):
             # self.info('Parent not found')
             pass
 
-        if False:
-            import resource
-            gbs = 5
-            max_mem = long(gbs * 1000 * 1048576)
-            resource.setrlimit(resource.RLIMIT_AS, (max_mem, -1))
-            resource.setrlimit(resource.RLIMIT_DATA, (max_mem, -1))
+        # if False:
+        #     import resource
+        #     gbs = 5
+        #     max_mem = long(gbs * 1000 * 1048576)
+        #     resource.setrlimit(resource.RLIMIT_AS, (max_mem, -1))
+        #     resource.setrlimit(resource.RLIMIT_DATA, (max_mem, -1))
 
         options = self.get_options()
 
@@ -129,14 +126,15 @@ class QuickApp(QuickAppBase):
 
         # Compmake storage for results
         storage = os.path.join(output_dir, 'compmake')
-        db = StorageFilesystem(storage, compress=False)
+        print('Creating storage in %s with compress %s' % (storage, options.compress))
+        db = StorageFilesystem(storage, compress=options.compress)
         currently_executing = ['root']
         # The original Compmake context
         oc = Context(db=db, currently_executing=currently_executing)
         # Our wrapper
         qc = CompmakeContext(cc=oc,
-                                  parent=None, qapp=self, job_prefix=None,
-                                  output_dir=output_dir)
+                             parent=None, qapp=self, job_prefix=None,
+                             output_dir=output_dir)
         read_rc_files(oc)
 
         original = oc.get_comp_prefix()
@@ -188,15 +186,15 @@ class QuickApp(QuickAppBase):
 
                 try:
                     _ = oc.batch_command(command)
-                    #print('qapp: ret0 = %s'  % ret0)
+                    # print('qapp: ret0 = %s'  % ret0)
                 except CommandFailed:
-                    #print('qapp: CommandFailed')
+                    # print('qapp: CommandFailed')
                     ret = QUICKAPP_COMPUTATION_ERROR
                 except ShellExitRequested:
-                    #print('qapp: ShellExitRequested')
+                    # print('qapp: ShellExitRequested')
                     ret = 0
                 else:
-                    #print('qapp: else ret = 0')
+                    # print('qapp: else ret = 0')
                     ret = 0
 
                 return ret
@@ -270,5 +268,5 @@ def quickapp_main(quickapp_class, args=None, sys_exit=True):
         args = sys.argv[1:]
 
     return wrap_script_entry_point(instance.main, logger,
-                            exceptions_no_traceback=(UserError, QuickAppException),
-                            args=args, sys_exit=sys_exit)
+                                   exceptions_no_traceback=(UserError, QuickAppException),
+                                   args=args, sys_exit=sys_exit)
