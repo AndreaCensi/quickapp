@@ -63,6 +63,7 @@ setup(name='QuickApp',
           'reprep',
           'PyContracts',
           'DecentLogs',
+          'ConfTools',
       ],
       tests_require=['nose'],
       )

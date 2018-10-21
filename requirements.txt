@@ -1,4 +1,5 @@
 PyContracts
 RepRep
 DecentLogs
-Compmake
+compmake
+ConfTools
