@@ -1,4 +1,4 @@
-from types import NoneType
+
 import os
 
 from compmake import Context, Promise
@@ -25,7 +25,7 @@ class QuickAppContext(object):
                  extra_report_keys=None,
                  report_manager=None):
         check_isinstance(cc, Context)
-        check_isinstance(parent, (CompmakeContext, NoneType))
+        check_isinstance(parent, (CompmakeContext, type(None)))
         self.cc = cc
         # can be removed once subtask() is removed
         self._qapp = qapp

@@ -36,11 +36,11 @@ def minimal_names_at_boundaries(objects, separators=['_', '-']):
     @contract(x='str', returns='str')
     def convert(x):
         return x
-        for s in separators[1:]:
-            x = x.replace(s, s0)
-        return x
+        # for s in separators[1:]:
+        #     x = x.replace(s, s0)
+        # return x
 
-    objectsu = map(convert, objects)
+    objectsu = list(map(convert, objects))
     astokens = [x.split(s0) for x in objectsu]
 
 
@@ -51,7 +51,7 @@ def minimal_names_at_boundaries(objects, separators=['_', '-']):
         return all(x.endswith(p) for x in objectsu)
 
     # max number of tokens
-    ntokens = max(map(len, astokens))
+    ntokens = max(list(map(len, astokens)))
     prefix = None
     for i in range(ntokens):
         toks = astokens[0][:i]
@@ -93,7 +93,7 @@ def _context_names_heuristics(values):
     names = get_descriptive_names(values)
     # get nonambiguous and minimal at _,- boundaries
     _, names, _ = minimal_names_at_boundaries(names)
-    names = map(good_context_name, names)
+    names = list(map(good_context_name, names))
 
     return names
 
@@ -107,7 +107,7 @@ def get_descriptive_names(values):
     if x is not None:
         return x
 
-    return map(str, values)
+    return list(map(str, values))
 
 
 def name_field(ob):
@@ -162,7 +162,7 @@ def id_field_heuristics(generated):
     values = [g[id_field] for g in generated]
     # print('Values of %r field are %s' % (id_field, values))
     if len(set(values)) == len(values):
-        final = map(good_context_name, values)
+        final = list(map(good_context_name, values))
         return final
 
     return None
