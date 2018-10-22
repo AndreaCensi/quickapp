@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from shutil import rmtree
 from tempfile import mkdtemp
-
+import os
 from nose.tools import istest
 from quickapp import (QuickApp, QUICKAPP_USER_ERROR, QUICKAPP_COMPUTATION_ERROR,
                       quickapp_main)
@@ -52,14 +52,14 @@ class CompappTest1(QuickappTest):
         def add(args, ret):
             cases.append(dict(args=args, ret=ret))
 
-        add('--contracts -c clean;make --param1 10 --param2 1', 0)
+        add('--compress --contracts -c clean;make --param1 10 --param2 1', 0)
 
         # parse error
-        add('--contracts -c clean;make  --param1 10 --parm2 1',
+        add('--compress --contracts -c clean;make  --param1 10 --parm2 1 ',
             QUICKAPP_USER_ERROR)
 
         # computation exception
-        add('--contracts  -c clean;make  --param1 10 --param2 -1',
+        add('--compress --contracts  -c clean;make  --param1 10 --param2 -1 ',
             QUICKAPP_COMPUTATION_ERROR)
 
         for c in cases:
@@ -70,6 +70,8 @@ class CompappTest1(QuickappTest):
             tmpdir = mkdtemp()
             args = ['-o', tmpdir] + args
             ret = c['ret']
+            with open(os.path.join(tmpdir, '.compmake.rc'), 'w') as f:
+                f.write('config echo 1\n')
             ret_found = quickapp_main(QuickAppDemo2, args, sys_exit=False)
             msg = 'Expected %d, got %d.\nArguments: %s ' % (ret, ret_found, c['args'])
             self.assertEqual(ret, ret_found, msg)
