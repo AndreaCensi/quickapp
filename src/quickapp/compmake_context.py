@@ -1,4 +1,4 @@
-
+import six
 import os
 
 from compmake import Context, Promise
@@ -193,7 +193,7 @@ class QuickAppContext(object):
             separate_resource_manager: If True, create a child of the ResourceManager,
             otherwise we just use the current one and its context.
         """
-        check_isinstance(name, str)
+        check_isinstance(name, six.string_types)
         if qapp is None:
             qapp = self._qapp
 

@@ -1,7 +1,7 @@
 import os
 import time
 from pprint import pformat
-
+import six
 import numpy as np
 from compmake import Context, Promise
 from compmake.utils import duration_compact
@@ -97,7 +97,7 @@ class ReportManager(object):
         """
         from quickapp.compmake_context import CompmakeContext
         assert isinstance(context, CompmakeContext)
-        if not isinstance(report_type, str):
+        if not isinstance(report_type, six.string_types):
             msg = 'Need a string for report_type, got %r.' % describe_value(report_type)
             raise ValueError(msg)
 
