@@ -1,4 +1,4 @@
-PyContracts3
+PyContracts3>=3.0.2
 reprep-z6
 DecentLogs-z6
 compmake-z6
