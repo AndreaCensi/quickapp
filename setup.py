@@ -1,6 +1,6 @@
 import os
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 
 def get_version(filename):
@@ -29,9 +29,19 @@ def read(fname):
 
 long_description = read('README.rst')
 
-setup(name='QuickApp',
+line = 'z6'
+
+install_requires = [
+    'compmake-z6',
+    'reprep-z6',
+    'PyContracts3',
+    'DecentLogs-z6',
+    'ConfTools-z6',
+]
+
+setup(name=f'QuickApp-{line}',
       author="Andrea Censi",
-      author_email="censi@mit.edu",
+      author_email="",
       url='http://github.com/AndreaCensi/quickapp',
 
       description=description,
@@ -58,12 +68,6 @@ setup(name='QuickApp',
       },
       package_dir={'': 'src'},
       packages=find_packages('src'),
-      install_requires=[
-          'compmake',
-          'reprep',
-          'PyContracts>=1.8.5',
-          'DecentLogs>=1.2.0',
-          'ConfTools',
-      ],
+      install_requires=install_requires,
       tests_require=['nose'],
       )
