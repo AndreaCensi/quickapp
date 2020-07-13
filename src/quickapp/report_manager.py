@@ -5,6 +5,7 @@ from pprint import pformat
 import numpy as np
 
 from compmake import Context, Promise
+from reprep.report_utils import StoreResults
 from zuper_commons.ui import duration_compact
 from conf_tools.utils import friendly_path
 from zuper_commons.types import check_isinstance, describe_type, describe_value
@@ -299,7 +300,7 @@ def get_most_similar(reports_different_type, key):
 
 def create_links_html(this_report, other_reports_same_type, index_filename,
                       most_similar_other_type):
-    check_isinstance(other_reports_same_type, 'StoreResults')
+    check_isinstance(other_reports_same_type, StoreResults)
     '''
     :param this_report: dictionary with the keys describing the report
     :param other_reports_same_type: StoreResults -> filename
