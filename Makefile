@@ -10,7 +10,7 @@ upload:
 	git push --all
 	rm -f dist/*
 	rm -rf src/*.egg-info
-	python setup.py sdist
+	python3 setup.py sdist
 	twine upload dist/*
 
 bump-upload:
