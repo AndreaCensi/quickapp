@@ -4,7 +4,7 @@ from typing import List, TypeVar, Callable
 import six
 
 from compmake import Context, Promise
-from compmake.context import load_static_storage
+from compmake.context_imp import load_static_storage
 from conf_tools import GlobalConfig
 from contracts import  contract, describe_type
 from contracts.utils import raise_wrapped
