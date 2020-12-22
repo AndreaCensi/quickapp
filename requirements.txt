@@ -1,6 +1,5 @@
 PyContracts3>=3.0.2
-reprep-z6
-DecentLogs-z6
-compmake-z6
-ConfTools-z6
-
+reprep-z7
+DecentLogs-z7
+compmake-z7
+ConfTools-z7
