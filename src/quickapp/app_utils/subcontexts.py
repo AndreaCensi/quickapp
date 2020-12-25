@@ -4,17 +4,15 @@ from typing import Sequence
 from .minimal_name import _context_names_heuristics
 
 __all__ = [
-    'iterate_context_names',
-    'iterate_context_pairs',
-    'iterate_context_triplets',
-
-    'iterate_context_names_pair',
-    'iterate_context_names_triplet',
-    'iterate_context_names_quartet',
+    "iterate_context_names",
+    "iterate_context_pairs",
+    "iterate_context_triplets",
+    "iterate_context_names_pair",
+    "iterate_context_names_triplet",
+    "iterate_context_names_quartet",
 ]
 
 
-# @contract(it1='seq[>0]', key='str|None')
 def iterate_context_names(context, it1: Sequence, key: str = None):
     """
         Creates child contexts with minimal names.
@@ -24,7 +22,7 @@ def iterate_context_names(context, it1: Sequence, key: str = None):
     # make strings
     values = list(it1)
     if len(values) == 0:
-        raise ValueError('Empty iterator: %s' % values)
+        raise ValueError("Empty iterator: %s" % values)
 
     # remove '-' and '_'
     names = _context_names_heuristics(values)
@@ -39,8 +37,9 @@ def iterate_context_names(context, it1: Sequence, key: str = None):
         yield e_c, x
 
 
-# @contract(it1='seq[>0]', it2='seq[>0]', key1='str|None', key2='str|None')
-def iterate_context_names_pair(context, it1: Sequence, it2: Sequence, key1: str = None, key2: str = None):
+def iterate_context_names_pair(
+    context, it1: Sequence, it2: Sequence, key1: str = None, key2: str = None
+):
     """
         Yields tuples of (context, s1, s2).
     """
@@ -52,10 +51,16 @@ def iterate_context_names_pair(context, it1: Sequence, it2: Sequence, key1: str 
 iterate_context_pairs = iterate_context_names_pair
 
 
-# @contract(it1='seq[>0]', it2='seq[>0]', it3='seq[>0]',
 #           key1='str|None', key2='str|None', key3='str|None')
-def iterate_context_names_triplet(context, it1: Sequence, it2: Sequence, it3: Sequence,
-                                  key1: str = None, key2: str = None, key3: str = None):
+def iterate_context_names_triplet(
+    context,
+    it1: Sequence,
+    it2: Sequence,
+    it3: Sequence,
+    key1: str = None,
+    key2: str = None,
+    key3: str = None,
+):
     """
         Yields tuples of (context, s1, s2, s3).
     """

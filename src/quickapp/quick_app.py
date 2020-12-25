@@ -6,23 +6,26 @@ from abc import abstractmethod
 from typing import List
 
 import contracts
-from compmake import CommandFailed, StorageFilesystem, read_rc_files
-from compmake.context import Context
-from compmake.exceptions import ShellExitRequested
-from compmake.jobs.uptodate import CacheQueryDB
-from contracts import ContractsMeta, contract, indent
+from compmake import (
+    CacheQueryDB,
+    CommandFailed,
+    Context,
+    read_rc_files,
+    ShellExitRequested,
+    StorageFilesystem,
+)
+from contracts import contract, ContractsMeta, indent
 from decent_params import DecentParams
 from decent_params.utils import UserError, wrap_script_entry_point
-from quickapp import QUICKAPP_COMPUTATION_ERROR, logger
-
+from quickapp import logger, QUICKAPP_COMPUTATION_ERROR
 from .compmake_context import CompmakeContext, context_get_merge_data
 from .exceptions import QuickAppException
 from .quick_app_base import QuickAppBase
 from .report_manager import _dynreports_create_index
 
 __all__ = [
-    'QuickApp',
-    'quickapp_main',
+    "QuickApp",
+    "quickapp_main",
 ]
 
 
@@ -45,28 +48,37 @@ class QuickApp(QuickAppBase):
     def _define_options_compmake(self, params):
         script_name = self.get_prog_name()
         s = script_name
-        s = s.replace('.py', '')
-        s = s.replace(' ', '_')
-        default_output_dir = 'out-%s/' % s
+        s = s.replace(".py", "")
+        s = s.replace(" ", "_")
+        default_output_dir = "out-%s/" % s
 
-        g = 'Generic arguments for Quickapp'
+        g = "Generic arguments for Quickapp"
         # TODO: use  add_help=False to ARgParsre
         # params.add_flag('help', short='-h', help='Shows help message')
-        params.add_flag('contracts', help='Activate PyContracts', group=g)
-        params.add_flag('profile', help='Use Python Profiler', group=g)
-        params.add_flag('compress', help='Compress stored data', group=g)
-        params.add_string('output', short='o',
-                          help='Output directory',
-                          default=default_output_dir, group=g)
+        params.add_flag("contracts", help="Activate PyContracts", group=g)
+        params.add_flag("profile", help="Use Python Profiler", group=g)
+        params.add_flag("compress", help="Compress stored data", group=g)
+        params.add_string(
+            "output",
+            short="o",
+            help="Output directory",
+            default=default_output_dir,
+            group=g,
+        )
 
-        params.add_flag('reset', help='Deletes the output directory', group=g)
-        # params.add_flag('compmake', help='Activates compmake caching (if app is such that set_default_reset())', group=g)
+        params.add_flag("reset", help="Deletes the output directory", group=g)
+        # params.add_flag('compmake', help='Activates compmake caching (if app is such that
+        # set_default_reset())', group=g)
 
-        params.add_flag('console', help='Use Compmake console', group=g)
+        params.add_flag("console", help="Use Compmake console", group=g)
 
-        params.add_string('command', short='c',
-                          help="Command to pass to compmake for batch mode",
-                          default=None, group=g)
+        params.add_string(
+            "command",
+            short="c",
+            help="Command to pass to compmake for batch mode",
+            default=None,
+            group=g,
+        )
 
     def define_program_options(self, params):
         self._define_options_compmake(params)
@@ -106,8 +118,7 @@ class QuickApp(QuickAppBase):
         # if self.get_qapp_parent() is None:
         # only do this if somebody didn't do it before
         if not options.contracts:
-            msg = ('PyContracts disabled for speed. '
-                   'Use --contracts to activate.')
+            msg = "PyContracts disabled for speed. " "Use --contracts to activate."
             self.logger.warning(msg)
             contracts.disable_all()
 
@@ -115,7 +126,7 @@ class QuickApp(QuickAppBase):
 
         if options.reset:
             if os.path.exists(output_dir):
-                self.logger.info('Removing output dir %r.' % output_dir)
+                self.logger.info("Removing output dir %r." % output_dir)
                 try:
                     shutil.rmtree(output_dir)
                 except OSError as e:
@@ -127,16 +138,18 @@ class QuickApp(QuickAppBase):
                         raise
 
         # Compmake storage for results
-        storage = os.path.join(output_dir, 'compmake')
-        logger.debug('Creating storage in %s  (compress = %s)' % (storage, options.compress))
+        storage = os.path.join(output_dir, "compmake")
+        logger.debug(
+            "Creating storage in %s  (compress = %s)" % (storage, options.compress)
+        )
         db = StorageFilesystem(storage, compress=options.compress)
-        currently_executing = ['root']
+        currently_executing = ["root"]
         # The original Compmake context
         oc = Context(db=db, currently_executing=currently_executing)
         # Our wrapper
-        qc = CompmakeContext(cc=oc,
-                             parent=None, qapp=self, job_prefix=None,
-                             output_dir=output_dir)
+        qc = CompmakeContext(
+            cc=oc, parent=None, qapp=self, job_prefix=None, output_dir=output_dir
+        )
         read_rc_files(oc)
 
         original = oc.get_comp_prefix()
@@ -159,7 +172,7 @@ class QuickApp(QuickAppBase):
         ndefined = len(oc.get_jobs_defined_in_this_session())
         if ndefined == 0:
             # self.comp was never called
-            msg = 'No jobs defined.'
+            msg = "No jobs defined."
             raise ValueError(msg)
         else:
             if options.console:
@@ -170,9 +183,13 @@ class QuickApp(QuickAppBase):
                 targets = cq.all_jobs()
                 todo, done, ready = cq.list_todo_targets(targets)
 
-                if not todo and  options.command is None:
+                if not todo and options.command is None:
                     msg = "Note: there is nothing for me to do. "
-                    msg += '\n(Jobs todo: %s done: %s ready: %s)' % (len(todo), len(done), len(ready))
+                    msg += "\n(Jobs todo: %s done: %s ready: %s)" % (
+                        len(todo),
+                        len(done),
+                        len(ready),
+                    )
                     msg += """\
 This application uses a cache system for the results.
 This means that if you call it second time with the same arguments,
@@ -181,7 +198,7 @@ This means that if you call it second time with the same arguments,
                     return 0
 
                 if options.command is None:
-                    command = 'make recurse=1'
+                    command = "make recurse=1"
                 else:
                     command = options.command
 
@@ -200,14 +217,20 @@ This means that if you call it second time with the same arguments,
 
                 return ret
 
-    @contract(args='dict(str:*)|list(str)', extra_dep='list')
-    def call_recursive(self, context, child_name, cmd_class, args,
-                       extra_dep: List=None,
-                       add_outdir=None,
-                       add_job_prefix=None,
-                       separate_resource_manager=False,
-                       separate_report_manager=False,
-                       extra_report_keys=None):
+    @contract(args="dict(str:*)|list(str)", extra_dep="list")
+    def call_recursive(
+        self,
+        context,
+        child_name,
+        cmd_class,
+        args,
+        extra_dep: List = None,
+        add_outdir=None,
+        add_job_prefix=None,
+        separate_resource_manager=False,
+        separate_report_manager=False,
+        extra_report_keys=None,
+    ):
         if extra_dep is None:
             extra_dep = []
         instance = cmd_class()
@@ -216,13 +239,16 @@ This means that if you call it second time with the same arguments,
 
         try:
             # we are already in a context; just define jobs
-            child_context = context.child(qapp=instance, name=child_name,
-                                          extra_dep=extra_dep,
-                                          add_outdir=add_outdir,
-                                          extra_report_keys=extra_report_keys,
-                                          separate_resource_manager=separate_resource_manager,
-                                          separate_report_manager=separate_report_manager,
-                                          add_job_prefix=add_job_prefix)  # XXX
+            child_context = context.child(
+                qapp=instance,
+                name=child_name,
+                extra_dep=extra_dep,
+                add_outdir=add_outdir,
+                extra_report_keys=extra_report_keys,
+                separate_resource_manager=separate_resource_manager,
+                separate_report_manager=separate_report_manager,
+                add_job_prefix=add_job_prefix,
+            )  # XXX
 
             if isinstance(args, list):
                 instance.set_options_from_args(args)
@@ -243,15 +269,15 @@ This means that if you call it second time with the same arguments,
             return res
 
         except Exception as e:
-            msg = 'While trying to run  %s\n' % cmd_class.__name__
-            msg += 'with arguments = %s\n' % args
-            if '_options' in instance.__dict__:
-                msg += ' parsed options: %s\n' % instance.get_options()
-                msg += ' params: %s\n' % instance.get_options().get_params()
+            msg = "While trying to run  %s\n" % cmd_class.__name__
+            msg += "with arguments = %s\n" % args
+            if "_options" in instance.__dict__:
+                msg += " parsed options: %s\n" % instance.get_options()
+                msg += " params: %s\n" % instance.get_options().get_params()
             if isinstance(e, QuickAppException):
-                msg += indent(str(e), '> ')
+                msg += indent(str(e), "> ")
             else:
-                msg += indent(traceback.format_exc(), '> ')
+                msg += indent(traceback.format_exc(), "> ")
             raise QuickAppException(msg)
 
 
@@ -270,6 +296,10 @@ def quickapp_main(quickapp_class, args=None, sys_exit=True):
     if args is None:
         args = sys.argv[1:]
 
-    return wrap_script_entry_point(instance.main, logger,
-                                   exceptions_no_traceback=(UserError, QuickAppException),
-                                   args=args, sys_exit=sys_exit)
+    return wrap_script_entry_point(
+        instance.main,
+        logger,
+        exceptions_no_traceback=(UserError, QuickAppException),
+        args=args,
+        sys_exit=sys_exit,
+    )

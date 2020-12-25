@@ -7,14 +7,19 @@ from pprint import pformat
 from typing import Any, Dict, List, Optional
 
 # from contracts import contract, ContractsMeta, describe_value
-from decent_params import DecentParams, DecentParamsResults, DecentParamsUserError, UserError
+from decent_params import (
+    DecentParams,
+    DecentParamsResults,
+    DecentParamsUserError,
+    UserError,
+)
 from quickapp import logger
 from zuper_commons.text import indent
 from .exceptions import QuickAppException
 from .utils import HasLogger
 
 __all__ = [
-    'QuickAppBase',
+    "QuickAppBase",
 ]
 
 
@@ -27,6 +32,7 @@ class QuickAppBase(HasLogger):
             description (deprecated) => use docstring
 
     """
+
     # __metaclass__ = ContractsMeta
     options: DecentParamsResults
 
@@ -44,7 +50,7 @@ class QuickAppBase(HasLogger):
 
     def __getstate__(self):
         d = dict(self.__dict__)
-        del d['logger']
+        del d["logger"]
         return d
 
     def __setstate__(self, d):
@@ -89,10 +95,10 @@ class QuickAppBase(HasLogger):
             # use docstring
             docs = cls.__doc__
         else:
-            docs = cls.__dict__.get('description', None)
+            docs = cls.__dict__.get("description", None)
 
         if docs is None:
-            logger.warn('No description at all for %s' % cls)
+            logger.warn("No description at all for %s" % cls)
         else:
             docs = docs.strip()
         return docs
@@ -110,7 +116,7 @@ class QuickAppBase(HasLogger):
             Returns an usage string for the program. The pattern ``%prog``
             will be substituted with the name of the program.
         """
-        usage = cls.__dict__.get('usage', None)
+        usage = cls.__dict__.get("usage", None)
         if usage is None:
             pass
         else:
@@ -130,10 +136,10 @@ class QuickAppBase(HasLogger):
             Returns the string used as the program name. By default
             it is contained in the ``cmd`` attribute.
         """
-        if not 'cmd' in cls.__dict__:
+        if not "cmd" in cls.__dict__:
             return os.path.basename(sys.argv[0])
         else:
-            return cls.__dict__['cmd']
+            return cls.__dict__["cmd"]
 
     def get_options(self):
         return self.options
@@ -146,8 +152,7 @@ class QuickAppBase(HasLogger):
             assert self.parent != self
         return self.parent
 
-    # @contract(args='None|list(str)', returns=int)
-    def main(self, args: Optional[List[str]]=None, parent=None) -> int:
+    def main(self, args: Optional[List[str]] = None, parent=None) -> int:
         """ Main entry point. Returns an integer as an error code. """
 
         if "short" in type(self).__dict__:
@@ -159,22 +164,23 @@ class QuickAppBase(HasLogger):
         self.parent = parent
         self.set_options_from_args(args)
 
-        profile = os.environ.get('QUICKAPP_PROFILE', False)
+        profile = os.environ.get("QUICKAPP_PROFILE", False)
 
         if not profile:
             ret = self.go()
         else:
-
+            ret = None
             import cProfile
+
             out = profile
-            print('writing to %r' % out)
-            ret = cProfile.runctx('self.go()', globals(), locals(), out)
+            print("writing to %r" % out)
+            cProfile.runctx("self.go()", globals(), locals(), out)
             import pstats
 
             p = pstats.Stats(out)
             n = 30
-            p.sort_stats('cumulative').print_stats(n)
-            p.sort_stats('time').print_stats(n)
+            p.sort_stats("cumulative").print_stats(n)
+            p.sort_stats("time").print_stats(n)
 
         if ret is None:
             ret = 0
@@ -182,7 +188,7 @@ class QuickAppBase(HasLogger):
         if isinstance(ret, int):
             return ret
         else:
-            msg = f'Expected None or an integer fomr self.go(), got {ret}'
+            msg = f"Expected None or an integer fomr self.go(), got {ret}"
             raise ValueError(msg)
 
     def set_options_from_dict(self, config: Dict[str, Any]):
@@ -200,15 +206,15 @@ class QuickAppBase(HasLogger):
         except DecentParamsUserError as e:
             raise QuickAppException(str(e))
         except Exception as e:
-            msg = 'Could not interpret:\n'
-            msg += indent(pformat(config), '| ')
-            msg += 'according to params spec:\n'
-            msg += indent(str(params), '| ') + '\n'
-            msg += 'Error is:\n'
+            msg = "Could not interpret:\n"
+            msg += indent(pformat(config), "| ")
+            msg += "according to params spec:\n"
+            msg += indent(str(params), "| ") + "\n"
+            msg += "Error is:\n"
             #             if isinstance(e, DecentParamsUserError):
             #                 msg += indent(str(e), '> ')
             #             else:
-            msg += indent(traceback.format_exc(), '> ')
+            msg += indent(traceback.format_exc(), "> ")
             raise QuickAppException(msg)  # XXX class
 
     def set_options_from_args(self, args: List[str]):
@@ -226,20 +232,20 @@ class QuickAppBase(HasLogger):
         try:
             usage = cls.get_usage()
             if usage:
-                usage = usage.replace('%prog', prog)
+                usage = usage.replace("%prog", prog)
 
             desc = cls.get_program_description()
             epilog = cls.get_epilog()
-            self.options = \
-                params.get_dpr_from_args(prog=prog, args=args, usage=usage,
-                                         description=desc, epilog=epilog)
+            self.options = params.get_dpr_from_args(
+                prog=prog, args=args, usage=usage, description=desc, epilog=epilog
+            )
         except UserError:
             raise
         except Exception as e:
-            msg = 'Could not interpret:\n'
-            msg += ' args = %s\n' % args
-            msg += 'according to params spec:\n'
-            msg += indent(str(params), '| ') + '\n'
-            msg += 'Error is:\n'
-            msg += indent(traceback.format_exc(), '> ')
+            msg = "Could not interpret:\n"
+            msg += " args = %s\n" % args
+            msg += "according to params spec:\n"
+            msg += indent(str(params), "| ") + "\n"
+            msg += "Error is:\n"
+            msg += indent(traceback.format_exc(), "> ")
             raise Exception(msg)  # XXX class

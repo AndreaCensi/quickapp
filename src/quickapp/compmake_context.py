@@ -1,29 +1,37 @@
 import os
-from typing import List, TypeVar, Callable
+from typing import List
 
 import six
 
-from compmake import Context, Promise
+from compmake import CMJobID, Context, Promise
 from compmake.context_imp import load_static_storage
 from conf_tools import GlobalConfig
-from contracts import  contract, describe_type
+from contracts import contract, describe_type
 from contracts.utils import raise_wrapped
+from zuper_commons.types import check_isinstance
 from .report_manager import ReportManager
 from .resource_manager import ResourceManager
-from zuper_commons.types import check_isinstance
 
 __all__ = [
-    'CompmakeContext',
-    'QuickAppContext',
+    "CompmakeContext",
+    "QuickAppContext",
+    "context_get_merge_data",
 ]
 
 
 class QuickAppContext:
-
-    def __init__(self, cc: Context, qapp, parent, job_prefix,
-                 output_dir, extra_dep: List = None, resource_manager=None,
-                 extra_report_keys=None,
-                 report_manager=None):
+    def __init__(
+        self,
+        cc: Context,
+        qapp,
+        parent,
+        job_prefix,
+        output_dir,
+        extra_dep: List = None,
+        resource_manager=None,
+        extra_report_keys=None,
+        report_manager=None,
+    ):
         check_isinstance(cc, Context)
         check_isinstance(parent, (CompmakeContext, type(None)))
         if extra_dep is None:
@@ -40,8 +48,8 @@ class QuickAppContext:
 
         if report_manager is None:
             self.private_report_manager = True  # only create indexe if this is true
-            reports = os.path.join(output_dir, 'report')
-            reports_index = os.path.join(output_dir, 'report.html')
+            reports = os.path.join(output_dir, "report")
+            reports_index = os.path.join(output_dir, "report.html")
             report_manager = ReportManager(self, reports, reports_index)
         else:
             self.private_report_manager = False
@@ -61,8 +69,8 @@ class QuickAppContext:
         self.branched_contexts = []
         self.branched_children = []
 
-    def __str__(self)->str:
-        return 'CompmakeContext(%s)' % (self._job_prefix)
+    def __str__(self) -> str:
+        return "CompmakeContext(%s)" % (self._job_prefix)
 
     # def all_jobs(self):
     #     return list(self._jobs.values())
@@ -82,9 +90,9 @@ class QuickAppContext:
 
             Returns the checkpoint job (CompmakePromise).
         """
-        job_checkpoint = self.comp(checkpoint, job_name,
-                                   prev_jobs=list(self._jobs.values()),
-                                   job_id=job_name)
+        job_checkpoint = self.comp(
+            checkpoint, job_name, prev_jobs=list(self._jobs.values()), job_id=job_name
+        )
         self._extra_dep.append(job_checkpoint)
         return job_checkpoint
 
@@ -99,12 +107,12 @@ class QuickAppContext:
         self.count_comp_invocations()
         self.cc.comp_prefix(self._job_prefix)
 
-        other_extra = kwargs.get('extra_dep', [])
+        other_extra = kwargs.get("extra_dep", [])
         if isinstance(other_extra, Promise):
             other_extra = [other_extra]
 
         extra_dep = self._extra_dep + other_extra
-        kwargs['extra_dep'] = extra_dep
+        kwargs["extra_dep"] = extra_dep
         promise = self.cc.comp(f, *args, **kwargs)
         self._jobs[promise.job_id] = promise
         return promise
@@ -115,21 +123,26 @@ class QuickAppContext:
         # context = self
 
         compmake_args = {}
-        compmake_args_name = ['job_id', 'extra_dep', 'command_name']
+        compmake_args_name = ["job_id", "extra_dep", "command_name"]
         for n in compmake_args_name:
             if n in kwargs:
                 compmake_args[n] = kwargs[n]
                 del kwargs[n]
 
-        if not 'command_name' in compmake_args:
-            compmake_args['command_name'] = f.__name__
+        if not "command_name" in compmake_args:
+            compmake_args["command_name"] = f.__name__
         #:arg:job_id:   sets the job id (respects job_prefix)
         #:arg:extra_dep: extra dependencies (not passed as arguments)
         #:arg:command_name: used to define job name if job_id not provided.
 
-        both = self.cc.comp_dynamic(_dynreports_wrap_dynamic, qc=context,
-                                    function=f, args=args, kw=kwargs,
-                                    **compmake_args)
+        both = self.cc.comp_dynamic(
+            _dynreports_wrap_dynamic,
+            qc=context,
+            function=f,
+            args=args,
+            kw=kwargs,
+            **compmake_args
+        )
 
         result = self.comp(_dynreports_getres, both)
         data = self.comp(_dynreports_getbra, both)
@@ -142,8 +155,8 @@ class QuickAppContext:
         """
         config_state = GlobalConfig.get_state()
         # so that compmake can use a good name
-        if not 'command_name' in kwargs:
-            kwargs['command_name'] = f.__name__
+        if not "command_name" in kwargs:
+            kwargs["command_name"] = f.__name__
         return self.comp(wrap_state, config_state, f, *args, **kwargs)
 
     def comp_config_dynamic(self, f, *args, **kwargs) -> Promise:
@@ -151,11 +164,11 @@ class QuickAppContext:
             more jobs. """
         config_state = GlobalConfig.get_state()
         # so that compmake can use a good name
-        if not 'command_name' in kwargs:
-            kwargs['command_name'] = f.__name__
+        if not "command_name" in kwargs:
+            kwargs["command_name"] = f.__name__
         return self.comp_dynamic(wrap_state_dynamic, config_state, f, *args, **kwargs)
 
-    def count_comp_invocations(self)->None:
+    def count_comp_invocations(self) -> None:
         self.n_comp_invocations += 1
         if self._parent is not None:
             self._parent.count_comp_invocations()
@@ -168,13 +181,17 @@ class QuickAppContext:
 
         return self._output_dir
 
-    def child(self, name:str, qapp=None,
-              add_job_prefix=None,
-              add_outdir=None,
-              extra_dep: list=None,
-              extra_report_keys=None,
-              separate_resource_manager=False,
-              separate_report_manager=False) -> "QuickAppContext":
+    def child(
+        self,
+        name: str,
+        qapp=None,
+        add_job_prefix=None,
+        add_outdir=None,
+        extra_dep: list = None,
+        extra_report_keys=None,
+        separate_resource_manager=False,
+        separate_report_manager=False,
+    ) -> "QuickAppContext":
         if extra_dep is None:
             extra_dep = []
         """
@@ -195,7 +212,7 @@ class QuickAppContext:
         if qapp is None:
             qapp = self._qapp
 
-        name_friendly = name.replace('-', '_')
+        name_friendly = name.replace("-", "_")
 
         if add_job_prefix is None:
             add_job_prefix = name_friendly
@@ -203,23 +220,25 @@ class QuickAppContext:
         if add_outdir is None:
             add_outdir = name_friendly
 
-        if add_job_prefix != '':
+        if add_job_prefix != "":
             if self._job_prefix is None:
                 job_prefix = add_job_prefix
             else:
-                job_prefix = self._job_prefix + '-' + add_job_prefix
+                job_prefix = self._job_prefix + "-" + add_job_prefix
         else:
             job_prefix = self._job_prefix
 
-        if add_outdir != '':
+        if add_outdir != "":
             output_dir = os.path.join(self._output_dir, name)
         else:
             output_dir = self._output_dir
 
         if separate_report_manager:
-            if add_outdir == '':
-                msg = ('Asked for separate report manager, but without changing output dir. '
-                       'This will make the report overwrite each other.')
+            if add_outdir == "":
+                msg = (
+                    "Asked for separate report manager, but without changing output dir. "
+                    "This will make the report overwrite each other."
+                )
                 raise ValueError(msg)
 
             report_manager = None
@@ -238,37 +257,49 @@ class QuickAppContext:
         if extra_report_keys is not None:
             extra_report_keys_.update(extra_report_keys)
 
-        c1 = CompmakeContext(cc=self.cc,
-                             qapp=qapp, parent=self,
-                             job_prefix=job_prefix,
-                             report_manager=report_manager,
-                             resource_manager=resource_manager,
-                             extra_report_keys=extra_report_keys_,
-                             output_dir=output_dir,
-                             extra_dep=_extra_dep)
+        c1 = CompmakeContext(
+            cc=self.cc,
+            qapp=qapp,
+            parent=self,
+            job_prefix=job_prefix,
+            report_manager=report_manager,
+            resource_manager=resource_manager,
+            extra_report_keys=extra_report_keys_,
+            output_dir=output_dir,
+            extra_dep=_extra_dep,
+        )
         self.branched_children.append(c1)
         return c1
 
-    @contract(job_id=str)
-    def add_job_defined_in_this_session(self, job_id):
-        self.cc.add_job_defined_in_this_session(self, job_id)
+    def add_job_defined_in_this_session(self, job_id: CMJobID):
+        self.cc.add_job_defined_in_this_session(job_id)
         if self._parent is not None:
             self._parent.add_job_defined_in_this_session(job_id)
 
-    @contract(extra_dep='list')
-    def subtask(self, task, extra_dep=[], add_job_prefix=None, add_outdir=None,
-                separate_resource_manager=False,
-                separate_report_manager=False,
-                extra_report_keys=None,
-                **task_config):
-        return self._qapp.call_recursive(context=self, child_name=task.cmd,
-                                         cmd_class=task, args=task_config,
-                                         extra_dep=extra_dep,
-                                         add_outdir=add_outdir,
-                                         add_job_prefix=add_job_prefix,
-                                         extra_report_keys=extra_report_keys,
-                                         separate_report_manager=separate_report_manager,
-                                         separate_resource_manager=separate_resource_manager)
+    def subtask(
+        self,
+        task,
+        extra_dep: List[str] = None,
+        add_job_prefix=None,
+        add_outdir=None,
+        separate_resource_manager=False,
+        separate_report_manager=False,
+        extra_report_keys=None,
+        **task_config
+    ):
+        extra_dep = extra_dep or []
+        return self._qapp.call_recursive(
+            context=self,
+            child_name=task.cmd,
+            cmd_class=task,
+            args=task_config,
+            extra_dep=extra_dep,
+            add_outdir=add_outdir,
+            add_job_prefix=add_job_prefix,
+            extra_report_keys=extra_report_keys,
+            separate_report_manager=separate_report_manager,
+            separate_resource_manager=separate_resource_manager,
+        )
 
     # Resource managers
     @contract(returns=ResourceManager)
@@ -285,13 +316,13 @@ class QuickAppContext:
         rm = self.get_resource_manager()
         return rm.get_resource_job(self, rtype, **params)
 
-    @contract(report=Promise, report_type='str')
+    @contract(report=Promise, report_type="str")
     def add_report(self, report, report_type, **params):
         rm = self.get_report_manager()
         params.update(self.extra_report_keys)
         rm.add(self, report, report_type, **params)
 
-    @contract(returns=Promise, report_type='str')
+    @contract(returns=Promise, report_type="str")
     def get_report(self, report_type, **params):
         """ Returns the promise to the given report """
         rm = self.get_report_manager()
@@ -303,7 +334,7 @@ class QuickAppContext:
     def add_extra_report_keys(self, **keys):
         for k in keys:
             if k in self.extra_report_keys:
-                msg = 'key %r already in %s' % (k, list(self.extra_report_keys))
+                msg = "key %r already in %s" % (k, list(self.extra_report_keys))
                 raise ValueError(msg)
         self.extra_report_keys.update(keys)
 
@@ -314,15 +345,17 @@ class QuickAppContext:
             # warnings.warn('Need IDs for contexts, using job_prefix.')
             # warnings.warn('XXX: Note that this sometimes creates a context '
             #              'with depth 1; then "delete not root" deletes it.')
-            self._promise_job_id = 'context'
-            self._promise = self.comp(load_static_storage, self,
-                                      job_id=self._promise_job_id)
+            self._promise_job_id = "context"
+            self._promise = self.comp(
+                load_static_storage, self, job_id=self._promise_job_id
+            )
         return self._promise
 
     def has_branched(self):
         """ Returns True if any comp_dynamic was issued. """
-        return (len(self.branched_contexts) > 0 or
-                any([c.has_branched() for c in self.branched_children]))
+        return len(self.branched_contexts) > 0 or any(
+            [c.has_branched() for c in self.branched_children]
+        )
 
 
 def wrap_state(config_state, f, *args, **kwargs):
@@ -341,7 +374,7 @@ def checkpoint(name, prev_jobs):
     pass
 
 
-@contract(context=Context, returns='dict')
+@contract(context=Context, returns="dict")
 def _dynreports_wrap_dynamic(context, qc, function, args, kw):
     """
 
@@ -351,36 +384,36 @@ def _dynreports_wrap_dynamic(context, qc, function, args, kw):
 
     res = {}
     try:
-        res['f-result'] = function(qc, *args, **kw)
+        res["f-result"] = function(qc, *args, **kw)
     except TypeError as e:
-        msg = 'Could not call %r' % function
+        msg = "Could not call %r" % function
         raise_wrapped(TypeError, e, msg, args=args, kw=kw)
 
-    res['context-res'] = context_get_merge_data(qc)
+    res["context-res"] = context_get_merge_data(qc)
     return res
 
 
-@contract(branched='list(dict)')
+@contract(branched="list(dict)")
 def _dynreports_merge(branched):
     rm = None
     for i, b in enumerate(branched):
         if i == 0:
-            rm = b['report_manager']
+            rm = b["report_manager"]
         else:
-            rm.merge(b['report_manager'])
+            rm.merge(b["report_manager"])
     return dict(report_manager=rm)
 
 
-@contract(res='dict')
+@contract(res="dict")
 def _dynreports_getres(res):
     """ gets only the result """
-    return res['f-result']
+    return res["f-result"]
 
 
-@contract(res='dict')
+@contract(res="dict")
 def _dynreports_getbra(res):
     """ gets only the result """
-    return res['context-res']
+    return res["context-res"]
 
 
 def get_branched_contexts(context):

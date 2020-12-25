@@ -1,11 +1,13 @@
 import os
 from typing import List, Sequence, Tuple
 
-__all__ = ['_context_names_heuristics']
+__all__ = ["_context_names_heuristics"]
 
 
-# @contract(objects='seq[N](str)', returns='tuple(str, list[N](str), str)')
-def minimal_names_at_boundaries(objects: List[str], separators=['_', '-']) -> Tuple[str, List[str], str]:
+def minimal_names_at_boundaries(
+    objects: List[str], separators: List[str] = None
+) -> Tuple[str, List[str], str]:
+
     """
         Converts a list of object IDs to a minimal non-ambiguous list of names.
 
@@ -26,9 +28,11 @@ def minimal_names_at_boundaries(objects: List[str], separators=['_', '-']) -> Tu
 
         Returns prefix, minimal, postfix
     """
+    if separators is None:
+        separators = ["_", "-"]
 
     if len(objects) == 1:
-        return '', objects, ''
+        return "", objects, ""
 
     s0 = separators[0]
 
@@ -64,7 +68,7 @@ def minimal_names_at_boundaries(objects: List[str], separators=['_', '-']) -> Tu
     postfix = None
     for i in range(ntokens):
         t0 = astokens[0]
-        toks = t0[len(t0) - i:]
+        toks = t0[len(t0) - i :]
         x = "".join(s0 + t for t in toks)
         if is_valid_postfix(x):
             postfix = x
@@ -76,7 +80,7 @@ def minimal_names_at_boundaries(objects: List[str], separators=['_', '-']) -> Tu
     n1 = len(prefix)
     n2 = len(postfix)
     # remove it
-    minimal = [o[n1:len(o) - n2] for o in objectsu]
+    minimal = [o[n1 : len(o) - n2] for o in objectsu]
 
     # recreate them to check everything is ok
     objects2 = [prefix + m + postfix for m in minimal]
@@ -109,8 +113,8 @@ def get_descriptive_names(values: List) -> List[str]:
 
 
 def name_field(ob):
-    if hasattr(ob, '__name__'):
-        return getattr(ob, '__name__')
+    if hasattr(ob, "__name__"):
+        return getattr(ob, "__name__")
     else:
         return None
 
@@ -150,7 +154,7 @@ def id_field_heuristics(generated):
 
     # print('all fields: %s' % fields)
 
-    is_id_field = lambda x: x.startswith('id')
+    is_id_field = lambda x: x.startswith("id")
     id_fields = list(filter(is_id_field, fields))
     if len(id_fields) != 1:
         # print('there are too many fields')
@@ -166,19 +170,17 @@ def id_field_heuristics(generated):
     return None
 
 
-
 def good_context_name(id_object: str) -> str:
     """
         Removes strange characters from a string to make it a good
         context name.
     """
-    id_object = id_object.replace('-', '')
-    id_object = id_object.replace('_', '')
-    id_object = id_object.replace(' ', '_')
+    id_object = id_object.replace("-", "")
+    id_object = id_object.replace("_", "")
+    id_object = id_object.replace(" ", "_")
     return id_object
 
 
-# @contract(objects='seq[N](str)', returns='tuple(str, list[N](str), str)')
 def minimal_names(objects: Sequence[str]) -> Tuple[str, List[str], str]:
     """
         Converts a list of object IDs to a minimal non-ambiguous list of names.
@@ -198,7 +200,7 @@ def minimal_names(objects: Sequence[str]) -> Tuple[str, List[str], str]:
         Returns prefix, minimal, postfix
     """
     if len(objects) == 1:
-        return '', objects, ''
+        return "", list(objects), ""
 
     # find the common prefix
     prefix = os.path.commonprefix(objects)
@@ -211,7 +213,7 @@ def minimal_names(objects: Sequence[str]) -> Tuple[str, List[str], str]:
     n1 = len(prefix)
     n2 = len(postfix)
     # remove it
-    minimal = [o[n1:len(o) - n2] for o in objects]
+    minimal = [o[n1 : len(o) - n2] for o in objects]
 
     # recreate them to check everything is ok
     objects2 = [prefix + m + postfix for m in minimal]
