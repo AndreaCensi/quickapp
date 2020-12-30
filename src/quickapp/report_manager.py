@@ -5,16 +5,15 @@ from pprint import pformat
 import numpy as np
 
 from compmake import Context, Promise
-from reprep.report_utils import StoreResults
-from zuper_commons.ui import duration_compact
 from conf_tools.utils import friendly_path
-from zuper_commons.types import check_isinstance, describe_type, describe_value
 from reprep import Report
-
+from reprep.report_utils import StoreResults
 from reprep.utils import frozendict2
 from zuper_commons.text import natsorted
+from zuper_commons.types import check_isinstance, ZValueError
+from zuper_commons.ui import duration_compact
 from . import logger
-from .rm import write_report_single
+
 
 __all__ = [
     "ReportManager",
@@ -95,6 +94,7 @@ class ReportManager:
             Adds a report to the collection.
 
             :param report: Promise of a Report object
+            :param context:
             :param report_type: A string that describes the "type" of the report
             :param kwargs:  str->str,int,float  parameters used for grouping
         """
@@ -102,15 +102,15 @@ class ReportManager:
 
         assert isinstance(context, CompmakeContext)
         if not isinstance(report_type, str):
-            msg = "Need a string for report_type, got %r." % describe_value(report_type)
-            raise ValueError(msg)
+            msg = "Need a string for report_type"
+            raise ZValueError(msg, report_type=report_type)
 
         if not isinstance(report, Promise):
             msg = (
                 "ReportManager is mean to be given Promise objects, "
-                "which are the output of comp(). Obtained: %s" % describe_type(report)
+                "which are the output of comp(). "
             )
-            raise ValueError(msg)
+            raise ZValueError(msg, obtained=report)
 
         # check the format is ok
         self._check_report_format(report_type, **kwargs)
@@ -137,37 +137,37 @@ class ReportManager:
         filename = os.path.join(dirname, basename)
         self.allreports_filename[key] = filename + ".html"
 
-        write_singles = False
-
-        if write_singles:
-            is_root = context.currently_executing == ["root"]
-            if not is_root:
-                # Add also a single report independent of a global index
-
-                # don't create the single report for the ones that are
-                # defined in the root session
-
-                filename_single = os.path.join(dirname, basename) + "_s.html"
-                # filename_index_dyn = os.path.join(dirname, basename) + '_dyn.html'
-
-                report_nid = self.html_resources_prefix + report_type_sane
-                if key:
-                    report_nid += "-" + basename_from_key(key)
-                write_job_id = jobid_minus_prefix(context, report.job_id + "-writes")
-
-                #                 write_report_yaml(report_nid, report_job_id=report.job_id,
-                #                                   key=key, html_filename=filename_single,
-                #                                   report_html_indexed=filename_index_dyn)
-
-                context.comp(
-                    write_report_single,
-                    report=report,
-                    report_nid=report_nid,
-                    report_html=filename_single,
-                    write_pickle=False,
-                    static_dir=self.static_dir,
-                    job_id=write_job_id,
-                )
+        # write_singles = False
+        #
+        # if write_singles:
+        #     is_root = context.currently_executing == ["root"]
+        #     if not is_root:
+        #         # Add also a single report independent of a global index
+        #
+        #         # don't create the single report for the ones that are
+        #         # defined in the root session
+        #
+        #         filename_single = os.path.join(dirname, basename) + "_s.html"
+        #         # filename_index_dyn = os.path.join(dirname, basename) + '_dyn.html'
+        #
+        #         report_nid = self.html_resources_prefix + report_type_sane
+        #         if key:
+        #             report_nid += "-" + basename_from_key(key)
+        #         write_job_id = jobid_minus_prefix(context, report.job_id + "-writes")
+        #
+        #         #                 write_report_yaml(report_nid, report_job_id=report.job_id,
+        #         #                                   key=key, html_filename=filename_single,
+        #         #                                   report_html_indexed=filename_index_dyn)
+        #
+        #         context.comp(
+        #             write_report_single,
+        #             report=report,
+        #             report_nid=report_nid,
+        #             report_html=filename_single,
+        #             write_pickle=False,
+        #             static_dir=self.static_dir,
+        #             job_id=write_job_id,
+        #         )
 
     def create_index_job(self, context: Context):
         if self.index_job_created:
@@ -249,7 +249,7 @@ def create_write_jobs(
         )
 
 
-def jobid_minus_prefix(context, want):
+def jobid_minus_prefix(context: Context, want):
     prefix = context.get_comp_prefix()
     if prefix is not None:
         pref = prefix + "-"
@@ -362,16 +362,16 @@ def create_links_html(
         variations = [(v, all_vars[v]) for v in sorted_variations]
 
         if len(variations) > MAX_VARIATIONS_EXPLICIT:
-            id_select = "select-%s" % (field)
-            onchange = "onchange_%s" % (field)
+            id_select = f"select-{field}"
+            onchange = f"onchange_{field}"
             s += "<select id='%s' onChange='%s()'>\n" % (id_select, onchange)
 
             for text, link in variations:
                 if link is not None:
-                    s += "<option value='%s'>%s</a> \n" % (link, text)
+                    s += f"<option value='{link}'>{text}</a> \n"
                 else:
                     if add_invalid_links:
-                        s += "<option value=''>%s</a> \n" % (text)
+                        s += f"<option value=''>{text}</a> \n"
                 s += "<br/>"
 
             s += "</select>\n"
@@ -469,9 +469,7 @@ def write_report_and_update(
     static_dir,
     write_pickle=False,
 ):
-    if not isinstance(report, Report):
-        msg = "Expected Report, got %s." % describe_type(report)
-        raise ValueError(msg)
+    check_isinstance(report, Report)
 
     links = create_links_html(
         this_report,
@@ -490,7 +488,7 @@ def write_report_and_update(
         report_html=report_html,
         static_dir=static_dir,
         write_pickle=write_pickle,
-        **extras
+        **extras,
     )
     index_reports(reports=all_reports, index=index_filename, update=html)
 
@@ -507,7 +505,7 @@ def write_report(report, report_html, static_dir, write_pickle=False, **kwargs):
         write_pickle=write_pickle,
         resources_dir=rd,
         static_dir=static_dir,
-        **kwargs
+        **kwargs,
     )
 
     # TODO: save hdf format
@@ -690,7 +688,8 @@ def make_sections(allruns, common=None):
     fields_size.sort(key=lambda x: x[1])
 
     if not fields_size:
-        # [frozendict({'i': 1, 'n': 3}), frozendict({'i': 2, 'n': 3}), frozendict({}), frozendict({'i': 0, 'n': 3})]
+        # [frozendict({'i': 1, 'n': 3}), frozendict({'i': 2, 'n': 3}), frozendict({}), frozendict({'i': 0,
+        # 'n': 3})]
         msg = "Not all records of the same type have the same fields"
         msg += pformat(list(allruns.keys()))
         raise ValueError(msg)

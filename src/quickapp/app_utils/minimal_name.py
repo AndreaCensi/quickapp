@@ -150,7 +150,7 @@ def id_field_heuristics(generated):
     # find common fields
     fields = set(generated[0].keys())
     for g in generated:
-        fields = fields & set(g.keys())
+        fields &= set(g.keys())
 
     # print('all fields: %s' % fields)
 

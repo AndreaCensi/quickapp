@@ -71,7 +71,7 @@ class ResourceManager:
                 msg += " type: %r params: %s\n" % (rtype, params)
                 msg += "While calling provider %r:\n" % provider
                 msg += indent(traceback.format_exc(), "> ")
-                raise Exception(msg)
+                raise Exception(msg) from e
 
         if not ok:
             msg = "No provider could create this resource:\n"

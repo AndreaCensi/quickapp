@@ -1,16 +1,18 @@
 __version__ = "6.0.9"
+__date__ = ""
 
 from zuper_commons.logs import ZLogger
 
 logger = ZLogger(__name__)
+logger.hello_module(
+    name=__name__, filename=__file__, version=__version__, date=__date__
+)
 
 # error in computation
 QUICKAPP_COMPUTATION_ERROR = 2
 
 # error in passing parameters
 QUICKAPP_USER_ERROR = 1
-
-from .utils import col_logging
 
 from .quick_app_base import *
 from .quick_multi_app import *

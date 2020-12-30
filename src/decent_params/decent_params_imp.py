@@ -1,5 +1,7 @@
 import argparse
 import logging
+import sys
+import traceback
 from argparse import (
     ArgumentError,
     ArgumentParser,
@@ -28,20 +30,24 @@ from .exceptions import (
 __all__ = ["DecentParams"]
 
 
-class DecentParams(object):
+class DecentParams:
     def __init__(self, usage=None, prog=None):
         self.usage = usage
         self.prog = prog
         self.params = {}
         self.accepts_extra = False
         self.accepts_extra_description = None
+        self.subcommands = None
+
+    def __repr__(self):
+        return self.__str__()
 
     def __str__(self):
         return "DecentParams(%s;extra=%s)" % (pformat(self.params), self.accepts_extra)
 
     def _add(self, p):
         if p.name in self.params:
-            msg = "I already know param %r." % p.name
+            msg = f"I already know param {p.name!r}."
             raise DecentParamsDefinitionError(msg)
         p.order = len(self.params)
         self.params[p.name] = p
@@ -104,7 +110,7 @@ class DecentParams(object):
             argparse_res, argv = parser.parse_known_args(args)
             if argv:
                 msg = "Extra arguments found: %s" % argv
-                raise DecentParamsUnknownArgs(self, msg)
+                raise DecentParamsUnknownArgs(msg, _=self)
         except SystemExit:
             raise  # XXX
             # raise Exception(e)  # TODO
@@ -131,19 +137,30 @@ class DecentParams(object):
                 parser.add_argument(
                     "remainder", nargs="*", help=self.accepts_extra_description
                 )
+            # argparse_res, unknown = parser.parse_known_args(args)
             argparse_res, unknown = parser.parse_known_intermixed_args(args)
         #                 print('argparse_res: %s' % argparse_res)
         #                 print('unknown: %s' % unknown)
         except SystemExit:
+            sys.stderr.write("System exit: " + traceback.format_exc())
             raise  # XXX
-
-        if unknown:
-            raise DecentParamsUnknownArgs(self, unknown)
 
         if self.accepts_extra:
             extra = argparse_res.remainder
         else:
             extra = []
+
+        if unknown and not self.subcommands:
+            helps = parser.format_help()
+            sys.stderr.write("raising arguments")
+            raise DecentParamsUnknownArgs(
+                all_args=args,
+                known=argparse_res,
+                extra=extra,
+                unknown=unknown,
+                _=self,
+                helps=helps,
+            )
 
         values, given = self._interpret_args(argparse_res)
         # TODO: raise if extra is given
@@ -162,7 +179,7 @@ class DecentParams(object):
             # if v.compulsory and parsed[k] is None:
             if v.compulsory and (not k in parsed or parsed[k] is None):
                 msg = "Compulsory option %r not given." % k
-                raise DecentParamsUserError(self, msg)
+                raise DecentParamsUserError(msg, _=self)
 
             # warnings.warn('Not sure below')
             # if parsed[k] is not None:
@@ -213,7 +230,7 @@ class DecentParams(object):
 
         class MyParser(argparse.ArgumentParser):
             def error(self, msg):
-                raise DecentParamsUserError(self, msg)
+                raise DecentParamsUserError(msg, _=self)
 
             def format_help(self):
                 formatter = self._get_formatter()
@@ -255,6 +272,7 @@ class DecentParams(object):
                 return formatter.format_help()
 
         # give None here
+        # noinspection PyTypeChecker
         parser = MyParser(
             prog=prog,
             usage=None,
@@ -275,7 +293,7 @@ class DecentParams(object):
         values, given, extra = self.parse_using_parser_extra(parser, args)
         if extra and not self.accepts_extra:
             msg = "Found extra arguments not accepted: %s" % extra
-            raise DecentParamsUserError(self, msg)
+            raise DecentParamsUserError(msg, _=self)
         dpr = DecentParamsResults(values, given, self, extra=extra)
         return dpr
 
@@ -288,7 +306,7 @@ class DecentParams(object):
 
 
 # from warnings import warn
-logging.basicConfig(format="%(levelname)s: Intermix: %(message)s")
+# logging.basicConfig(format="%(levelname)s: Intermix: %(message)s")
 
 
 def warn(message):

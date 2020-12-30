@@ -35,7 +35,6 @@ line = "z7"
 install_requires = [
     "compmake-z7",
     "reprep-z7",
-    "PyContracts3",
     "DecentLogs-z7",
     "ConfTools-z7",
 ]

@@ -1,29 +1,30 @@
-import logging
 import os
 import sys
 import traceback
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from pprint import pformat
 from typing import Any, Dict, List, Optional
 
-# from contracts import contract, ContractsMeta, describe_value
 from decent_params import (
     DecentParams,
     DecentParamsResults,
     DecentParamsUserError,
     UserError,
 )
-from quickapp import logger
+from zuper_commons import ZLogger
+from zuper_commons.cmds import ExitCode
 from zuper_commons.text import indent
+from zuper_commons.types import ZException
+from zuper_utils_asyncio import async_main_sti, SyncTaskInterface
+from . import logger
 from .exceptions import QuickAppException
-from .utils import HasLogger
 
 __all__ = [
     "QuickAppBase",
 ]
 
 
-class QuickAppBase(HasLogger):
+class QuickAppBase(ABC):
     """
         class attributes used:
 
@@ -37,16 +38,24 @@ class QuickAppBase(HasLogger):
     options: DecentParamsResults
 
     def __init__(self, parent=None):
-        HasLogger.__init__(self)
         self.parent = parent
-
         self._init_logger()
 
     def _init_logger(self):
-        logger_name = self.get_prog_name()
-        logger = logging.getLogger(logger_name)
-        logger.setLevel(logging.DEBUG)
-        self.logger = logger
+        prog = self.get_prog_name()
+        self.logger = ZLogger(prog)
+
+    def info(self, msg: str = None, *args, **kwargs):
+        return self.logger.info(msg, *args, stacklevel=1, **kwargs)
+
+    def warn(self, msg: str = None, *args, **kwargs):
+        return self.logger.warn(msg, *args, stacklevel=1, **kwargs)
+
+    def error(self, msg: str = None, *args, **kwargs):
+        return self.logger.error(msg, *args, stacklevel=1, **kwargs)
+
+    def debug(self, msg: str = None, *args, **kwargs):
+        return self.logger.debug(msg, *args, stacklevel=1, **kwargs)
 
     def __getstate__(self):
         d = dict(self.__dict__)
@@ -60,22 +69,24 @@ class QuickAppBase(HasLogger):
     @abstractmethod
     def define_program_options(self, params):
         """ Must be implemented by the subclass. """
-        pass
+        raise NotImplementedError(type(self))
 
     @abstractmethod
-    def go(self) -> Optional[int]:
+    async def go2(self, sti: SyncTaskInterface) -> ExitCode:
         """
             Must be implemented. This should return either None to mean success,
             or an integer error code.
         """
+        raise NotImplementedError(type(self))
 
     @classmethod
     def get_sys_main(cls):
         """ Returns a function to be used as main function for a script. """
-        from quickapp import quickapp_main
 
-        def entry(args=None, sys_exit=True):
-            return quickapp_main(cls, args=args, sys_exit=sys_exit)
+        @async_main_sti(None)
+        async def entry(sti: SyncTaskInterface, args=None) -> ExitCode:
+            instance = cls()
+            return await instance.main(sti=sti, args=args)
 
         return entry
 
@@ -152,22 +163,32 @@ class QuickAppBase(HasLogger):
             assert self.parent != self
         return self.parent
 
-    def main(self, args: Optional[List[str]] = None, parent=None) -> int:
+    async def main(
+        self, sti: SyncTaskInterface, args: Optional[List[str]] = None, parent=None
+    ) -> ExitCode:
         """ Main entry point. Returns an integer as an error code. """
+        sti.logger.info(f"{type(self).__name__}.main", args=args, parent=parent)
+        # sys.stderr.write(f'HERE! ars = {args} \n')
 
         if "short" in type(self).__dict__:
-            msg = 'Class %s uses deprecated attribute "short".' % type(self)
+            msg = f'Class {type(self)} uses deprecated attribute "short".'
             msg += ' Use "description" instead.'
             self.error(msg)
 
         # Create the parameters and set them using args
         self.parent = parent
-        self.set_options_from_args(args)
+
+        try:
+            self.set_options_from_args(args)
+        except Exception as e:
+            self.logger.user_error(str(e))
+            sys.stderr.write(str(e) + "\n")
+            return ExitCode.WRONG_ARGUMENTS
 
         profile = os.environ.get("QUICKAPP_PROFILE", False)
 
         if not profile:
-            ret = self.go()
+            ret = await self.go2(sti)
         else:
             ret = None
             import cProfile
@@ -183,7 +204,7 @@ class QuickAppBase(HasLogger):
             p.sort_stats("time").print_stats(n)
 
         if ret is None:
-            ret = 0
+            ret = ExitCode.OK
 
         if isinstance(ret, int):
             return ret
@@ -228,6 +249,9 @@ class QuickAppBase(HasLogger):
         prog = cls.get_prog_name()
         params = DecentParams()
         self.define_program_options(params)
+        if not params.params:
+            msg = "No params defined"
+            raise ZException(msg, prog=prog, cls=cls, f=self.define_program_options)
 
         try:
             usage = cls.get_usage()
@@ -242,10 +266,52 @@ class QuickAppBase(HasLogger):
         except UserError:
             raise
         except Exception as e:
-            msg = "Could not interpret:\n"
-            msg += " args = %s\n" % args
-            msg += "according to params spec:\n"
-            msg += indent(str(params), "| ") + "\n"
-            msg += "Error is:\n"
-            msg += indent(traceback.format_exc(), "> ")
-            raise Exception(msg)  # XXX class
+            msg = "Could not interpret arguments"
+            # msg += " args = %s\n" % args
+            # msg += "according to params spec:\n"
+            # msg += indent(str(params), "| ") + "\n"
+            # msg += "Error is:\n"
+            # msg += indent(traceback.format_exc(), "> ")
+            raise ZException(
+                msg, prog=prog, cls=cls, args=args, params=params
+            ) from e  # XXX class
+
+    # Implementation
+
+    def _define_options_compmake(self, params: DecentParams):
+        script_name = self.get_prog_name()
+        s = script_name
+        s = s.replace(".py", "")
+        s = s.replace(" ", "_")
+        default_output_dir = "out-%s/" % s
+
+        g = "Generic arguments for Quickapp"
+        # TODO: use  add_help=False to ARgParsre
+        # params.add_flag('help', short='-h', help='Shows help message')
+        params.add_flag("contracts", help="Activate PyContracts", group=g)
+        params.add_flag("profile", help="Use Python Profiler", group=g)
+        params.add_flag("compress", help="Compress stored data", group=g)
+        params.add_string(
+            "output",
+            short="o",
+            help="Output directory",
+            default=default_output_dir,
+            group=g,
+        )
+        params.add_string(
+            "db", help="DB directory", default=None, group=g,
+        )
+
+        params.add_flag("reset", help="Deletes the output directory", group=g)
+        # params.add_flag('compmake', help='Activates compmake caching (if app is such that
+        # set_default_reset())', group=g)
+
+        params.add_flag("console", help="Use Compmake console", group=g)
+
+        params.add_string(
+            "command",
+            short="c",
+            help="Command to pass to compmake for batch mode",
+            default=None,
+            group=g,
+        )

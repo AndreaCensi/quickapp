@@ -1,4 +1,2 @@
-
-
 class QuickAppException(Exception):
     pass

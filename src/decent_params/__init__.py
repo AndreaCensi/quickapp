@@ -1,9 +1,16 @@
-__version__ = '1.2.0'
+__version__ = "1.2.0"
+
+from zuper_commons import ZLogger
+
+logger = ZLogger(__name__)
+
 
 from .utils import UserError
 
+
 class Choice(list):
-    pass 
+    pass
+
 
 from .decent_param import *
 from .decent_params_imp import *

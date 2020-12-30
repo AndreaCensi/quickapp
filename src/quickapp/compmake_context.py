@@ -3,12 +3,10 @@ from typing import List
 
 import six
 
-from compmake import CMJobID, Context, Promise
-from compmake.context_imp import load_static_storage
+from compmake import CMJobID, Context, load_static_storage, Promise
 from conf_tools import GlobalConfig
-from contracts import contract, describe_type
-from contracts.utils import raise_wrapped
-from zuper_commons.types import check_isinstance
+from zuper_commons.types import check_isinstance, ZTypeError
+from zuper_utils_asyncio import SyncTaskInterface
 from .report_manager import ReportManager
 from .resource_manager import ResourceManager
 
@@ -70,7 +68,7 @@ class QuickAppContext:
         self.branched_children = []
 
     def __str__(self) -> str:
-        return "CompmakeContext(%s)" % (self._job_prefix)
+        return f"CompmakeContext({self._job_prefix})"
 
     # def all_jobs(self):
     #     return list(self._jobs.values())
@@ -141,7 +139,7 @@ class QuickAppContext:
             function=f,
             args=args,
             kw=kwargs,
-            **compmake_args
+            **compmake_args,
         )
 
         result = self.comp(_dynreports_getres, both)
@@ -276,8 +274,9 @@ class QuickAppContext:
         if self._parent is not None:
             self._parent.add_job_defined_in_this_session(job_id)
 
-    def subtask(
+    async def subtask(
         self,
+        sti: SyncTaskInterface,
         task,
         extra_dep: List[str] = None,
         add_job_prefix=None,
@@ -285,10 +284,11 @@ class QuickAppContext:
         separate_resource_manager=False,
         separate_report_manager=False,
         extra_report_keys=None,
-        **task_config
+        **task_config,
     ):
         extra_dep = extra_dep or []
-        return self._qapp.call_recursive(
+        return await self._qapp.call_recursive(
+            sti,
             context=self,
             child_name=task.cmd,
             cmd_class=task,
@@ -302,28 +302,25 @@ class QuickAppContext:
         )
 
     # Resource managers
-    @contract(returns=ResourceManager)
-    def get_resource_manager(self):
+    def get_resource_manager(self) -> ResourceManager:
         return self._resource_manager
 
     def needs(self, rtype, **params):
         rm = self.get_resource_manager()
         res = rm.get_resource_job(self, rtype, **params)
-        assert isinstance(res, Promise), describe_type(res)
+        check_isinstance(res, Promise)
         self._extra_dep.append(res)
 
     def get_resource(self, rtype, **params):
         rm = self.get_resource_manager()
         return rm.get_resource_job(self, rtype, **params)
 
-    @contract(report=Promise, report_type="str")
-    def add_report(self, report, report_type, **params):
+    def add_report(self, report, report_type: str, **params) -> None:
         rm = self.get_report_manager()
         params.update(self.extra_report_keys)
         rm.add(self, report, report_type, **params)
 
-    @contract(returns=Promise, report_type="str")
-    def get_report(self, report_type, **params):
+    def get_report(self, report_type: str, **params) -> Promise:
         """ Returns the promise to the given report """
         rm = self.get_report_manager()
         return rm.get(report_type, **params)
@@ -338,8 +335,7 @@ class QuickAppContext:
                 raise ValueError(msg)
         self.extra_report_keys.update(keys)
 
-    @contract(returns=Promise)
-    def _get_promise(self):
+    def _get_promise(self) -> Promise:
         """ Returns the promise object representing this context. """
         if self._promise is None:
             # warnings.warn('Need IDs for contexts, using job_prefix.')
@@ -370,12 +366,12 @@ def wrap_state_dynamic(context, config_state, f, *args, **kwargs):
     return f(context, *args, **kwargs)
 
 
+# noinspection PyUnusedLocal
 def checkpoint(name, prev_jobs):
     pass
 
 
-@contract(context=Context, returns="dict")
-def _dynreports_wrap_dynamic(context, qc, function, args, kw):
+def _dynreports_wrap_dynamic(context: Context, qc, function, args, kw) -> dict:
     """
 
     """
@@ -387,14 +383,13 @@ def _dynreports_wrap_dynamic(context, qc, function, args, kw):
         res["f-result"] = function(qc, *args, **kw)
     except TypeError as e:
         msg = "Could not call %r" % function
-        raise_wrapped(TypeError, e, msg, args=args, kw=kw)
+        raise ZTypeError(msg, args=args, kw=kw) from e
 
     res["context-res"] = context_get_merge_data(qc)
     return res
 
 
-@contract(branched="list(dict)")
-def _dynreports_merge(branched):
+def _dynreports_merge(branched: List[dict]):
     rm = None
     for i, b in enumerate(branched):
         if i == 0:
@@ -404,14 +399,12 @@ def _dynreports_merge(branched):
     return dict(report_manager=rm)
 
 
-@contract(res="dict")
-def _dynreports_getres(res):
+def _dynreports_getres(res: dict):
     """ gets only the result """
     return res["f-result"]
 
 
-@contract(res="dict")
-def _dynreports_getbra(res):
+def _dynreports_getbra(res) -> dict:
     """ gets only the result """
     return res["context-res"]
 

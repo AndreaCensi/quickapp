@@ -3,21 +3,22 @@ import shutil
 import sys
 import traceback
 from abc import abstractmethod
-from typing import List
+from typing import cast, Dict, List, Union
 
-import contracts
 from compmake import (
     CacheQueryDB,
+    CMJobID,
     CommandFailed,
-    Context,
+    ContextImp,
     read_rc_files,
     ShellExitRequested,
     StorageFilesystem,
 )
-from contracts import contract, ContractsMeta, indent
 from decent_params import DecentParams
 from decent_params.utils import UserError, wrap_script_entry_point
 from quickapp import logger, QUICKAPP_COMPUTATION_ERROR
+from zuper_commons.text import indent
+from zuper_utils_asyncio import SyncTaskInterface
 from .compmake_context import CompmakeContext, context_get_merge_data
 from .exceptions import QuickAppException
 from .quick_app_base import QuickAppBase
@@ -32,55 +33,20 @@ __all__ = [
 class QuickApp(QuickAppBase):
     """ Template for an application that uses compmake to define jobs. """
 
-    __metaclass__ = ContractsMeta
-
     # Interface to be implemented
     @abstractmethod
     def define_jobs_context(self, context):
         """ Define jobs in the current context. """
 
+        raise NotImplementedError(type(self))
+
     @abstractmethod
     def define_options(self, params: DecentParams):
         """ Define options for the application. """
 
-    # Implementation
+        raise NotImplementedError(type(self))
 
-    def _define_options_compmake(self, params):
-        script_name = self.get_prog_name()
-        s = script_name
-        s = s.replace(".py", "")
-        s = s.replace(" ", "_")
-        default_output_dir = "out-%s/" % s
-
-        g = "Generic arguments for Quickapp"
-        # TODO: use  add_help=False to ARgParsre
-        # params.add_flag('help', short='-h', help='Shows help message')
-        params.add_flag("contracts", help="Activate PyContracts", group=g)
-        params.add_flag("profile", help="Use Python Profiler", group=g)
-        params.add_flag("compress", help="Compress stored data", group=g)
-        params.add_string(
-            "output",
-            short="o",
-            help="Output directory",
-            default=default_output_dir,
-            group=g,
-        )
-
-        params.add_flag("reset", help="Deletes the output directory", group=g)
-        # params.add_flag('compmake', help='Activates compmake caching (if app is such that
-        # set_default_reset())', group=g)
-
-        params.add_flag("console", help="Use Compmake console", group=g)
-
-        params.add_string(
-            "command",
-            short="c",
-            help="Command to pass to compmake for batch mode",
-            default=None,
-            group=g,
-        )
-
-    def define_program_options(self, params):
+    def define_program_options(self, params: DecentParams):
         self._define_options_compmake(params)
         self.define_options(params)
 
@@ -93,7 +59,7 @@ class QuickApp(QuickAppBase):
             parent = parent.parent
         return None
 
-    def go(self):
+    async def go2(self, sti: SyncTaskInterface):
         # check that if we have a parent who is a quickapp,
         # then use its context
         qapp_parent = self.get_qapp_parent()
@@ -117,10 +83,11 @@ class QuickApp(QuickAppBase):
 
         # if self.get_qapp_parent() is None:
         # only do this if somebody didn't do it before
-        if not options.contracts:
-            msg = "PyContracts disabled for speed. " "Use --contracts to activate."
-            self.logger.warning(msg)
-            contracts.disable_all()
+        # if not options.contracts:
+        #
+        #     msg = "PyContracts disabled for speed. " "Use --contracts to activate."
+        #     self.logger.warning(msg)
+        #     contracts.disable_all()
 
         output_dir = options.output
 
@@ -138,14 +105,16 @@ class QuickApp(QuickAppBase):
                         raise
 
         # Compmake storage for results
-        storage = os.path.join(output_dir, "compmake")
-        logger.debug(
-            "Creating storage in %s  (compress = %s)" % (storage, options.compress)
-        )
+
+        if options.db is not None:
+            storage = options.db
+        else:
+            storage = os.path.join(output_dir, "compmake")
+        logger.debug("Creating storage", where=storage, compress=options.compress)
         db = StorageFilesystem(storage, compress=options.compress)
-        currently_executing = ["root"]
+        currently_executing = [cast(CMJobID, "root")]
         # The original Compmake context
-        oc = Context(db=db, currently_executing=currently_executing)
+        oc = ContextImp(db=db, currently_executing=currently_executing)
         # Our wrapper
         qc = CompmakeContext(
             cc=oc, parent=None, qapp=self, job_prefix=None, output_dir=output_dir
@@ -176,7 +145,7 @@ class QuickApp(QuickAppBase):
             raise ValueError(msg)
         else:
             if options.console:
-                oc.compmake_console()
+                await oc.compmake_console(sti)
                 return 0
             else:
                 cq = CacheQueryDB(oc.get_compmake_db())
@@ -203,7 +172,7 @@ This means that if you call it second time with the same arguments,
                     command = options.command
 
                 try:
-                    _ = oc.batch_command(command)
+                    _ = await oc.batch_command(sti, command)
                     # print('qapp: ret0 = %s'  % ret0)
                 except CommandFailed:
                     # print('qapp: CommandFailed')
@@ -217,14 +186,14 @@ This means that if you call it second time with the same arguments,
 
                 return ret
 
-    @contract(args="dict(str:*)|list(str)", extra_dep="list")
-    def call_recursive(
+    async def call_recursive(
         self,
+        sti: SyncTaskInterface,
         context,
         child_name,
         cmd_class,
-        args,
-        extra_dep: List = None,
+        args: Union[Dict[str, object], List[str]],
+        extra_dep: List[str] = None,
         add_outdir=None,
         add_job_prefix=None,
         separate_resource_manager=False,
@@ -259,7 +228,7 @@ This means that if you call it second time with the same arguments,
 
             if not is_quickapp:
                 self.child_context = child_context
-                res = instance.go()
+                res = await instance.go2(sti)
             else:
                 instance.context = child_context
                 res = instance.define_jobs_context(child_context)
@@ -281,7 +250,7 @@ This means that if you call it second time with the same arguments,
             raise QuickAppException(msg)
 
 
-def quickapp_main(quickapp_class, args=None, sys_exit=True):
+def quickapp_main(quickapp_class, args: List[str] = None, sys_exit: bool = True):
     """
         Use like this:
 

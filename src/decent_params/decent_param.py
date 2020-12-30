@@ -9,14 +9,21 @@ from .exceptions import DecentParamsSemanticError
 # from optparse import Option
 
 
-not_given = 'DefaultNotGiven'
+not_given = "DefaultNotGiven"
 
 
 class DecentParam:
-
-    def __init__(self, ptype, name, default=not_given, help: str = None,  # @ReservedAssignment
-                 short=None, allow_multi=False, group=None):
-        compulsory = (default == not_given)
+    def __init__(
+        self,
+        ptype,
+        name,
+        default=not_given,
+        help: str = None,  # @ReservedAssignment
+        short=None,
+        allow_multi=False,
+        group=None,
+    ):
+        compulsory = default == not_given
         if compulsory:
             default = None
         self.ptype = ptype
@@ -35,7 +42,7 @@ class DecentParam:
             self.validate(self.default)
 
     def __repr__(self) -> str:
-        return 'DecentParam(%r,%r)' % (self.ptype, self.name)
+        return "DecentParam(%r,%r)" % (self.ptype, self.name)
 
     def validate(self, value):
         self.check_type(value)
@@ -46,10 +53,9 @@ class DecentParam:
     def value_from_string(self, s: str):
         """ Possibly returns Choice(options) """
         # print('%s %s' % (s, self.ptype))
-        sep = ','
+        sep = ","
         if isinstance(s, six.string_types) and sep in s:
-            return Choice([self.value_from_string(x)
-                           for x in s.split(sep)])
+            return Choice([self.value_from_string(x) for x in s.split(sep)])
 
         if self.ptype in six.string_types:
             return self.ptype(s)
@@ -61,8 +67,8 @@ class DecentParam:
             res = bool(s)  # TODO: check
             # print('s %s -> %s' % (s, res))
             return res
-        msg = 'Unknown type %r' % self.ptype
-        raise DecentParamsSemanticError(self.params, self, msg)
+        msg = "Unknown type %r" % self.ptype
+        raise DecentParamsSemanticError(msg, _=self)
 
     def check_type(self, x):
         expected = self.ptype
@@ -70,25 +76,23 @@ class DecentParam:
             expected = (float, int)
 
         if not isinstance(x, expected):
-            msg = ("For param '%s', expected %s, got %s" %
-                   (self.name, self.ptype, x))
-            raise DecentParamsSemanticError(self.params, self, msg)
+            msg = "For param '%s', expected %s, got %s" % (self.name, self.ptype, x)
+            raise DecentParamsSemanticError(msg, _=self)
 
     def get_desc(self):
         desc = self.desc
         if self.compulsory:
-            desc = '[*required*] %s' % desc
+            desc = "[*required*] %s" % desc
         elif self.default is not None:
-            desc = '[default: %8s] %s' % (self.default, desc)
+            desc = "[default: %8s] %s" % (self.default, desc)
         return desc
 
     def populate(self, parser):
-        option = '--%s' % self.name
+        option = "--%s" % self.name
 
-        nargs = '+' if self.allow_multi else 1
-        other = dict(help=self.get_desc(), default=self.default,
-                     nargs=nargs)
-        other['type'] = self.ptype
+        nargs = "+" if self.allow_multi else 1
+        other = dict(help=self.get_desc(), default=self.default, nargs=nargs)
+        other["type"] = self.ptype
         if self.short is not None:
             parser.add_argument(self._get_short_option(), option, **other)
         else:
@@ -96,8 +100,8 @@ class DecentParam:
 
     def _get_short_option(self):
         short = self.short
-        short = short.replace('-', '')
-        option1 = '-%s' % short
+        short = short.replace("-", "")
+        option1 = "-%s" % short
         return option1
 
 
@@ -112,10 +116,18 @@ class DecentParamsResults:
             self.__dict__[k] = v
 
     def __repr__(self):
-        return 'DecentParamsResults(%r,given=%r,extra=%r)' % (self._values, self._given, self._extra)
+        return "DecentParamsResults(%r,given=%r,extra=%r)" % (
+            self._values,
+            self._given,
+            self._extra,
+        )
 
     def __str__(self):
-        return 'DPR(values=%s;given=%s;extra=%s)' % (self._values, self._given, self._extra)
+        return "DPR(values=%s;given=%s;extra=%s)" % (
+            self._values,
+            self._given,
+            self._extra,
+        )
 
     def get_extra(self) -> List[str]:
         return self._extra
@@ -146,6 +158,7 @@ class DecentParamsResults:
 #             Option.take_action(
 #                 self, action, dest, opt, value, values, parser)
 
+
 class DecentParamMultiple(DecentParam):
     """ Allow multiple values """
 
@@ -153,25 +166,25 @@ class DecentParamMultiple(DecentParam):
         if default is not not_given:
             if not isinstance(default, list):
                 default = [default]
-        DecentParam.__init__(self, ptype=ptype, name=name, default=default,
-                             **args)
+        DecentParam.__init__(self, ptype=ptype, name=name, default=default, **args)
 
     def value_from_string(self, s: str) -> List:
-        values = [DecentParam.value_from_string(self, x) for x in s.split(',')]
+        values = [DecentParam.value_from_string(self, x) for x in s.split(",")]
         return values
 
     def validate(self, value):
         if not isinstance(value, list):
             msg = "Should be a list, not %r" % value
-            raise DecentParamsSemanticError(self.params, self, msg)
+            raise DecentParamsSemanticError(msg, _=self)
         for x in value:
             self.check_type(x)
 
     def populate(self, parser):
-        option = '--%s' % self.name
+        option = "--%s" % self.name
 
-        other = dict(nargs='+', type=self.ptype,
-                     help=self.get_desc(), default=self.default)
+        other = dict(
+            nargs="+", type=self.ptype, help=self.get_desc(), default=self.default
+        )
 
         #         other = dict(nargs=1, type=self.ptype, action='append',
         #                             help=self.get_desc(), default=self.default)
@@ -184,8 +197,8 @@ class DecentParamMultiple(DecentParam):
 
 class DecentParamFlag(DecentParam):
     def populate(self, parser, default=False):
-        option = '--%s' % self.name
-        other = dict(help=self.desc, default=default, action='store_true')
+        option = "--%s" % self.name
+        other = dict(help=self.desc, default=default, action="store_true")
 
         if self.short is not None:
             parser.add_argument(self._get_short_option(), option, **other)
@@ -200,5 +213,5 @@ class DecentParamChoice(DecentParam):
 
     def validate(self, value):
         if not value in self.choices:
-            msg = 'Not %r in %r' % (value, self.choices)
-            raise DecentParamsSemanticError(self.params, self, msg)
+            msg = "Not %r in %r" % (value, self.choices)
+            raise DecentParamsSemanticError(msg, _=self)

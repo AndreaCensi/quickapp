@@ -1,6 +1,6 @@
 
-  
-#         
+
+#
 # # TODO: remove
 # def create_conf_name_digest(values, length=12):
 #     """ Create an hash for the given values """
@@ -23,9 +23,9 @@
 #    if len(cn) > limit:
 #        cn = cn[:limit]  # TODO XXX
 #    return cn
-#    
-    
-#    
+#
+
+#
 # def create_conf_name_values(values, given):
 #    def make_short(a):
 #        if isinstance(a, Choice):
@@ -39,12 +39,12 @@
 #        s = s.replace(',', '_')
 #        return s
 #    return "-".join([make_short(values[x]) for x in sorted(given)])
-#    
-#    
-    
+#
+#
 
-         
-        
+
+
+
 #     def old_stuff():
 #         combs = {}
 #         for params, choices in all_combinations(options, give_choices=True):
@@ -52,10 +52,10 @@
 #             name = 'C%03d' % i
 #             warnings.warn('xx')
 #             combs[name] = dict(params=params, choices=choices, given=options.get_given())
-#                      
-#         app_params = None; 
-#         self.add_combs(outdir, combs, app_params)        
-# 
+#
+#         app_params = None;
+#         self.add_combs(outdir, combs, app_params)
+#
 #         def add_combs(self, outdir, combs, app_params):
 #             multiple = len(combs) > 1
 #             for name, x in combs.items():
@@ -64,32 +64,29 @@
 #                 given = x['given']
 #                 if multiple:
 #                     self.logger.info('Config %s: %s' % (name, choices))
-#                     comp_prefix(name) 
+#                     comp_prefix(name)
 #                 self._options = DecentParamsResults(params, given, app_params.params)
 #                 self._current_params = params
-#                 
+#
 #                 self._output_dir = os.path.join(outdir, 'output', name)
-#     
+#
 #                 self.define_jobs()
 #                 # TODO: check that we defined some jobs
-#                 
+#
 #             if multiple:
 #                 comp_prefix()
-#     
+#
 #     @staticmethod
 #     def choice(it):
 #         return Choice(it)
 #     # Other utility stuff
-#     
+#
 #     @staticmethod
 #     def choice(it):
 #         return Choice(it)
-#     
+#
 #     def comp_comb(self, *args, **kwargs):
 #         return comp_comb(*args, **kwargs)
 
 # new_contract('QuickApp', QuickApp)
 # new_contract('CompmakeContext', CompmakeContext)
- 
- 
- 

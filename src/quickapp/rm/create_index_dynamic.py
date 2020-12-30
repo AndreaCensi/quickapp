@@ -1,21 +1,22 @@
 from reprep import Report
 
 __all__ = [
-    'write_report_single',
+    "write_report_single",
 ]
 
 from zuper_commons.types import check_isinstance
 
 
-def write_report_single(report: Report,
-                        report_nid, report_html,
-                        static_dir,
-                        write_pickle=False):
+def write_report_single(
+    report: Report, report_nid, report_html, static_dir, write_pickle=False
+):
     from quickapp.report_manager import write_report
 
     check_isinstance(report, Report)
     report.nid = report_nid
     write_report(report, report_html, static_dir=static_dir, write_pickle=write_pickle)
+
+
 #
 #
 # def write_report_yaml(report_nid, report_job_id, key, html_filename, report_html_indexed):
