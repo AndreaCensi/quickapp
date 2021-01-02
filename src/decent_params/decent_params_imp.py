@@ -14,6 +14,8 @@ from pprint import pformat
 from typing import Any, Dict, List, Tuple
 
 from decent_params import Choice
+from zuper_commons.cmds import ExitCode
+from zuper_commons.types import ZValueError
 from .decent_param import (
     DecentParam,
     DecentParamChoice,
@@ -126,6 +128,8 @@ class DecentParams:
 
             returns: values, given, extra
         """
+        if args is None:
+            raise ZValueError("args is None")
 
         try:
             #             if False:
@@ -138,10 +142,12 @@ class DecentParams:
                     "remainder", nargs="*", help=self.accepts_extra_description
                 )
             # argparse_res, unknown = parser.parse_known_args(args)
-            argparse_res, unknown = parser.parse_known_intermixed_args(args)
+            argparse_res, unknown = parser.parse_known_intermixed_args(args=args)
         #                 print('argparse_res: %s' % argparse_res)
         #                 print('unknown: %s' % unknown)
-        except SystemExit:
+        except SystemExit as e:
+            if e.code == 0 and ("-h" in args or "--help" in args):
+                raise
             sys.stderr.write("System exit: " + traceback.format_exc())
             raise  # XXX
 

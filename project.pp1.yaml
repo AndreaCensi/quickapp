@@ -6,6 +6,12 @@ modules:
 
 install_requires:
   - zuper-commons-z7
+  - ConfTools-z7
+  - compmake-z7
+  - reprep-z7
+  - zuper-utils-asyncio-z7
+  - numpy
+  - six
 
 install_conflicts: [ 'QuickApp*' ]
 tests_require: [ ]

@@ -5,7 +5,12 @@ __all__ = [
     "DecentParamsUserError",
     "DecentParamsUnknownArgs",
     "DecentParamsSemanticError",
+    "DecentParamsException",
 ]
+
+
+class DecentParamsException(ZException):
+    pass
 
 
 class DecentParamsDefinitionError(ZException):

@@ -220,7 +220,12 @@ This means that if you call it second time with the same arguments,
             )  # XXX
 
             if isinstance(args, list):
-                instance.set_options_from_args(args)
+                try:
+                    instance.set_options_from_args(args)
+                except SystemExit as e:
+                    if e.code == 0:
+                        return 0
+                    raise
             elif isinstance(args, dict):
                 instance.set_options_from_dict(args)
             else:

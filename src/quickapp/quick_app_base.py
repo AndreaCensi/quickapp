@@ -14,7 +14,7 @@ from decent_params import (
 from zuper_commons import ZLogger
 from zuper_commons.cmds import ExitCode
 from zuper_commons.text import indent
-from zuper_commons.types import ZException
+from zuper_commons.types import ZException, ZValueError
 from zuper_utils_asyncio import async_main_sti, SyncTaskInterface
 from . import logger
 from .exceptions import QuickAppException
@@ -83,9 +83,12 @@ class QuickAppBase(ABC):
     def get_sys_main(cls):
         """ Returns a function to be used as main function for a script. """
 
-        @async_main_sti(None)
+        @async_main_sti(None, main_function=True)
         async def entry(sti: SyncTaskInterface, args=None) -> ExitCode:
+            sti.started()
             instance = cls()
+            if args is None:
+                args = sys.argv[1:]
             return await instance.main(sti=sti, args=args)
 
         return entry
@@ -180,7 +183,7 @@ class QuickAppBase(ABC):
 
         try:
             self.set_options_from_args(args)
-        except Exception as e:
+        except DecentParamsUserError as e:
             self.logger.user_error(str(e))
             sys.stderr.write(str(e) + "\n")
             return ExitCode.WRONG_ARGUMENTS
@@ -244,7 +247,10 @@ class QuickAppBase(ABC):
 
             raises: UserError: Wrong configuration, user's mistake.
                     Exception: all other exceptions
+
         """
+        if args is None:
+            raise ZValueError("args is None")
         cls = type(self)
         prog = cls.get_prog_name()
         params = DecentParams()
@@ -265,6 +271,8 @@ class QuickAppBase(ABC):
             )
         except UserError:
             raise
+        except SystemExit:
+            raise
         except Exception as e:
             msg = "Could not interpret arguments"
             # msg += " args = %s\n" % args
@@ -273,7 +281,12 @@ class QuickAppBase(ABC):
             # msg += "Error is:\n"
             # msg += indent(traceback.format_exc(), "> ")
             raise ZException(
-                msg, prog=prog, cls=cls, args=args, params=params
+                msg,
+                prog=prog,
+                cls=cls,
+                args=args,
+                params=params,
+                e=traceback.format_exc(),
             ) from e  # XXX class
 
     # Implementation
