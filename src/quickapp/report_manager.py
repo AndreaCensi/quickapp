@@ -494,7 +494,7 @@ def write_report_and_update(
 
 
 def write_report(report, report_html, static_dir, write_pickle=False, **kwargs):
-    logger.debug("Writing to %s " % friendly_path(report_html))
+    logger.debug(f"Writing to {friendly_path(report_html)} ")
     #     if False:
     #         # Note here they might overwrite each other
     #         rd = os.path.join(os.path.dirname(report_html), 'images')
@@ -572,21 +572,21 @@ def index_reports(reports, index, update=None):  # @UnusedVariable
         )
         if os.path.exists(filename):
             when = duration_compact(time.time() - mtime(filename))
-            span_when = '<span class="when">%s ago</span>' % when
+            span_when = f'<span class="when">{when} ago</span>'
             style = style_order(order(filename))
-            a = '<a href="%s">%s</a>' % (href, desc)
+            a = f'<a href="{href}">{desc}</a>'
         else:
             # print('File %s does not exist yet' % filename)
             style = ""
             span_when = '<span class="when">missing</span>'
-            a = '<a href="%s">%s</a>' % (href, desc)
-        f.write('<%s style="%s">%s %s</%s>' % (element, style, a, span_when, element))
+            a = f'<a href="{href}">{desc}</a>'
+        f.write(f'<{element} style="{style}">{a} {span_when}</{element}>')
 
     # write the first 10
     existing.sort(key=lambda x: (-mtime(x[1])))
     nlast = min(len(existing), 10)
     last = existing[:nlast]
-    f.write('<h2 id="last">Last %d report</h2>\n' % (nlast))
+    f.write(f'<h2 id="last">Last {nlast:d} report</h2>\n')
 
     f.write("<ul>")
     for i in range(nlast):
@@ -610,7 +610,7 @@ def index_reports(reports, index, update=None):  # @UnusedVariable
     try:
         sections = make_sections(reports)
     except:
-        logger.error(str(list(reports.keys())))
+        # logger.error(str(list(reports.keys())))
         raise
 
     if sections["type"] == "sample":
@@ -703,10 +703,10 @@ def make_sections(allruns, common=None):
         try:
             division[value] = make_sections(samples, common=c)
         except Exception:
-            msg = "Error occurred inside grouping by field %r = %r" % (field, value)
-            msg += "\nCommon: %r" % common
-            msg += "\nSamples: %s" % list(samples.keys())
-            logger.error(msg)
+            msg = f"Error occurred inside grouping by field {field!r} = {value!r}"
+            # msg += "\nCommon: %r" % common
+            # msg += "\nSamples: %s" % list(samples.keys())
+            logger.error(msg, common=common, samples=list(samples.keys()))
             raise
 
     return dict(type="division", field=field, division=division, common=common)

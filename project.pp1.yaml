@@ -3,6 +3,8 @@ srcdir: src
 version_file: "1"
 modules:
   - quickapp
+  - reprep_quickapp
+  - decent_params
 
 install_requires:
   - zuper-commons-z7

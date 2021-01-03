@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from compmake_tests.utils import Env, run_with_env
 from decent_params import DecentParams
