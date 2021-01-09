@@ -116,10 +116,8 @@ class QuickApp(QuickAppBase):
         # The original Compmake context
         oc = ContextImp(db=db, currently_executing=currently_executing)
         # Our wrapper
-        qc = CompmakeContext(
-            cc=oc, parent=None, qapp=self, job_prefix=None, output_dir=output_dir
-        )
-        read_rc_files(oc)
+        qc = CompmakeContext(cc=oc, parent=None, qapp=self, job_prefix=None, output_dir=output_dir)
+        await read_rc_files(sti, oc)
 
         original = oc.get_comp_prefix()
         self.define_jobs_context(qc)
@@ -154,11 +152,7 @@ class QuickApp(QuickAppBase):
 
                 if not todo and options.command is None:
                     msg = "Note: there is nothing for me to do. "
-                    msg += "\n(Jobs todo: %s done: %s ready: %s)" % (
-                        len(todo),
-                        len(done),
-                        len(ready),
-                    )
+                    msg += "\n(Jobs todo: %s done: %s ready: %s)" % (len(todo), len(done), len(ready),)
                     msg += """\
 This application uses a cache system for the results.
 This means that if you call it second time with the same arguments,
