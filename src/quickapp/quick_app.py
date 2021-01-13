@@ -147,8 +147,8 @@ class QuickApp(QuickAppBase):
                 return 0
             else:
                 cq = CacheQueryDB(oc.get_compmake_db())
-                targets = cq.all_jobs()
-                todo, done, ready = cq.list_todo_targets(targets)
+                targets = await cq.all_jobs()
+                todo, done, ready = await cq.list_todo_targets(targets)
 
                 if not todo and options.command is None:
                     msg = "Note: there is nothing for me to do. "
