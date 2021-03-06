@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from compmake import Promise
-from quickapp import CompmakeContext
+from quickapp import QuickAppContext
 from quickapp.report_manager import basename_from_key
 from reprep import logger, NotExistent, Report
 
@@ -14,13 +14,11 @@ class FigureProxy:
         self.report_proxy = report_proxy
 
     def sub(self, what: str, **kwargs):
-        self.report_proxy.op(
-            rp_figure_sub, id_figure=self.id_figure, what=what, **kwargs
-        )
+        self.report_proxy.op(rp_figure_sub, id_figure=self.id_figure, what=what, **kwargs)
 
 
 class ReportProxy:
-    def __init__(self, context: CompmakeContext):
+    def __init__(self, context: QuickAppContext):
         self.context = context
         self.operations = []
         self.resources = {}
@@ -41,16 +39,12 @@ class ReportProxy:
         part = self.get_part_of(url, report_type, strict=strict, **report_args)
 
         if nid is None:
-            nid = (
-                basename_from_key(report_args) + "-" + url.replace("/", "-")
-            )  # XXX url chars
+            nid = basename_from_key(report_args) + "-" + url.replace("/", "-")  # XXX url chars
 
         self.add_child_with_id(part, nid)
         return nid
 
-    def get_part_of(
-        self, url: str, report_type: str, strict=True, **report_args
-    ) -> Promise:
+    def get_part_of(self, url: str, report_type: str, strict=True, **report_args) -> Promise:
         job_id = "get_part-" + report_type + "-" + basename_from_key(report_args)
         r = self.context.get_report(report_type, **report_args)
         job_id += "-" + url.replace("/", "_")  # XXX

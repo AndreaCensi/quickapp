@@ -15,9 +15,9 @@ class ResourceManager:
         pass
 
     def __init__(self, context):
-        from quickapp.compmake_context import CompmakeContext
+        from quickapp.compmake_context import QuickAppContext
 
-        assert isinstance(context, CompmakeContext), context
+        assert isinstance(context, QuickAppContext), context
         from reprep.report_utils import StoreResults
 
         self.allresources = StoreResults()

@@ -11,13 +11,29 @@ from .report_manager import ReportManager
 from .resource_manager import ResourceManager
 
 __all__ = [
-    "CompmakeContext",
     "QuickAppContext",
     "context_get_merge_data",
 ]
 
 
 class QuickAppContext:
+    def __getstate__(self):
+        # Copy the object's state from self.__dict__ which contains
+        # all our instance attributes. Always use the dict.copy()
+        # method to avoid modifying the original state.
+        state = self.__dict__.copy()
+        if "cc" in state:
+            state.pop("cc")
+        # # Remove the unpicklable entries.
+        # for k, v in state.items():
+        #     try:
+        #         pickle.dumps(v)
+        #     except BaseException as e:
+        #         msg = f'Cannot pickle member {k!r}'
+        #         raise ZValueError(msg, k=k, v=v) from e
+
+        return state
+
     def __init__(
         self,
         cc: Context,
@@ -31,7 +47,7 @@ class QuickAppContext:
         report_manager=None,
     ):
         check_isinstance(cc, Context)
-        check_isinstance(parent, (CompmakeContext, type(None)))
+        check_isinstance(parent, (QuickAppContext, type(None)))
         if extra_dep is None:
             extra_dep = []
         self.cc = cc
@@ -68,7 +84,7 @@ class QuickAppContext:
         self.branched_children = []
 
     def __str__(self) -> str:
-        return f"CompmakeContext({self._job_prefix})"
+        return f"QuickAppContext({self._job_prefix})"
 
     # def all_jobs(self):
     #     return list(self._jobs.values())
@@ -88,9 +104,7 @@ class QuickAppContext:
 
             Returns the checkpoint job (CompmakePromise).
         """
-        job_checkpoint = self.comp(
-            checkpoint, job_name, prev_jobs=list(self._jobs.values()), job_id=job_name
-        )
+        job_checkpoint = self.comp(checkpoint, job_name, prev_jobs=list(self._jobs.values()), job_id=job_name)
         self._extra_dep.append(job_checkpoint)
         return job_checkpoint
 
@@ -134,12 +148,7 @@ class QuickAppContext:
         #:arg:command_name: used to define job name if job_id not provided.
 
         both = self.cc.comp_dynamic(
-            _dynreports_wrap_dynamic,
-            qc=context,
-            function=f,
-            args=args,
-            kw=kwargs,
-            **compmake_args,
+            _dynreports_wrap_dynamic, qc=context, function=f, args=args, kw=kwargs, **compmake_args,
         )
 
         result = self.comp(_dynreports_getres, both)
@@ -244,7 +253,7 @@ class QuickAppContext:
             report_manager = self._report_manager
 
         if separate_resource_manager:
-            resource_manager = None  # CompmakeContext will create its own
+            resource_manager = None  # QuickAppContext will create its own
         else:
             resource_manager = self._resource_manager
 
@@ -255,7 +264,7 @@ class QuickAppContext:
         if extra_report_keys is not None:
             extra_report_keys_.update(extra_report_keys)
 
-        c1 = CompmakeContext(
+        c1 = QuickAppContext(
             cc=self.cc,
             qapp=qapp,
             parent=self,
@@ -342,16 +351,12 @@ class QuickAppContext:
             # warnings.warn('XXX: Note that this sometimes creates a context '
             #              'with depth 1; then "delete not root" deletes it.')
             self._promise_job_id = "context"
-            self._promise = self.comp(
-                load_static_storage, self, job_id=self._promise_job_id
-            )
+            self._promise = self.comp(load_static_storage, self, job_id=self._promise_job_id)
         return self._promise
 
     def has_branched(self):
         """ Returns True if any comp_dynamic was issued. """
-        return len(self.branched_contexts) > 0 or any(
-            [c.has_branched() for c in self.branched_children]
-        )
+        return len(self.branched_contexts) > 0 or any([c.has_branched() for c in self.branched_children])
 
 
 def wrap_state(config_state, f, *args, **kwargs):
@@ -427,6 +432,3 @@ def context_get_merge_data(context):
         return context.cc.comp(_dynreports_merge, data)
     else:
         return data[0]
-
-
-CompmakeContext = QuickAppContext

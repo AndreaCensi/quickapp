@@ -2,7 +2,7 @@
 from nose.tools import assert_equal
 
 from compmake_tests.utils import Env, run_with_env
-from quickapp import CompmakeContext, iterate_context_names, QuickApp
+from quickapp import QuickAppContext, iterate_context_names, QuickApp
 from quickapp_tests.quickappbase import run_quickapp
 
 
@@ -12,7 +12,7 @@ def f(name):
 
 
 def define_jobs(context, id_name):
-    assert isinstance(context, CompmakeContext)
+    assert isinstance(context, QuickAppContext)
     context.comp(f, id_name)
 
 
@@ -51,15 +51,7 @@ async def test_child_(env: Env):
 
     # These are the jobs currently defined
     await env.assert_jobs_equal(
-        "all",
-        [
-            "a-define_jobs",
-            "b-define_jobs",
-            "c-define_jobs",
-            "a-context",
-            "b-context",
-            "c-context",
-        ],
+        "all", ["a-define_jobs", "b-define_jobs", "c-define_jobs", "a-context", "b-context", "c-context",],
     )
 
     await env.assert_cmd_success("make *-define_jobs; ls")
@@ -80,15 +72,7 @@ async def test_child_(env: Env):
     )
 
     await env.assert_jobs_equal(
-        "done",
-        [
-            "a-define_jobs",
-            "b-define_jobs",
-            "c-define_jobs",
-            "a-context",
-            "b-context",
-            "c-context",
-        ],
+        "done", ["a-define_jobs", "b-define_jobs", "c-define_jobs", "a-context", "b-context", "c-context",],
     )
 
     await env.assert_cmd_success("make; ls")

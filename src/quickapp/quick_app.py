@@ -19,7 +19,7 @@ from decent_params.utils import UserError, wrap_script_entry_point
 from quickapp import logger, QUICKAPP_COMPUTATION_ERROR
 from zuper_commons.text import indent
 from zuper_utils_asyncio import SyncTaskInterface
-from .compmake_context import CompmakeContext, context_get_merge_data
+from .compmake_context import QuickAppContext, context_get_merge_data
 from .exceptions import QuickAppException
 from .quick_app_base import QuickAppBase
 from .report_manager import _dynreports_create_index
@@ -115,8 +115,9 @@ class QuickApp(QuickAppBase):
         currently_executing = [cast(CMJobID, "root")]
         # The original Compmake context
         oc = ContextImp(db=db, currently_executing=currently_executing)
+        await oc.init()
         # Our wrapper
-        qc = CompmakeContext(cc=oc, parent=None, qapp=self, job_prefix=None, output_dir=output_dir)
+        qc = QuickAppContext(cc=oc, parent=None, qapp=self, job_prefix=None, output_dir=output_dir)
         await read_rc_files(sti, oc)
 
         original = oc.get_comp_prefix()

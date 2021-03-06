@@ -98,18 +98,15 @@ class ReportManager:
             :param report_type: A string that describes the "type" of the report
             :param kwargs:  str->str,int,float  parameters used for grouping
         """
-        from quickapp.compmake_context import CompmakeContext
+        from quickapp.compmake_context import QuickAppContext
 
-        assert isinstance(context, CompmakeContext)
+        assert isinstance(context, QuickAppContext)
         if not isinstance(report_type, str):
             msg = "Need a string for report_type"
             raise ZValueError(msg, report_type=report_type)
 
         if not isinstance(report, Promise):
-            msg = (
-                "ReportManager is mean to be given Promise objects, "
-                "which are the output of comp(). "
-            )
+            msg = "ReportManager is mean to be given Promise objects, " "which are the output of comp(). "
             raise ZValueError(msg, obtained=report)
 
         # check the format is ok
@@ -191,13 +188,7 @@ class ReportManager:
 
 
 def create_write_jobs(
-    context,
-    allreports_filename,
-    allreports,
-    html_resources_prefix,
-    index_filename,
-    suffix,
-    static_dir,
+    context, allreports_filename, allreports, html_resources_prefix, index_filename, suffix, static_dir,
 ):
     # Do not pass as argument, it will take lots of memory!
     # XXX FIXME: there should be a way to make this update or not
@@ -316,9 +307,7 @@ def get_most_similar(reports_different_type, key):
     return best
 
 
-def create_links_html(
-    this_report, other_reports_same_type, index_filename, most_similar_other_type
-):
+def create_links_html(this_report, other_reports_same_type, index_filename, most_similar_other_type):
     check_isinstance(other_reports_same_type, StoreResults)
     """
     :param this_report: dictionary with the keys describing the report
@@ -472,10 +461,7 @@ def write_report_and_update(
     check_isinstance(report, Report)
 
     links = create_links_html(
-        this_report,
-        other_reports_same_type,
-        index_filename,
-        most_similar_other_type=most_similar_other_type,
+        this_report, other_reports_same_type, index_filename, most_similar_other_type=most_similar_other_type,
     )
 
     tree_html = '<pre style="display:none">%s</pre>' % report.format_tree()
@@ -484,11 +470,7 @@ def write_report_and_update(
 
     report.nid = report_nid
     html = write_report(
-        report=report,
-        report_html=report_html,
-        static_dir=static_dir,
-        write_pickle=write_pickle,
-        **extras,
+        report=report, report_html=report_html, static_dir=static_dir, write_pickle=write_pickle, **extras,
     )
     index_reports(reports=all_reports, index=index_filename, update=html)
 
@@ -501,11 +483,7 @@ def write_report(report, report_html, static_dir, write_pickle=False, **kwargs):
     #     else:
     rd = os.path.splitext(report_html)[0]
     report.to_html(
-        report_html,
-        write_pickle=write_pickle,
-        resources_dir=rd,
-        static_dir=static_dir,
-        **kwargs,
+        report_html, write_pickle=write_pickle, resources_dir=rd, static_dir=static_dir, **kwargs,
     )
 
     # TODO: save hdf format
@@ -567,9 +545,7 @@ def index_reports(reports, index, update=None):  # @UnusedVariable
 
     def write_li(k, filename: str, element="li"):
         desc = ",  ".join("%s = %s" % (a, b) for a, b in list(k.items()))
-        href = os.path.relpath(
-            os.path.realpath(filename), os.path.dirname(os.path.realpath(index))
-        )
+        href = os.path.relpath(os.path.realpath(filename), os.path.dirname(os.path.realpath(index)))
         if os.path.exists(filename):
             when = duration_compact(time.time() - mtime(filename))
             span_when = f'<span class="when">{when} ago</span>'
@@ -615,9 +591,7 @@ def index_reports(reports, index, update=None):  # @UnusedVariable
 
     if sections["type"] == "sample":
         # only one...
-        sections = dict(
-            type="division", field="raw", division=dict(raw1=sections), common=dict()
-        )
+        sections = dict(type="division", field="raw", division=dict(raw1=sections), common=dict())
 
     def write_sections(sections, parents):
         assert "type" in sections
