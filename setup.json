@@ -6,7 +6,8 @@
     "reprep-z7",
     "six",
     "zuper-commons-z7",
-    "zuper-utils-asyncio-z7"
+    "zuper-utils-asyncio-z7",
+    "zuper-zapp-z7"
   ],
   "tests_require": [],
   "srcdir": "src",
