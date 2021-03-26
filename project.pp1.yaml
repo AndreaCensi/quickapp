@@ -14,6 +14,7 @@ install_requires:
   - zuper-utils-asyncio-z7
   - numpy
   - six
+  - zuper-zapp-z7
 
 install_conflicts: [ 'QuickApp*' ]
 tests_require: [ ]

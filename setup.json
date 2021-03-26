@@ -1,0 +1,33 @@
+{
+  "install_requires": [
+    "ConfTools-z7",
+    "compmake-z7",
+    "numpy",
+    "reprep-z7",
+    "six",
+    "zuper-commons-z7",
+    "zuper-utils-asyncio-z7"
+  ],
+  "tests_require": [],
+  "srcdir": "src",
+  "package_name": "QuickApp-z7",
+  "entry_points": {
+    "console_scripts": [
+      "zt-demo = zuper_utils_asyncio:zt_demo"
+    ]
+  },
+  "zip_safe": false,
+  "include_package_data": false,
+  "modules": [
+    "decent_params",
+    "decent_params.utils",
+    "quickapp",
+    "quickapp.app_utils",
+    "quickapp.rm",
+    "reprep_quickapp"
+  ],
+  "version": "7.1.2101052341",
+  "author": "",
+  "author_email": "info@zupermind.com",
+  "url": "http://github.com/zupermind/PACKAGENAME"
+}

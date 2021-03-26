@@ -15,7 +15,8 @@ from zuper_commons import ZLogger
 from zuper_commons.cmds import ExitCode
 from zuper_commons.text import indent
 from zuper_commons.types import ZException, ZValueError
-from zuper_utils_asyncio import async_main_sti, SyncTaskInterface
+from zuper_utils_asyncio import SyncTaskInterface
+from zuper_zapp import async_main_sti
 from . import logger
 from .exceptions import QuickAppException
 
@@ -166,9 +167,7 @@ class QuickAppBase(ABC):
             assert self.parent != self
         return self.parent
 
-    async def main(
-        self, sti: SyncTaskInterface, args: Optional[List[str]] = None, parent=None
-    ) -> ExitCode:
+    async def main(self, sti: SyncTaskInterface, args: Optional[List[str]] = None, parent=None) -> ExitCode:
         """ Main entry point. Returns an integer as an error code. """
         sti.logger.info(f"{type(self).__name__}.main", args=args, parent=parent)
         # sys.stderr.write(f'HERE! ars = {args} \n')
@@ -281,12 +280,7 @@ class QuickAppBase(ABC):
             # msg += "Error is:\n"
             # msg += indent(traceback.format_exc(), "> ")
             raise ZException(
-                msg,
-                prog=prog,
-                cls=cls,
-                args=args,
-                params=params,
-                e=traceback.format_exc(),
+                msg, prog=prog, cls=cls, args=args, params=params, e=traceback.format_exc(),
             ) from e  # XXX class
 
     # Implementation
@@ -305,11 +299,7 @@ class QuickAppBase(ABC):
         params.add_flag("profile", help="Use Python Profiler", group=g)
         params.add_flag("compress", help="Compress stored data", group=g)
         params.add_string(
-            "output",
-            short="o",
-            help="Output directory",
-            default=default_output_dir,
-            group=g,
+            "output", short="o", help="Output directory", default=default_output_dir, group=g,
         )
         params.add_string(
             "db", help="DB directory", default=None, group=g,
@@ -322,9 +312,5 @@ class QuickAppBase(ABC):
         params.add_flag("console", help="Use Compmake console", group=g)
 
         params.add_string(
-            "command",
-            short="c",
-            help="Command to pass to compmake for batch mode",
-            default=None,
-            group=g,
+            "command", short="c", help="Command to pass to compmake for batch mode", default=None, group=g,
         )
