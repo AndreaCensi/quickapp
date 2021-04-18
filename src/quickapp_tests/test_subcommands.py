@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from compmake_tests.utils import Env, run_with_env
+from .copied_from_compmake_utils import Env, run_with_env
 from decent_params import DecentParams
 from quickapp import QuickMultiCmdApp
 from zuper_commons.test_utils import known_failure

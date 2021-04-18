@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-from nose.tools import assert_equal
 
-from compmake_tests.utils import Env, run_with_env
-from quickapp import QuickAppContext, iterate_context_names, QuickApp
+from .copied_from_compmake_utils import Env, run_with_env
+from quickapp import iterate_context_names, QuickApp, QuickAppContext
 from quickapp_tests.quickappbase import run_quickapp
 
 

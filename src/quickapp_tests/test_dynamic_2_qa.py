@@ -1,4 +1,4 @@
-from compmake_tests.utils import Env, run_with_env
+from .copied_from_compmake_utils import Env, run_with_env
 from quickapp import iterate_context_names, QuickApp
 from .quickappbase import run_quickapp
 

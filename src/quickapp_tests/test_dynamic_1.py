@@ -1,7 +1,7 @@
 from nose.tools import assert_equal
 
 from compmake import Context
-from compmake_tests.utils import Env, run_with_env
+from .copied_from_compmake_utils import Env, run_with_env
 from decent_params import DecentParams
 from quickapp import QuickApp, QuickAppContext
 from .quickappbase import run_quickapp

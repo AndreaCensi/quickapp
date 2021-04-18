@@ -4,13 +4,11 @@ from shutil import rmtree
 from tempfile import mkdtemp
 from typing import List
 
-from nose.tools import assert_equal
-
-from compmake_tests.utils import Env, run_with_env
-from quickapp import QuickApp, QUICKAPP_COMPUTATION_ERROR, QUICKAPP_USER_ERROR
+from quickapp import QuickApp, QUICKAPP_COMPUTATION_ERROR
 from reprep import Report
 from zuper_commons.cmds import ExitCode
 from zuper_commons.types import ZAssertionError
+from .copied_from_compmake_utils import Env, run_with_env
 from .quickappbase import run_quickapp
 
 

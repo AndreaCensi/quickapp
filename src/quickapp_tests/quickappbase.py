@@ -2,7 +2,7 @@ from typing import List, Type, Union
 
 from nose.tools import assert_equal
 
-from compmake_tests.utils import Env
+from .copied_from_compmake_utils import Env
 from quickapp import QuickAppBase
 from zuper_commons.types import ZTypeError
 
@@ -27,7 +27,7 @@ async def run_quickapp(
 
     # tell the context that it's all good
     jobs = await env.all_jobs()
-    env.cc.reset_jobs_defined_in_this_session(jobs)
+    await env.cc.reset_jobs_defined_in_this_session(jobs)
 
     if return_retcode:
         return retcode
