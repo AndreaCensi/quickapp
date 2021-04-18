@@ -2,9 +2,9 @@ jobs:
   test-3.8-production:
     docker:
     - {image: python:3.8}
-    environment: {COLUMNS: '160', COVER_PACKAGES: 'decent_params_tests,quickapp_tests,quickapp.exceptions,reprep_quickapp.report_proxy,quickapp.compmake_context,quickapp.rm,quickapp.app_utils,decent_params,decent_params.utils,quickapp.resource_manager,decent_params.exceptions,quickapp.quick_multi_app,decent_params.decent_params_imp,quickapp,decent_params.decent_param,quickapp.app_utils.minimal_name,quickapp.rm.generated_report,decent_params.utils.script_utils,quickapp.report_manager,quickapp.app_utils.subcontexts,quickapp.rm.create_index_dynamic,quickapp.rm.configuration,quickapp.quick_app,reprep_quickapp,quickapp.quick_app_base,quickapp.app_utils.subcontexts_test',
+    environment: {COLUMNS: '160', COVER_PACKAGES: 'quickapp_tests,decent_params_tests,decent_params.utils,decent_params.utils.script_utils,quickapp.compmake_context,decent_params.exceptions,reprep_quickapp.report_proxy,quickapp.rm.configuration,quickapp.app_utils.minimal_name,quickapp.rm,quickapp,quickapp.app_utils.subcontexts,quickapp.quick_multi_app,decent_params,quickapp.rm.generated_report,quickapp.rm.create_index_dynamic,quickapp.app_utils.subcontexts_test,decent_params.decent_params_imp,quickapp.exceptions,quickapp.app_utils,decent_params.decent_param,quickapp.quick_app_base,quickapp.quick_app,reprep_quickapp,quickapp.resource_manager,quickapp.report_manager',
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin,
-      TEST_PACKAGES: decent_params_tests quickapp_tests}
+      TEST_PACKAGES: quickapp_tests decent_params_tests}
     steps:
     - checkout
     - run: {command: "mkdir -p  build-stats\nenv | tee  build-stats/env.txt\n", name: Build
@@ -45,9 +45,9 @@ jobs:
   test-3.8-staging:
     docker:
     - {image: python:3.8}
-    environment: {COLUMNS: '160', COVER_PACKAGES: 'decent_params_tests,quickapp_tests,quickapp.exceptions,reprep_quickapp.report_proxy,quickapp.compmake_context,quickapp.rm,quickapp.app_utils,decent_params,decent_params.utils,quickapp.resource_manager,decent_params.exceptions,quickapp.quick_multi_app,decent_params.decent_params_imp,quickapp,decent_params.decent_param,quickapp.app_utils.minimal_name,quickapp.rm.generated_report,decent_params.utils.script_utils,quickapp.report_manager,quickapp.app_utils.subcontexts,quickapp.rm.create_index_dynamic,quickapp.rm.configuration,quickapp.quick_app,reprep_quickapp,quickapp.quick_app_base,quickapp.app_utils.subcontexts_test',
+    environment: {COLUMNS: '160', COVER_PACKAGES: 'quickapp_tests,decent_params_tests,decent_params.utils,decent_params.utils.script_utils,quickapp.compmake_context,decent_params.exceptions,reprep_quickapp.report_proxy,quickapp.rm.configuration,quickapp.app_utils.minimal_name,quickapp.rm,quickapp,quickapp.app_utils.subcontexts,quickapp.quick_multi_app,decent_params,quickapp.rm.generated_report,quickapp.rm.create_index_dynamic,quickapp.app_utils.subcontexts_test,decent_params.decent_params_imp,quickapp.exceptions,quickapp.app_utils,decent_params.decent_param,quickapp.quick_app_base,quickapp.quick_app,reprep_quickapp,quickapp.resource_manager,quickapp.report_manager',
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin,
-      TEST_PACKAGES: decent_params_tests quickapp_tests}
+      TEST_PACKAGES: quickapp_tests decent_params_tests}
     steps:
     - checkout
     - run: {command: "mkdir -p  build-stats\nenv | tee  build-stats/env.txt\n", name: Build
@@ -99,4 +99,4 @@ workflows:
           branches: {ignore: /z7-stage.*/}
   version: 2
 
-# sigil 2ca60d8585687e4db497c43cd94c9d3f
+# sigil 49616856c4b8cb01cc104fedc11622cf
