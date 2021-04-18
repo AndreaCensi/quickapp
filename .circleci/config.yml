@@ -2,9 +2,9 @@ jobs:
   test-3.8-production:
     docker:
     - {image: python:3.8}
-    environment: {COLUMNS: '160', COVER_PACKAGES: 'decent_params_tests,quickapp_tests,quickapp.app_utils.minimal_name,decent_params.exceptions,decent_params.decent_params_imp,quickapp.quick_app,quickapp.app_utils.subcontexts,quickapp.exceptions,quickapp.resource_manager,decent_params,decent_params.utils,quickapp.app_utils,quickapp.compmake_context,quickapp.rm,decent_params.utils.script_utils,quickapp.rm.generated_report,decent_params.decent_param,quickapp.app_utils.subcontexts_test,quickapp.quick_multi_app,quickapp,reprep_quickapp.report_proxy,quickapp.quick_app_base,quickapp.rm.configuration,quickapp.rm.create_index_dynamic,quickapp.report_manager,reprep_quickapp',
+    environment: {COLUMNS: '160', COVER_PACKAGES: 'decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp',
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin,
-      TEST_PACKAGES: decent_params_tests quickapp_tests}
+      TEST_PACKAGES: quickapp_tests decent_params_tests}
     steps:
     - checkout
     - run: {command: "mkdir -p  build-stats\nenv | tee  build-stats/env.txt\n", name: Build
@@ -45,9 +45,9 @@ jobs:
   test-3.8-staging:
     docker:
     - {image: python:3.8}
-    environment: {COLUMNS: '160', COVER_PACKAGES: 'decent_params_tests,quickapp_tests,quickapp.app_utils.minimal_name,decent_params.exceptions,decent_params.decent_params_imp,quickapp.quick_app,quickapp.app_utils.subcontexts,quickapp.exceptions,quickapp.resource_manager,decent_params,decent_params.utils,quickapp.app_utils,quickapp.compmake_context,quickapp.rm,decent_params.utils.script_utils,quickapp.rm.generated_report,decent_params.decent_param,quickapp.app_utils.subcontexts_test,quickapp.quick_multi_app,quickapp,reprep_quickapp.report_proxy,quickapp.quick_app_base,quickapp.rm.configuration,quickapp.rm.create_index_dynamic,quickapp.report_manager,reprep_quickapp',
+    environment: {COLUMNS: '160', COVER_PACKAGES: 'decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp',
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin,
-      TEST_PACKAGES: decent_params_tests quickapp_tests}
+      TEST_PACKAGES: quickapp_tests decent_params_tests}
     steps:
     - checkout
     - run: {command: "mkdir -p  build-stats\nenv | tee  build-stats/env.txt\n", name: Build
@@ -99,4 +99,4 @@ workflows:
           branches: {ignore: /z7-stage.*/}
   version: 2
 
-# sigil 10f120308acd87404648f2f21c0ac1d4
+# sigil 3790dab56590943286be278096ddfa33
