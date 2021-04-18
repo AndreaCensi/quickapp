@@ -67,9 +67,9 @@ class ReportManager:
 
     def set_html_resources_prefix(self, prefix):
         """
-            Sets the prefix for the resources filename.
+        Sets the prefix for the resources filename.
 
-            example: set_resources_prefix('jbds')
+        example: set_resources_prefix('jbds')
         """
         self.html_resources_prefix = prefix + "-"
 
@@ -91,12 +91,12 @@ class ReportManager:
 
     def add(self, context, report, report_type: str, **kwargs):
         """
-            Adds a report to the collection.
+        Adds a report to the collection.
 
-            :param report: Promise of a Report object
-            :param context:
-            :param report_type: A string that describes the "type" of the report
-            :param kwargs:  str->str,int,float  parameters used for grouping
+        :param report: Promise of a Report object
+        :param context:
+        :param report_type: A string that describes the "type" of the report
+        :param kwargs:  str->str,int,float  parameters used for grouping
         """
         from quickapp.compmake_context import QuickAppContext
 
@@ -188,7 +188,13 @@ class ReportManager:
 
 
 def create_write_jobs(
-    context, allreports_filename, allreports, html_resources_prefix, index_filename, suffix, static_dir,
+    context,
+    allreports_filename,
+    allreports,
+    html_resources_prefix,
+    index_filename,
+    suffix,
+    static_dir,
 ):
     # Do not pass as argument, it will take lots of memory!
     # XXX FIXME: there should be a way to make this update or not
@@ -461,7 +467,10 @@ def write_report_and_update(
     check_isinstance(report, Report)
 
     links = create_links_html(
-        this_report, other_reports_same_type, index_filename, most_similar_other_type=most_similar_other_type,
+        this_report,
+        other_reports_same_type,
+        index_filename,
+        most_similar_other_type=most_similar_other_type,
     )
 
     tree_html = '<pre style="display:none">%s</pre>' % report.format_tree()
@@ -470,7 +479,11 @@ def write_report_and_update(
 
     report.nid = report_nid
     html = write_report(
-        report=report, report_html=report_html, static_dir=static_dir, write_pickle=write_pickle, **extras,
+        report=report,
+        report_html=report_html,
+        static_dir=static_dir,
+        write_pickle=write_pickle,
+        **extras,
     )
     index_reports(reports=all_reports, index=index_filename, update=html)
 
@@ -483,7 +496,11 @@ def write_report(report, report_html, static_dir, write_pickle=False, **kwargs):
     #     else:
     rd = os.path.splitext(report_html)[0]
     report.to_html(
-        report_html, write_pickle=write_pickle, resources_dir=rd, static_dir=static_dir, **kwargs,
+        report_html,
+        write_pickle=write_pickle,
+        resources_dir=rd,
+        static_dir=static_dir,
+        **kwargs,
     )
 
     # TODO: save hdf format
@@ -492,10 +509,10 @@ def write_report(report, report_html, static_dir, write_pickle=False, **kwargs):
 
 def index_reports(reports, index, update=None):  # @UnusedVariable
     """
-        Writes an index for the report to the file given.
-        The special key "report" gives the report type.
+    Writes an index for the report to the file given.
+    The special key "report" gives the report type.
 
-        report[dict(report=...,param1=..., param2=...) ] => filename
+    report[dict(report=...,param1=..., param2=...) ] => filename
     """
     # print('Updating because of new report %s' % update)
 
@@ -692,8 +709,8 @@ def _dynreports_create_index(context, merged_data):
 
 
 def basename_from_key(key: dict) -> str:
-    """ Returns a nice basename from a key
-        that doesn't have special chars """
+    """Returns a nice basename from a key
+    that doesn't have special chars"""
     if not key:
         raise ValueError("empty key")
     keys_ordered = sorted(list(key.keys()))

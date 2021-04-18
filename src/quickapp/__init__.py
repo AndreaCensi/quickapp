@@ -4,9 +4,7 @@ __date__ = "2021-04-18T15:13:53.831486"
 from zuper_commons.logs import ZLogger
 
 logger = ZLogger(__name__)
-logger.hello_module(
-    name=__name__, filename=__file__, version=__version__, date=__date__
-)
+logger.hello_module(name=__name__, filename=__file__, version=__version__, date=__date__)
 
 # error in computation
 QUICKAPP_COMPUTATION_ERROR = 2

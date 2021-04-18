@@ -9,24 +9,24 @@ def minimal_names_at_boundaries(
 ) -> Tuple[str, List[str], str]:
 
     """
-        Converts a list of object IDs to a minimal non-ambiguous list of names.
+    Converts a list of object IDs to a minimal non-ambiguous list of names.
 
-        In this version, we only care about splitting at boundaries
-        defined by separators.
+    In this version, we only care about splitting at boundaries
+    defined by separators.
 
-        For example, the names: ::
+    For example, the names: ::
 
-            test_learn1_fast_10
-            test_learn1_slow_10
-            test_learn2_faster_10
+        test_learn1_fast_10
+        test_learn1_slow_10
+        test_learn2_faster_10
 
-        is converted to: ::
+    is converted to: ::
 
-            learn1_fast
-            learn2_slow
-            learn2_faster
+        learn1_fast
+        learn2_slow
+        learn2_faster
 
-        Returns prefix, minimal, postfix
+    Returns prefix, minimal, postfix
     """
     if separators is None:
         separators = ["_", "-"]
@@ -121,7 +121,7 @@ def name_field(ob):
 
 def try_heuristics(objects, fun):
     """
-        fun must return either a string or None
+    fun must return either a string or None
     """
     names = []
     for o in objects:
@@ -172,8 +172,8 @@ def id_field_heuristics(generated):
 
 def good_context_name(id_object: str) -> str:
     """
-        Removes strange characters from a string to make it a good
-        context name.
+    Removes strange characters from a string to make it a good
+    context name.
     """
     id_object = id_object.replace("-", "")
     id_object = id_object.replace("_", "")
@@ -183,21 +183,21 @@ def good_context_name(id_object: str) -> str:
 
 def minimal_names(objects: Sequence[str]) -> Tuple[str, List[str], str]:
     """
-        Converts a list of object IDs to a minimal non-ambiguous list of names.
+    Converts a list of object IDs to a minimal non-ambiguous list of names.
 
-        For example, the names: ::
+    For example, the names: ::
 
-            test_learn_fast_10
-            test_learn_slow_10
-            test_learn_faster_10
+        test_learn_fast_10
+        test_learn_slow_10
+        test_learn_faster_10
 
-        is converted to: ::
+    is converted to: ::
 
-            fast
-            slow
-            faster
+        fast
+        slow
+        faster
 
-        Returns prefix, minimal, postfix
+    Returns prefix, minimal, postfix
     """
     if len(objects) == 1:
         return "", list(objects), ""

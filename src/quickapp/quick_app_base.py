@@ -27,11 +27,11 @@ __all__ = [
 
 class QuickAppBase(ABC):
     """
-        class attributes used:
+    class attributes used:
 
-            cmd
-            usage
-            description (deprecated) => use docstring
+        cmd
+        usage
+        description (deprecated) => use docstring
 
     """
 
@@ -75,8 +75,8 @@ class QuickAppBase(ABC):
     @abstractmethod
     async def go2(self, sti: SyncTaskInterface) -> ExitCode:
         """
-            Must be implemented. This should return either None to mean success,
-            or an integer error code.
+        Must be implemented. This should return either None to mean success,
+        or an integer error code.
         """
         raise NotImplementedError(type(self))
 
@@ -102,9 +102,9 @@ class QuickAppBase(ABC):
     @classmethod
     def get_program_description(cls):
         """
-            Returns a description for the program. This is by default
-            looked in the docstring or in the "description" attribute
-            (deprecated).
+        Returns a description for the program. This is by default
+        looked in the docstring or in the "description" attribute
+        (deprecated).
         """
         if cls.__doc__ is not None:
             # use docstring
@@ -128,8 +128,8 @@ class QuickAppBase(ABC):
     @classmethod
     def get_usage(cls):
         """
-            Returns an usage string for the program. The pattern ``%prog``
-            will be substituted with the name of the program.
+        Returns an usage string for the program. The pattern ``%prog``
+        will be substituted with the name of the program.
         """
         usage = cls.__dict__.get("usage", None)
         if usage is None:
@@ -141,15 +141,15 @@ class QuickAppBase(ABC):
     @classmethod
     def get_epilog(cls):
         """
-            Returns the string used as an epilog in the help text.
+        Returns the string used as an epilog in the help text.
         """
         return None
 
     @classmethod
     def get_prog_name(cls):
         """
-            Returns the string used as the program name. By default
-            it is contained in the ``cmd`` attribute.
+        Returns the string used as the program name. By default
+        it is contained in the ``cmd`` attribute.
         """
         if not "cmd" in cls.__dict__:
             return os.path.basename(sys.argv[0])
@@ -216,10 +216,10 @@ class QuickAppBase(ABC):
 
     def set_options_from_dict(self, config: Dict[str, Any]):
         """
-            Reads the configuration from a dictionary.
+        Reads the configuration from a dictionary.
 
-            raises: UserError: Wrong configuration, user's mistake.
-                    Exception: all other exceptions
+        raises: UserError: Wrong configuration, user's mistake.
+                Exception: all other exceptions
         """
         params = DecentParams()
         self.define_program_options(params)
@@ -242,10 +242,10 @@ class QuickAppBase(ABC):
 
     def set_options_from_args(self, args: List[str]):
         """
-            Reads the configuration from command line arguments.
+        Reads the configuration from command line arguments.
 
-            raises: UserError: Wrong configuration, user's mistake.
-                    Exception: all other exceptions
+        raises: UserError: Wrong configuration, user's mistake.
+                Exception: all other exceptions
 
         """
         if args is None:
@@ -280,7 +280,12 @@ class QuickAppBase(ABC):
             # msg += "Error is:\n"
             # msg += indent(traceback.format_exc(), "> ")
             raise ZException(
-                msg, prog=prog, cls=cls, args=args, params=params, e=traceback.format_exc(),
+                msg,
+                prog=prog,
+                cls=cls,
+                args=args,
+                params=params,
+                e=traceback.format_exc(),
             ) from e  # XXX class
 
     # Implementation
@@ -299,10 +304,17 @@ class QuickAppBase(ABC):
         params.add_flag("profile", help="Use Python Profiler", group=g)
         params.add_flag("compress", help="Compress stored data", group=g)
         params.add_string(
-            "output", short="o", help="Output directory", default=default_output_dir, group=g,
+            "output",
+            short="o",
+            help="Output directory",
+            default=default_output_dir,
+            group=g,
         )
         params.add_string(
-            "db", help="DB directory", default=None, group=g,
+            "db",
+            help="DB directory",
+            default=None,
+            group=g,
         )
 
         params.add_flag("reset", help="Deletes the output directory", group=g)
@@ -312,5 +324,9 @@ class QuickAppBase(ABC):
         params.add_flag("console", help="Use Compmake console", group=g)
 
         params.add_string(
-            "command", short="c", help="Command to pass to compmake for batch mode", default=None, group=g,
+            "command",
+            short="c",
+            help="Command to pass to compmake for batch mode",
+            default=None,
+            group=g,
         )

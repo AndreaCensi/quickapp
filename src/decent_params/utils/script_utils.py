@@ -10,23 +10,19 @@ class UserError(ZException):
     pass
 
 
-def wrap_script_entry_point(
-    function, logger, exceptions_no_traceback=(UserError,), args=None, sys_exit=True
-):
+def wrap_script_entry_point(function, logger, exceptions_no_traceback=(UserError,), args=None, sys_exit=True):
     """
-        Wraps the main() of a script.
-        For Exception: we exit with value 2.
+    Wraps the main() of a script.
+    For Exception: we exit with value 2.
 
-        :param exceptions_no_traceback: list of exceptions for which we
-         just print the error, and return 1.
+    :param exceptions_no_traceback: list of exceptions for which we
+     just print the error, and return 1.
 
     """
 
     # logger.info('wrap_script_entry_point')
 
-    ret = wrap_script_entry_point_noexit(
-        function, logger, exceptions_no_traceback, args
-    )
+    ret = wrap_script_entry_point_noexit(function, logger, exceptions_no_traceback, args)
 
     # logger.info('wrap_script_entry_point ret %s' % ret)
 
@@ -38,14 +34,12 @@ def wrap_script_entry_point(
         return ret
 
 
-def wrap_script_entry_point_noexit(
-    function, logger, exceptions_no_traceback=(UserError,), args=None
-):
+def wrap_script_entry_point_noexit(function, logger, exceptions_no_traceback=(UserError,), args=None):
     """
-        Wraps the main() of a script.
+    Wraps the main() of a script.
 
-        :param exceptions_no_traceback: list of exceptions for which we
-         just print the error, and return 1.
+    :param exceptions_no_traceback: list of exceptions for which we
+     just print the error, and return 1.
 
     """
     if args is None:

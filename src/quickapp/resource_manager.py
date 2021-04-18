@@ -27,17 +27,17 @@ class ResourceManager:
 
     def set_resource_provider(self, rtype: str, provider):
         """
-            provider: any callable. It will be called with "context" as first
-                argument, and with any remaining params. It needs to return
-                a Compmake Promise() object (i.e. the output of comp()).
+        provider: any callable. It will be called with "context" as first
+            argument, and with any remaining params. It needs to return
+            a Compmake Promise() object (i.e. the output of comp()).
 
         """
         self.providers[rtype].append(provider)
 
     def set_resource_prefix_function(self, rtype, make_prefix):
         """
-            make_prefix: a function that takes (rtype, **params) and
-            returns a string.
+        make_prefix: a function that takes (rtype, **params) and
+        returns a string.
         """
         self.make_prefix[rtype] = make_prefix
 

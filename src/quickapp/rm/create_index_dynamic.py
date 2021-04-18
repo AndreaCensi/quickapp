@@ -7,9 +7,7 @@ __all__ = [
 from zuper_commons.types import check_isinstance
 
 
-def write_report_single(
-    report: Report, report_nid, report_html, static_dir, write_pickle=False
-):
+def write_report_single(report: Report, report_nid, report_html, static_dir, write_pickle=False):
     from quickapp.report_manager import write_report
 
     check_isinstance(report, Report)

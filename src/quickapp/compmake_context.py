@@ -95,14 +95,14 @@ class QuickAppContext:
     def checkpoint(self, job_name: str) -> Promise:
         """
 
-            (DEPRECATED)
+        (DEPRECATED)
 
-            Creates a dummy job called "job_name" that depends on all jobs
-            previously defined; further, this new job is put into _extra_dep.
-            This means that all successive jobs will require that the previous
-            ones be done.
+        Creates a dummy job called "job_name" that depends on all jobs
+        previously defined; further, this new job is put into _extra_dep.
+        This means that all successive jobs will require that the previous
+        ones be done.
 
-            Returns the checkpoint job (CompmakePromise).
+        Returns the checkpoint job (CompmakePromise).
         """
         job_checkpoint = self.comp(checkpoint, job_name, prev_jobs=list(self._jobs.values()), job_id=job_name)
         self._extra_dep.append(job_checkpoint)
@@ -113,8 +113,8 @@ class QuickAppContext:
     #
     def comp(self, f, *args, **kwargs) -> Promise:
         """
-            Simple wrapper for Compmake's comp function.
-            Use this instead of "comp".
+        Simple wrapper for Compmake's comp function.
+        Use this instead of "comp".
         """
         self.count_comp_invocations()
         self.cc.comp_prefix(self._job_prefix)
@@ -148,7 +148,12 @@ class QuickAppContext:
         #:arg:command_name: used to define job name if job_id not provided.
 
         both = self.cc.comp_dynamic(
-            _dynreports_wrap_dynamic, qc=context, function=f, args=args, kw=kwargs, **compmake_args,
+            _dynreports_wrap_dynamic,
+            qc=context,
+            function=f,
+            args=args,
+            kw=kwargs,
+            **compmake_args,
         )
 
         result = self.comp(_dynreports_getres, both)
@@ -158,7 +163,7 @@ class QuickAppContext:
 
     def comp_config(self, f, *args, **kwargs) -> Promise:
         """
-            Like comp, but we also automatically save the GlobalConfig state.
+        Like comp, but we also automatically save the GlobalConfig state.
         """
         config_state = GlobalConfig.get_state()
         # so that compmake can use a good name
@@ -167,8 +172,8 @@ class QuickAppContext:
         return self.comp(wrap_state, config_state, f, *args, **kwargs)
 
     def comp_config_dynamic(self, f, *args, **kwargs) -> Promise:
-        """ Defines jobs that will take a "context" argument to define
-            more jobs. """
+        """Defines jobs that will take a "context" argument to define
+        more jobs."""
         config_state = GlobalConfig.get_state()
         # so that compmake can use a good name
         if not "command_name" in kwargs:
@@ -377,9 +382,7 @@ def checkpoint(name, prev_jobs):
 
 
 def _dynreports_wrap_dynamic(context: Context, qc, function, args, kw) -> dict:
-    """
-
-    """
+    """"""
 
     qc.cc = context
 

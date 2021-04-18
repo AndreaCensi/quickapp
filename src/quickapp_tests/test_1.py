@@ -82,9 +82,7 @@ async def test_compapp(env: Env):
         with open(os.path.join(tmpdir, ".compmake.rc"), "w") as f:
             f.write("config echo 1\n")
         ret_found = await run_quickapp(env, QuickAppDemo2, args, return_retcode=True)
-        different = (not (ret_found in [0, None]) and (ret in [0, None])) and (
-            ret_found != ret
-        )
+        different = (not (ret_found in [0, None]) and (ret in [0, None])) and (ret_found != ret)
         if different:
             raise ZAssertionError(expected=ret, fount=ret, c=c)
         # msg = f"Expected {ret!r}, got {ret_found!r}.\nArguments: {c['args']} "

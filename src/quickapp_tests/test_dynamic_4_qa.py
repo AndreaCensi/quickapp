@@ -33,7 +33,13 @@ class QuickAppDemoChild4(QuickApp):
 async def test_dynamic4(env: Env):
     await run_quickapp(env, qapp=QuickAppDemoChild4, cmd="ls")
     await env.assert_jobs_equal(
-        "all", ["a-context", "b-context", "a-define_jobs1", "b-define_jobs1",]
+        "all",
+        [
+            "a-context",
+            "b-context",
+            "a-define_jobs1",
+            "b-define_jobs1",
+        ],
     )
     await env.assert_cmd_success("make *define_jobs1;ls")
     await env.assert_jobs_equal(

@@ -98,6 +98,4 @@ async def test_dynamic3(env: Env):
         ],
     )
     await env.assert_cmd_success("details a-m-f")
-    await env.assert_defined_by(
-        "a-m-f", ["root", "a-m-define_jobs1", "a-m-define_jobs2"]
-    )
+    await env.assert_defined_by("a-m-f", ["root", "a-m-define_jobs1", "a-m-define_jobs2"])

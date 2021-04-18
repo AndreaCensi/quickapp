@@ -153,7 +153,11 @@ class QuickApp(QuickAppBase):
 
                 if not todo and options.command is None:
                     msg = "Note: there is nothing for me to do. "
-                    msg += "\n(Jobs todo: %s done: %s ready: %s)" % (len(todo), len(done), len(ready),)
+                    msg += "\n(Jobs todo: %s done: %s ready: %s)" % (
+                        len(todo),
+                        len(done),
+                        len(ready),
+                    )
                     msg += """\
 This application uses a cache system for the results.
 This means that if you call it second time with the same arguments,
@@ -252,13 +256,13 @@ This means that if you call it second time with the same arguments,
 
 def quickapp_main(quickapp_class, args: List[str] = None, sys_exit: bool = True):
     """
-        Use like this:
+    Use like this:
 
-            if __name__ == '__main__':
-                quickapp_main(MyQuickApp)
+        if __name__ == '__main__':
+            quickapp_main(MyQuickApp)
 
 
-        if sys_exit is True, we call sys.exis(ret), otherwise we return the value.
+    if sys_exit is True, we call sys.exis(ret), otherwise we return the value.
 
     """
     instance = quickapp_class()

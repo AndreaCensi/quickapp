@@ -32,9 +32,7 @@ async def test_dynamic2(env: Env):
     await run_quickapp(env, qapp=QuickAppDemoChild3, cmd="ls")
     logger.info("ls 1")
     await env.assert_cmd_success("ls not *dynrep*")
-    await env.assert_jobs_equal(
-        "all", ["a-context", "b-context", "a-define_jobs1", "b-define_jobs1"]
-    )
+    await env.assert_jobs_equal("all", ["a-context", "b-context", "a-define_jobs1", "b-define_jobs1"])
     logger.info("make root")
     await env.assert_cmd_success("make a-define_jobs1 b-define_jobs1")
     logger.info("ls 2")

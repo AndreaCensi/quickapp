@@ -51,7 +51,15 @@ async def test_child_(env: Env):
 
     # These are the jobs currently defined
     await env.assert_jobs_equal(
-        "all", ["a-define_jobs", "b-define_jobs", "c-define_jobs", "a-context", "b-context", "c-context",],
+        "all",
+        [
+            "a-define_jobs",
+            "b-define_jobs",
+            "c-define_jobs",
+            "a-context",
+            "b-context",
+            "c-context",
+        ],
     )
 
     await env.assert_cmd_success("make *-define_jobs; ls")
@@ -72,7 +80,15 @@ async def test_child_(env: Env):
     )
 
     await env.assert_jobs_equal(
-        "done", ["a-define_jobs", "b-define_jobs", "c-define_jobs", "a-context", "b-context", "c-context",],
+        "done",
+        [
+            "a-define_jobs",
+            "b-define_jobs",
+            "c-define_jobs",
+            "a-context",
+            "b-context",
+            "c-context",
+        ],
     )
 
     await env.assert_cmd_success("make; ls")

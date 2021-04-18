@@ -15,9 +15,9 @@ __all__ = [
 
 def iterate_context_names(context, it1: Sequence, key: str = None):
     """
-        Creates child contexts with minimal names.
+    Creates child contexts with minimal names.
 
-        Yields tuples of (context, s1)
+    Yields tuples of (context, s1)
     """
     # make strings
     values = list(it1)
@@ -37,11 +37,9 @@ def iterate_context_names(context, it1: Sequence, key: str = None):
         yield e_c, x
 
 
-def iterate_context_names_pair(
-    context, it1: Sequence, it2: Sequence, key1: str = None, key2: str = None
-):
+def iterate_context_names_pair(context, it1: Sequence, it2: Sequence, key1: str = None, key2: str = None):
     """
-        Yields tuples of (context, s1, s2).
+    Yields tuples of (context, s1, s2).
     """
     for cc, x1 in iterate_context_names(context, it1, key=key1):
         for c, x2 in iterate_context_names(cc, it2, key=key2):
@@ -62,7 +60,7 @@ def iterate_context_names_triplet(
     key3: str = None,
 ):
     """
-        Yields tuples of (context, s1, s2, s3).
+    Yields tuples of (context, s1, s2, s3).
     """
     for c1, x1 in iterate_context_names(context, it1, key=key1):
         for c2, x2 in iterate_context_names(c1, it2, key=key2):
@@ -75,7 +73,7 @@ iterate_context_triplets = iterate_context_names_triplet
 
 def iterate_context_names_quartet(context, it1, it2, it3, it4):
     """
-        Yields tuples of (context, s1, s2, s3, s4).
+    Yields tuples of (context, s1, s2, s3, s4).
     """
     for c1, x1 in iterate_context_names(context, it1):
         for c2, x2 in iterate_context_names(c1, it2):
@@ -86,7 +84,7 @@ def iterate_context_names_quartet(context, it1, it2, it3, it4):
 
 def iterate_context_names_quintuplet(context, it1, it2, it3, it4, it5):
     """
-        Yields tuples of (context, s1, s2, s3, s4).
+    Yields tuples of (context, s1, s2, s3, s4).
     """
     for c1, x1 in iterate_context_names(context, it1):
         for c2, x2 in iterate_context_names(c1, it2):

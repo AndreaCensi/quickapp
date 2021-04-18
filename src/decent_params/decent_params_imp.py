@@ -104,8 +104,8 @@ class DecentParams:
 
     def parse_using_parser(self, parser, args: List[str]) -> Tuple[Dict, List[str]]:
         """
-            Returns a dictionary with all values of parameters,
-            but possibly some values are Choice() instances.
+        Returns a dictionary with all values of parameters,
+        but possibly some values are Choice() instances.
 
         """
         try:
@@ -120,13 +120,11 @@ class DecentParams:
         values, given = self._interpret_args(argparse_res)
         return values, given
 
-    def parse_using_parser_extra(
-        self, parser, args: List[str]
-    ) -> Tuple[Dict, List[str], List[str]]:
+    def parse_using_parser_extra(self, parser, args: List[str]) -> Tuple[Dict, List[str], List[str]]:
         """
-            This returns also the extra parameters
+        This returns also the extra parameters
 
-            returns: values, given, extra
+        returns: values, given, extra
         """
         if args is None:
             raise ZValueError("args is None")
@@ -138,9 +136,7 @@ class DecentParams:
             #                 argparse_res, unknown = parser.parse_known_args(args)
             #             else:
             if self.accepts_extra:
-                parser.add_argument(
-                    "remainder", nargs="*", help=self.accepts_extra_description
-                )
+                parser.add_argument("remainder", nargs="*", help=self.accepts_extra_description)
             # argparse_res, unknown = parser.parse_known_args(args)
             argparse_res, unknown = parser.parse_known_intermixed_args(args=args)
         #                 print('argparse_res: %s' % argparse_res)
@@ -221,9 +217,7 @@ class DecentParams:
             else:
                 title = str(g)
             description = None
-            group = option_container.add_argument_group(
-                title=title, description=description
-            )
+            group = option_container.add_argument_group(title=title, description=description)
             g_params = [p for p in list(self.params.values()) if p.group == g]
             for p in g_params:
                 p.populate(group)
@@ -289,12 +283,8 @@ class DecentParams:
         self._populate_parser(option_container=parser, prog=prog)
         return parser
 
-    def get_dpr_from_args(
-        self, args: List[str], prog=None, usage=None, epilog=None, description=None
-    ):
-        parser = self.create_parser(
-            prog=prog, usage=usage, epilog=epilog, description=description
-        )
+    def get_dpr_from_args(self, args: List[str], prog=None, usage=None, epilog=None, description=None):
+        parser = self.create_parser(prog=prog, usage=usage, epilog=epilog, description=description)
 
         values, given, extra = self.parse_using_parser_extra(parser, args)
         if extra and not self.accepts_extra:
@@ -345,9 +335,7 @@ def parse_known_intermixed_args(self, args=None, namespace=None, _fallback=None)
     if a:
         if _fallback is None:
             a = a[0]
-            err = ArgumentError(
-                a, "parse_intermixed_args: positional arg with nargs=%s" % a.nargs
-            )
+            err = ArgumentError(a, "parse_intermixed_args: positional arg with nargs=%s" % a.nargs)
             self.error(str(err))
         else:
             return _fallback(args, namespace)
