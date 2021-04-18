@@ -2,7 +2,7 @@ jobs:
   test-3.8-production:
     docker:
     - {image: python:3.8}
-    environment: {COLUMNS: '160', COVER_PACKAGES: 'decent_params_tests,quickapp_tests,decent_params.decent_params_imp,quickapp.rm,decent_params.exceptions,quickapp.rm.generated_report,quickapp.rm.configuration,decent_params.utils.script_utils,quickapp.rm.create_index_dynamic,decent_params.decent_param,quickapp.resource_manager,quickapp.compmake_context,quickapp,reprep_quickapp.report_proxy,decent_params,quickapp.quick_app_base,quickapp.app_utils.minimal_name,quickapp.quick_multi_app,quickapp.app_utils,quickapp.app_utils.subcontexts,quickapp.report_manager,quickapp.exceptions,quickapp.app_utils.subcontexts_test,reprep_quickapp,quickapp.quick_app,decent_params.utils',
+    environment: {COLUMNS: '160', COVER_PACKAGES: 'decent_params_tests,quickapp_tests,quickapp.app_utils.minimal_name,decent_params.exceptions,decent_params.decent_params_imp,quickapp.quick_app,quickapp.app_utils.subcontexts,quickapp.exceptions,quickapp.resource_manager,decent_params,decent_params.utils,quickapp.app_utils,quickapp.compmake_context,quickapp.rm,decent_params.utils.script_utils,quickapp.rm.generated_report,decent_params.decent_param,quickapp.app_utils.subcontexts_test,quickapp.quick_multi_app,quickapp,reprep_quickapp.report_proxy,quickapp.quick_app_base,quickapp.rm.configuration,quickapp.rm.create_index_dynamic,quickapp.report_manager,reprep_quickapp',
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin,
       TEST_PACKAGES: decent_params_tests quickapp_tests}
     steps:
@@ -33,7 +33,7 @@ jobs:
           \n#              --processes=8 --process-timeout=1000 --process-restartworker\
           \ \\\n# --cover-packages=${COVER_PACKAGES} \\\nnosetests \\\n  --rednose\
           \ --immediate \\\n  --cover-tests --with-coverage \\\n  --with-xunitmp --xunitmp-file=${xunit_output}\
-          \ \\\n  --cover-packages=${COVER_PACKAGES} \\\n  ${TEST_PACKAGES}\n", name: Run
+          \ \\\n  --cover-package=${COVER_PACKAGES} \\\n  ${TEST_PACKAGES}\n", name: Run
           tests}
     - store_test_results: {path: out/test-results, when: always}
     - run: {command: "coverage combine\ncoverage html -d out/coverage\ncoverage xml\n",
@@ -45,7 +45,7 @@ jobs:
   test-3.8-staging:
     docker:
     - {image: python:3.8}
-    environment: {COLUMNS: '160', COVER_PACKAGES: 'decent_params_tests,quickapp_tests,decent_params.decent_params_imp,quickapp.rm,decent_params.exceptions,quickapp.rm.generated_report,quickapp.rm.configuration,decent_params.utils.script_utils,quickapp.rm.create_index_dynamic,decent_params.decent_param,quickapp.resource_manager,quickapp.compmake_context,quickapp,reprep_quickapp.report_proxy,decent_params,quickapp.quick_app_base,quickapp.app_utils.minimal_name,quickapp.quick_multi_app,quickapp.app_utils,quickapp.app_utils.subcontexts,quickapp.report_manager,quickapp.exceptions,quickapp.app_utils.subcontexts_test,reprep_quickapp,quickapp.quick_app,decent_params.utils',
+    environment: {COLUMNS: '160', COVER_PACKAGES: 'decent_params_tests,quickapp_tests,quickapp.app_utils.minimal_name,decent_params.exceptions,decent_params.decent_params_imp,quickapp.quick_app,quickapp.app_utils.subcontexts,quickapp.exceptions,quickapp.resource_manager,decent_params,decent_params.utils,quickapp.app_utils,quickapp.compmake_context,quickapp.rm,decent_params.utils.script_utils,quickapp.rm.generated_report,decent_params.decent_param,quickapp.app_utils.subcontexts_test,quickapp.quick_multi_app,quickapp,reprep_quickapp.report_proxy,quickapp.quick_app_base,quickapp.rm.configuration,quickapp.rm.create_index_dynamic,quickapp.report_manager,reprep_quickapp',
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin,
       TEST_PACKAGES: decent_params_tests quickapp_tests}
     steps:
@@ -76,7 +76,7 @@ jobs:
           \n#              --processes=8 --process-timeout=1000 --process-restartworker\
           \ \\\n# --cover-packages=${COVER_PACKAGES} \\\nnosetests \\\n  --rednose\
           \ --immediate \\\n  --cover-tests --with-coverage \\\n  --with-xunitmp --xunitmp-file=${xunit_output}\
-          \ \\\n  --cover-packages=${COVER_PACKAGES} \\\n  ${TEST_PACKAGES}\n", name: Run
+          \ \\\n  --cover-package=${COVER_PACKAGES} \\\n  ${TEST_PACKAGES}\n", name: Run
           tests}
     - store_test_results: {path: out/test-results, when: always}
     - run: {command: "coverage combine\ncoverage html -d out/coverage\ncoverage xml\n",
@@ -99,4 +99,4 @@ workflows:
           branches: {ignore: /z7-stage.*/}
   version: 2
 
-# sigil 9be46555ef536e0c7ca4c884970136af
+# sigil 10f120308acd87404648f2f21c0ac1d4
