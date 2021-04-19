@@ -111,7 +111,7 @@ class QuickApp(QuickAppBase):
         else:
             storage = os.path.join(output_dir, "compmake")
         logger.debug("Creating storage", where=storage, compress=options.compress)
-        db = StorageFilesystem(storage, compress=options.compress)
+        db = StorageFilesystem(storage, compress=True)
         currently_executing = [cast(CMJobID, "root")]
         # The original Compmake context
         oc = ContextImp(db=db, currently_executing=currently_executing)
