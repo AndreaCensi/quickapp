@@ -1,43 +1,43 @@
 package_name: QuickApp-z7
 srcdir: src
-version_file: "1"
+version_file: '1'
 modules:
-  - quickapp
-  - reprep_quickapp
-  - decent_params
+- quickapp
+- reprep_quickapp
+- decent_params
 
 install_requires:
-  - zuper-commons-z7
-  - ConfTools-z7
-  - compmake-z7
-  - reprep-z7
-  - zuper-utils-asyncio-z7
-  - numpy
-  - six
-  - zuper-zapp-z7
+- zuper-commons-z7
+- ConfTools-z7
+- compmake-z7
+- reprep-z7
+- zuper-utils-asyncio-z7
+- numpy
+- six
+- zuper-zapp-z7
 
-install_conflicts: [ 'QuickApp*' ]
-tests_require: [ ]
+install_conflicts: [QuickApp*]
+tests_require: []
 
 console_scripts: {}
 nose:
   modules:
-    - "*_tests"
+  - '*_tests'
   python_versions:
-    - '3.7'
-    - '3.8'
+  - '3.7'
+  - '3.8'
 
 pypi:
-  upload: [ ]
+  upload: []
 
 circleci:
   active: true
-  test_python_versions: [ '3.8' ]
+  test_python_versions: ['3.7', '3.8']
 
 python_syntax_version: '3.8'
 
 url: https://github.com/zupermind/PACKAGENAME
 author: ''
-author_email: 'info@zupermind.com'
+author_email: info@zupermind.com
 short_description: ''
 full_description: ''
