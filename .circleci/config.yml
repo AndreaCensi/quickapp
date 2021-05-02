@@ -20,7 +20,7 @@ jobs:
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
-      TEST_PACKAGES: quickapp_tests decent_params_tests
+      TEST_PACKAGES: decent_params_tests quickapp_tests
     docker:
     - image: ${DOCKER_REGISTRY}/zupermind/zuper-ci-3.8:z7
       auth:
@@ -143,7 +143,7 @@ jobs:
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
-      TEST_PACKAGES: quickapp_tests decent_params_tests
+      TEST_PACKAGES: decent_params_tests quickapp_tests
     docker:
     - image: ${DOCKER_REGISTRY}/zupermind/zuper-ci-3.8:z7
       auth:
@@ -261,4 +261,4 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
     resource_class: medium+
 
-# sigil eefe6da506a3d0f0f5e91a3fc2611753
+# sigil 0aa087849b2707052edd2199965f6fec
