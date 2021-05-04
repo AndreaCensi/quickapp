@@ -20,7 +20,7 @@ jobs:
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
-      TEST_PACKAGES: quickapp_tests decent_params_tests
+      TEST_PACKAGES: decent_params_tests quickapp_tests
     docker:
     - image: ${DOCKER_REGISTRY}/zupermind/zuper-ci-3.8:z7
       auth:
@@ -98,23 +98,10 @@ jobs:
 
 
     - run:
-        name: quickapp_tests
-        command: |-
-          set -ex
-          mkdir -p out/test-results;
-          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
-          nosetests \
-              --rednose --immediate \
-              --cover-tests --with-coverage \
-              --with-xunit --xunit-file=${xunit_output} \
-              --cover-package=${COVER_PACKAGES} \
-              quickapp_tests
-        when: always
-    - run:
         name: decent_params_tests
         command: |-
-          set -ex
-          mkdir -p out/test-results;
+          set -euxo pipefail
+          mkdir -p out/test-results
           xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-decent_params_tests-xunit.xml
           nosetests \
               --rednose --immediate \
@@ -122,6 +109,19 @@ jobs:
               --with-xunit --xunit-file=${xunit_output} \
               --cover-package=${COVER_PACKAGES} \
               decent_params_tests
+        when: always
+    - run:
+        name: quickapp_tests
+        command: |-
+          set -euxo pipefail
+          mkdir -p out/test-results
+          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
+          nosetests \
+              --rednose --immediate \
+              --cover-tests --with-coverage \
+              --with-xunit --xunit-file=${xunit_output} \
+              --cover-package=${COVER_PACKAGES} \
+              quickapp_tests
         when: always
     - run:
         name: post-circle-tests
@@ -168,7 +168,7 @@ jobs:
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
-      TEST_PACKAGES: quickapp_tests decent_params_tests
+      TEST_PACKAGES: decent_params_tests quickapp_tests
     docker:
     - image: ${DOCKER_REGISTRY}/zupermind/zuper-ci-3.8:z7
       auth:
@@ -246,23 +246,10 @@ jobs:
 
 
     - run:
-        name: quickapp_tests
-        command: |-
-          set -ex
-          mkdir -p out/test-results;
-          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
-          nosetests \
-              --rednose --immediate \
-              --cover-tests --with-coverage \
-              --with-xunit --xunit-file=${xunit_output} \
-              --cover-package=${COVER_PACKAGES} \
-              quickapp_tests
-        when: always
-    - run:
         name: decent_params_tests
         command: |-
-          set -ex
-          mkdir -p out/test-results;
+          set -euxo pipefail
+          mkdir -p out/test-results
           xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-decent_params_tests-xunit.xml
           nosetests \
               --rednose --immediate \
@@ -270,6 +257,19 @@ jobs:
               --with-xunit --xunit-file=${xunit_output} \
               --cover-package=${COVER_PACKAGES} \
               decent_params_tests
+        when: always
+    - run:
+        name: quickapp_tests
+        command: |-
+          set -euxo pipefail
+          mkdir -p out/test-results
+          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
+          nosetests \
+              --rednose --immediate \
+              --cover-tests --with-coverage \
+              --with-xunit --xunit-file=${xunit_output} \
+              --cover-package=${COVER_PACKAGES} \
+              quickapp_tests
         when: always
     - run:
         name: post-circle-tests
@@ -311,4 +311,4 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
     resource_class: medium+
 
-# sigil fae47ea6f5c6081f2632d694fcc49508
+# sigil 3cd61a8a48c0bc74856aaa345f665020
