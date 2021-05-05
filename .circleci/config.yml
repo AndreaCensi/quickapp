@@ -21,6 +21,7 @@ jobs:
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: decent_params_tests quickapp_tests
+      Z_SERVICE_LOG: zuper_zapp.envs.log
     docker:
     - image: ${DOCKER_REGISTRY}/zupermind/zuper-ci-3.8:z7
       auth:
@@ -169,6 +170,7 @@ jobs:
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: decent_params_tests quickapp_tests
+      Z_SERVICE_LOG: zuper_zapp.envs.log
     docker:
     - image: ${DOCKER_REGISTRY}/zupermind/zuper-ci-3.8:z7
       auth:
@@ -311,4 +313,4 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
     resource_class: medium+
 
-# sigil 3cd61a8a48c0bc74856aaa345f665020
+# sigil 17a4aa8b110a541446845d915a989d76
