@@ -9,7 +9,10 @@
     "zuper-utils-asyncio-z7",
     "zuper-zapp-z7"
   ],
-  "tests_require": [],
+  "tests_require": [
+    "zuper-abstract-fs-z7",
+    "zuper-abstract-subprocess-z7"
+  ],
   "srcdir": "src",
   "package_name": "QuickApp-z7",
   "entry_points": {
