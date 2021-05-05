@@ -18,7 +18,10 @@ install_requires     :
 - zuper-zapp-z7
 
 install_conflicts    : [QuickApp*]
-tests_require        : []
+tests_require        :
+- zuper-abstract-fs-z7
+- zuper-abstract-subprocess-z7
+
 
 console_scripts      : {}
 nose                 :
