@@ -20,7 +20,7 @@ jobs:
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
-      TEST_PACKAGES: decent_params_tests quickapp_tests
+      TEST_PACKAGES: quickapp_tests decent_params_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_abstract_subprocess.use_local_process
       Z_SERVICE_FS: zuper_abstract_fs.use_local_fs
@@ -101,19 +101,6 @@ jobs:
 
 
     - run:
-        name: decent_params_tests
-        command: |-
-          set -euxo pipefail
-          mkdir -p out/test-results
-          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-decent_params_tests-xunit.xml
-          nosetests \
-              --rednose --immediate \
-              --cover-tests --with-coverage \
-              --with-xunit --xunit-file=${xunit_output} \
-              --cover-package=${COVER_PACKAGES} \
-              decent_params_tests
-        when: always
-    - run:
         name: quickapp_tests
         command: |-
           set -euxo pipefail
@@ -125,6 +112,19 @@ jobs:
               --with-xunit --xunit-file=${xunit_output} \
               --cover-package=${COVER_PACKAGES} \
               quickapp_tests
+        when: always
+    - run:
+        name: decent_params_tests
+        command: |-
+          set -euxo pipefail
+          mkdir -p out/test-results
+          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-decent_params_tests-xunit.xml
+          nosetests \
+              --rednose --immediate \
+              --cover-tests --with-coverage \
+              --with-xunit --xunit-file=${xunit_output} \
+              --cover-package=${COVER_PACKAGES} \
+              decent_params_tests
         when: always
     - run:
         name: post-circle-tests
@@ -171,7 +171,7 @@ jobs:
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
-      TEST_PACKAGES: decent_params_tests quickapp_tests
+      TEST_PACKAGES: quickapp_tests decent_params_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_abstract_subprocess.use_local_process
       Z_SERVICE_FS: zuper_abstract_fs.use_local_fs
@@ -252,19 +252,6 @@ jobs:
 
 
     - run:
-        name: decent_params_tests
-        command: |-
-          set -euxo pipefail
-          mkdir -p out/test-results
-          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-decent_params_tests-xunit.xml
-          nosetests \
-              --rednose --immediate \
-              --cover-tests --with-coverage \
-              --with-xunit --xunit-file=${xunit_output} \
-              --cover-package=${COVER_PACKAGES} \
-              decent_params_tests
-        when: always
-    - run:
         name: quickapp_tests
         command: |-
           set -euxo pipefail
@@ -276,6 +263,19 @@ jobs:
               --with-xunit --xunit-file=${xunit_output} \
               --cover-package=${COVER_PACKAGES} \
               quickapp_tests
+        when: always
+    - run:
+        name: decent_params_tests
+        command: |-
+          set -euxo pipefail
+          mkdir -p out/test-results
+          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-decent_params_tests-xunit.xml
+          nosetests \
+              --rednose --immediate \
+              --cover-tests --with-coverage \
+              --with-xunit --xunit-file=${xunit_output} \
+              --cover-package=${COVER_PACKAGES} \
+              decent_params_tests
         when: always
     - run:
         name: post-circle-tests
@@ -317,4 +317,4 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
     resource_class: medium+
 
-# sigil 66798e62c4b77e5b718810c7d0bde44e
+# sigil ac3974e39c090c38743898c0ca5bb891
