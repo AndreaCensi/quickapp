@@ -20,7 +20,7 @@ install_requires     :
 install_conflicts    : [QuickApp*]
 tests_require        :
 - zuper-fs-local-z7
-- zuper-abstract-subprocess-z7
+- zuper-proc-local-z7
 
 
 console_scripts      : {}
@@ -39,7 +39,7 @@ circleci             :
   test_python_versions: ['3.8']
   environment:
     Z_SERVICE_LOG: zuper_zapp.envs.log
-    Z_SERVICE_PROC: zuper_abstract_subprocess.use_local_process
+    Z_SERVICE_PROC: zuper_proc_local.proc
     Z_SERVICE_FS: zuper_fs_local.use_local_fs
 
 python_syntax_version: '3.8'

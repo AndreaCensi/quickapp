@@ -22,7 +22,7 @@ jobs:
       COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: quickapp_tests decent_params_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
-      Z_SERVICE_PROC: zuper_abstract_subprocess.use_local_process
+      Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
     docker:
     - image: ${DOCKER_REGISTRY}/zupermind/zuper-ci-3.8:z7
@@ -173,7 +173,7 @@ jobs:
       COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: quickapp_tests decent_params_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
-      Z_SERVICE_PROC: zuper_abstract_subprocess.use_local_process
+      Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
     docker:
     - image: ${DOCKER_REGISTRY}/zupermind/zuper-ci-3.8:z7
