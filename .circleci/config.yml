@@ -23,7 +23,7 @@ jobs:
       TEST_PACKAGES: quickapp_tests decent_params_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_abstract_subprocess.use_local_process
-      Z_SERVICE_FS: zuper_abstract_fs.use_local_fs
+      Z_SERVICE_FS: zuper_fs_local.use_local_fs
     docker:
     - image: ${DOCKER_REGISTRY}/zupermind/zuper-ci-3.8:z7
       auth:
@@ -174,7 +174,7 @@ jobs:
       TEST_PACKAGES: quickapp_tests decent_params_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_abstract_subprocess.use_local_process
-      Z_SERVICE_FS: zuper_abstract_fs.use_local_fs
+      Z_SERVICE_FS: zuper_fs_local.use_local_fs
     docker:
     - image: ${DOCKER_REGISTRY}/zupermind/zuper-ci-3.8:z7
       auth:
@@ -317,4 +317,4 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
     resource_class: medium+
 
-# sigil ac3974e39c090c38743898c0ca5bb891
+# sigil 50c05a396c2f5c1082571645d996c97e

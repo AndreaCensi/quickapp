@@ -10,8 +10,8 @@
     "zuper-zapp-z7"
   ],
   "tests_require": [
-    "zuper-abstract-fs-z7",
-    "zuper-abstract-subprocess-z7"
+    "zuper-abstract-subprocess-z7",
+    "zuper-fs-local-z7"
   ],
   "srcdir": "src",
   "package_name": "QuickApp-z7",
