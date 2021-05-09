@@ -1,51 +1,48 @@
 ---
-package_name         : QuickApp-z7
-srcdir               : src
-version_file         : '1'
-modules              :
-- quickapp
-- reprep_quickapp
-- decent_params
+package_name: QuickApp-z7
+srcdir: src
+version_file: '1'
+modules:
+    - quickapp
+    - reprep_quickapp
+    - decent_params
 
-install_requires     :
-- zuper-commons-z7
-- ConfTools-z7
-- compmake-z7
-- reprep-z7
-- zuper-utils-asyncio-z7
-- numpy
-- six
-- zuper-zapp-z7
+install_requires:
+    - zuper-commons-z7
+    - ConfTools-z7
+    - compmake-z7
+    - reprep-z7
+    - zuper-utils-asyncio-z7
+    - numpy
+    - six
+    - zuper-zapp-z7
 
-install_conflicts    : [QuickApp*]
-tests_require        :
-- zuper-fs-local-z7
-- zuper-proc-local-z7
+install_conflicts: [QuickApp*]
+tests_require:
+    - zuper-fs-local-z7
+    - zuper-proc-local-z7
 
 
-console_scripts      : {}
-nose                 :
-  modules:
-  - '*_tests'
-  python_versions:
-  - '3.7'
-  - '3.8'
+console_scripts: {}
+nose:
+    modules:
+        - '*_tests'
 
-pypi                 :
-  upload: []
+pypi:
+    upload: []
 
-circleci             :
-  active: true
-  test_python_versions: ['3.8']
-  environment:
-    Z_SERVICE_LOG: zuper_zapp.envs.log
-    Z_SERVICE_PROC: zuper_proc_local.proc
-    Z_SERVICE_FS: zuper_fs_local.use_local_fs
+circleci:
+    active: true
+    test_python_versions: ['3.8']
+    environment:
+        Z_SERVICE_LOG: zuper_zapp.envs.log
+        Z_SERVICE_PROC: zuper_proc_local.proc
+        Z_SERVICE_FS: zuper_fs_local.use_local_fs
 
 python_syntax_version: '3.8'
 
-url                  : https://github.com/zupermind/PACKAGENAME
-author               : ''
-author_email         : info@zupermind.com
-short_description    : ''
-full_description     : ''
+url: https://github.com/zupermind/PACKAGENAME
+author: Andrea Censi
+author_email: info@zupermind.com
+short_description: ''
+full_description: ''
