@@ -17,7 +17,7 @@ install_requires:
 - six
 - zuper-zapp-z7
 
-install_conflicts: [QuickApp*]
+
 tests_require:
 - zuper-fs-local-z7
 - zuper-proc-local-z7
