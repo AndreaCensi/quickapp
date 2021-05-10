@@ -16,7 +16,7 @@ from zuper_commons.cmds import ExitCode
 from zuper_commons.text import indent
 from zuper_commons.types import ZException, ZValueError
 from zuper_utils_asyncio import SyncTaskInterface
-from zuper_zapp import async_main_sti
+from zuper_zapp import zapp1, ZappEnv
 from . import logger
 from .exceptions import QuickAppException
 
@@ -84,12 +84,16 @@ class QuickAppBase(ABC):
     def get_sys_main(cls):
         """ Returns a function to be used as main function for a script. """
 
-        @async_main_sti(None, main_function=True)
-        async def entry(sti: SyncTaskInterface, args=None) -> ExitCode:
-            sti.started()
+        @zapp1()
+        async def entry(ze: ZappEnv) -> ExitCode:
+
+            sti = ze.sti
+            logger = sti.logger
+
+            logger.info("starting application")
+            await sti.started_and_yield()
+            args = ze.args
             instance = cls()
-            if args is None:
-                args = sys.argv[1:]
             return await instance.main(sti=sti, args=args)
 
         return entry

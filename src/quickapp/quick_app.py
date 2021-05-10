@@ -35,7 +35,7 @@ class QuickApp(QuickAppBase):
 
     # Interface to be implemented
     @abstractmethod
-    def define_jobs_context(self, context):
+    async def define_jobs_context(self, sti: SyncTaskInterface, context):
         """ Define jobs in the current context. """
 
         raise NotImplementedError(type(self))
@@ -60,13 +60,14 @@ class QuickApp(QuickAppBase):
         return None
 
     async def go2(self, sti: SyncTaskInterface):
+        sti.logger.info("in go2()")
         # check that if we have a parent who is a quickapp,
         # then use its context
         qapp_parent = self.get_qapp_parent()
         if qapp_parent is not None:
             # self.info('Found parent: %s' % qapp_parent)
             qc = qapp_parent.child_context
-            self.define_jobs_context(qc)
+            await self.define_jobs_context(sti, qc)
             return
         else:
             # self.info('Parent not found')
@@ -93,7 +94,7 @@ class QuickApp(QuickAppBase):
 
         if options.reset:
             if os.path.exists(output_dir):
-                self.logger.info("Removing output dir %r." % output_dir)
+                sti.logger.info("Removing output dir", dir=output_dir)
                 try:
                     shutil.rmtree(output_dir)
                 except OSError as e:
@@ -115,13 +116,14 @@ class QuickApp(QuickAppBase):
         currently_executing = [cast(CMJobID, "root")]
         # The original Compmake context
         oc = ContextImp(db=db, currently_executing=currently_executing)
-        await oc.init()
+        await oc.init(sti)
         # Our wrapper
         qc = QuickAppContext(cc=oc, parent=None, qapp=self, job_prefix=None, output_dir=output_dir)
+        sti.logger.info("reading rc files")
         await read_rc_files(sti, oc)
 
         original = oc.get_comp_prefix()
-        self.define_jobs_context(qc)
+        await self.define_jobs_context(sti, qc)
         oc.comp_prefix(original)
 
         merged = context_get_merge_data(qc)
@@ -170,6 +172,7 @@ This means that if you call it second time with the same arguments,
                 else:
                     command = options.command
 
+                await read_rc_files(sti, context=oc)
                 try:
                     _ = await oc.batch_command(sti, command)
                     # print('qapp: ret0 = %s'  % ret0)
