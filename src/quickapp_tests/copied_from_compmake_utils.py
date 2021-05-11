@@ -1,10 +1,10 @@
-import traceback
-
 import os
+import traceback
 from contextlib import asynccontextmanager
-from nose.tools import assert_equal
 from tempfile import mkdtemp
 from typing import AsyncIterator, Awaitable, Callable, cast, TypeVar
+
+from nose.tools import assert_equal
 
 from compmake import (
     all_jobs,
@@ -48,7 +48,7 @@ class Env:
     async def init(self):
         self.db = StorageFilesystem(self.rootd, compress=True)
         self.cc = ContextImp(self.db)
-        await self.cc.init()
+        await self.cc.init(self.sti)
         self.cq = CacheQueryDB(db=self.db)
         self.cc.set_compmake_config("console_status", False)
         await read_rc_files(self.sti, context=self.cc)
@@ -199,6 +199,7 @@ def run_with_env(f: Callable[[Env], Awaitable[ExitCode]]) -> Callable[[], ExitCo
     test_main.__qualname__ = f.__qualname__
     # noinspection PyUnresolvedReferences
     test_main.__module__ = f.__module__
+    # noinspection PyTypeChecker
     return test_main
 
 

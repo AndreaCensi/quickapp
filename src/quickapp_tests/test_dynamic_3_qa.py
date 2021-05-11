@@ -20,7 +20,7 @@ class QuickAppDemoChild3(QuickApp):
     def define_options(self, params):
         pass
 
-    def define_jobs_context(self, context):
+    async def define_jobs_context(self, sti, context):
         names1 = ["a", "b"]
         names2 = ["m", "n"]
         for c1, name1 in iterate_context_names(context, names1):

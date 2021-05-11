@@ -19,7 +19,7 @@ class QuickAppDemoChild(QuickApp):
     def define_options(self, params):
         pass
 
-    def define_jobs_context(self, context):
+    async def define_jobs_context(self, sti, context):
         names = ["a", "b", "c"]
         for c, id_name in iterate_context_names(context, names):
             define_jobs(c, id_name)
@@ -38,7 +38,7 @@ class QuickAppDemoChild2(QuickApp):
     def define_options(self, params):
         pass
 
-    def define_jobs_context(self, context):
+    async def define_jobs_context(self, sti, context):
         names = ["a", "b", "c"]
         for c, id_name in iterate_context_names(context, names):
             c.comp_dynamic(define_jobs, id_name)

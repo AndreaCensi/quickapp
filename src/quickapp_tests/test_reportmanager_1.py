@@ -24,7 +24,7 @@ class QuickAppDemoReport(QuickApp):
     def define_options(self, params):
         pass
 
-    def define_jobs_context(self, context):
+    async def define_jobs_context(self, sti, context):
         param1s = ["a", "b"]
         param2s = [1, 2]
 

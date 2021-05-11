@@ -36,7 +36,7 @@ class QuickAppDemo2(QuickApp):
         params.add_int("param1", help="First parameter", default=1)
         params.add_int("param2", help="Second parameter")
 
-    def define_jobs_context(self, context):
+    async def define_jobs_context(self, sti, context):
         options = self.get_options()
         param1 = options.param1
         param2 = options.param2

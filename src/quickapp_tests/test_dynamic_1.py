@@ -23,7 +23,7 @@ class QuickAppDemoChild1(QuickApp):
     def define_options(self, params: DecentParams):
         pass
 
-    def define_jobs_context(self, context: QuickAppContext):
+    async def define_jobs_context(self, sti, context: QuickAppContext):
         context.comp_dynamic(define_jobs1)
 
 

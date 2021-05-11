@@ -37,7 +37,7 @@ class QuickAppDemoReport(QuickApp):
     def define_options(self, params):
         pass
 
-    def define_jobs_context(self, context):
+    async def define_jobs_context(self, sti, context):
         context.comp_dynamic(instance_reports)
 
 

@@ -9,7 +9,7 @@ class AppExample(QuickApp):
     def define_options(self, params):
         params.add_int("x", default=1)
 
-    def define_jobs_context(self, context):
+    async def define_jobs_context(self, sti, context):
         options = self.get_options()
         # create a job
         context.comp(f, options.x)
