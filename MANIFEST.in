@@ -13,3 +13,9 @@ exclude .pre-commit-config.yaml
 prune attic 
 prune src/decent_params_tests
 prune src/quickapp_tests
+exclude README.rst
+exclude .coveragerc
+exclude MANIFEST.in
+exclude .compmake_history.txt
+exclude .compmake.rc
+prune docs
