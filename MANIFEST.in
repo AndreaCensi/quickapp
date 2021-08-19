@@ -19,3 +19,7 @@ exclude MANIFEST.in
 exclude .compmake_history.txt
 exclude .compmake.rc
 prune docs
+exclude Makefile*
+exclude Dockerfile*
+exclude *.mk
+exclude README.md
