@@ -1,26 +1,38 @@
+%YAML 1.1
+---
 version: '2'
 workflows:
   version: 2
   test:
     jobs:
-    - test-3.8-staging:
-        context: pip-staging
+    - test-3.8-stage:
+        context: z7-stage
         filters:
           branches:
             only: /z7-stage.*/
-    - test-3.8-production:
-        context: z7-production
+    - test-3.8-prod:
+        context: z7-prod
+        filters:
+          branches:
+            ignore: /z7-stage.*/
+    - test-3.9-stage:
+        context: z7-stage
+        filters:
+          branches:
+            only: /z7-stage.*/
+    - test-3.9-prod:
+        context: z7-prod
         filters:
           branches:
             ignore: /z7-stage.*/
 jobs:
-  test-3.8-staging:
+  test-3.8-stage:
     environment:
       COLUMNS: '160'
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
-      TEST_PACKAGES: quickapp_tests decent_params_tests
+      TEST_PACKAGES: decent_params_tests quickapp_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
@@ -44,22 +56,23 @@ jobs:
         name: Install deps
         command: |
           shyaml get-values install_requires < project.pp1.yaml > .requirements.txt
-          pip3 install  -r .requirements.txt
+          python3 -m pip install -U pip
+          python3 -m pip install  -r .requirements.txt
           rm .requirements.txt
 
     - run:
         name: Install testing deps
         command: |
           shyaml get-values tests_require < project.pp1.yaml > .requirements_tests.txt
-          pip3 install -r .requirements_tests.txt
+          python3 -m pip  install -r .requirements_tests.txt
           rm .requirements_tests.txt
 
     - run:
         name: Python stats
         command: |
           pipdeptree | tee  build-stats/pipdeptree.txt
-          pip list   | sort | tee  build-stats/pip-list.txt
-          pip freeze | sort | tee  build-stats/pip-freeze.txt
+          python3 -m pip  list   | sort | tee  build-stats/pip-list.txt
+          python3 -m pip  freeze | sort | tee  build-stats/pip-freeze.txt
 
     - store_artifacts:
         path: build-stats
@@ -68,7 +81,7 @@ jobs:
     - run:
         name: setup.py develop
         command: |
-          python setup.py develop --prefix ~/.local --no-deps
+          pip install -e . --prefix ~/.local --no-deps
 
     - run:
         name: Make docs
@@ -80,10 +93,18 @@ jobs:
           fi
 
     - store_artifacts:
-        when: always
         path: out/docs
         destination: docs
-
+    - run:
+        background: true
+        name: services
+        command: |
+          TARGET=services
+          if make -n $TARGET ; then
+              make $TARGET
+          else
+              echo "Target $TARGET not defined"
+          fi
     - run:
         name: pre-circle-tests
         command: |
@@ -94,25 +115,13 @@ jobs:
               echo "Target $TARGET not defined"
           fi
 
-      # - run:
-      #     name: Notebooks
-      #     command: |
-      #       make -C notebooks cleanup all
+
+    # - run:
+    #     name: Notebooks
+    #     command: |
+    #       make -C notebooks cleanup all
 
 
-    - run:
-        name: quickapp_tests
-        command: |-
-          set -euxo pipefail
-          mkdir -p out/test-results
-          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
-          nosetests \
-              --rednose --immediate \
-              --cover-tests --with-coverage \
-              --with-xunit --xunit-file=${xunit_output} \
-              --cover-package=${COVER_PACKAGES} \
-              quickapp_tests
-        when: always
     - run:
         name: decent_params_tests
         command: |-
@@ -127,6 +136,19 @@ jobs:
               decent_params_tests
         when: always
     - run:
+        name: quickapp_tests
+        command: |-
+          set -euxo pipefail
+          mkdir -p out/test-results
+          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
+          nosetests \
+              --rednose --immediate \
+              --cover-tests --with-coverage \
+              --with-xunit --xunit-file=${xunit_output} \
+              --cover-package=${COVER_PACKAGES} \
+              quickapp_tests
+        when: always
+    - run:
         name: post-circle-tests
         command: |
           TARGET=post-circle-tests
@@ -137,7 +159,6 @@ jobs:
           fi
 
     - store_test_results:
-        when: always
         path: out/test-results
 
     - run:
@@ -150,12 +171,10 @@ jobs:
 
 
     - store_artifacts:
-        when: always
         path: out/coverage
         destination: coverage
 
     - store_artifacts:
-        when: always
         path: out/tests
         destination: tests
 
@@ -164,14 +183,14 @@ jobs:
         when: always
         command: |
           bash <(curl -s https://codecov.io/bash)
-    resource_class: medium+
-  test-3.8-production:
+    resource_class: medium
+  test-3.8-prod:
     environment:
       COLUMNS: '160'
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
-      TEST_PACKAGES: quickapp_tests decent_params_tests
+      TEST_PACKAGES: decent_params_tests quickapp_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
@@ -195,22 +214,23 @@ jobs:
         name: Install deps
         command: |
           shyaml get-values install_requires < project.pp1.yaml > .requirements.txt
-          pip3 install  -r .requirements.txt
+          python3 -m pip install -U pip
+          python3 -m pip install  -r .requirements.txt
           rm .requirements.txt
 
     - run:
         name: Install testing deps
         command: |
           shyaml get-values tests_require < project.pp1.yaml > .requirements_tests.txt
-          pip3 install -r .requirements_tests.txt
+          python3 -m pip  install -r .requirements_tests.txt
           rm .requirements_tests.txt
 
     - run:
         name: Python stats
         command: |
           pipdeptree | tee  build-stats/pipdeptree.txt
-          pip list   | sort | tee  build-stats/pip-list.txt
-          pip freeze | sort | tee  build-stats/pip-freeze.txt
+          python3 -m pip  list   | sort | tee  build-stats/pip-list.txt
+          python3 -m pip  freeze | sort | tee  build-stats/pip-freeze.txt
 
     - store_artifacts:
         path: build-stats
@@ -219,7 +239,7 @@ jobs:
     - run:
         name: setup.py develop
         command: |
-          python setup.py develop --prefix ~/.local --no-deps
+          pip install -e . --prefix ~/.local --no-deps
 
     - run:
         name: Make docs
@@ -231,10 +251,18 @@ jobs:
           fi
 
     - store_artifacts:
-        when: always
         path: out/docs
         destination: docs
-
+    - run:
+        background: true
+        name: services
+        command: |
+          TARGET=services
+          if make -n $TARGET ; then
+              make $TARGET
+          else
+              echo "Target $TARGET not defined"
+          fi
     - run:
         name: pre-circle-tests
         command: |
@@ -245,25 +273,13 @@ jobs:
               echo "Target $TARGET not defined"
           fi
 
-      # - run:
-      #     name: Notebooks
-      #     command: |
-      #       make -C notebooks cleanup all
+
+    # - run:
+    #     name: Notebooks
+    #     command: |
+    #       make -C notebooks cleanup all
 
 
-    - run:
-        name: quickapp_tests
-        command: |-
-          set -euxo pipefail
-          mkdir -p out/test-results
-          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
-          nosetests \
-              --rednose --immediate \
-              --cover-tests --with-coverage \
-              --with-xunit --xunit-file=${xunit_output} \
-              --cover-package=${COVER_PACKAGES} \
-              quickapp_tests
-        when: always
     - run:
         name: decent_params_tests
         command: |-
@@ -278,6 +294,19 @@ jobs:
               decent_params_tests
         when: always
     - run:
+        name: quickapp_tests
+        command: |-
+          set -euxo pipefail
+          mkdir -p out/test-results
+          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
+          nosetests \
+              --rednose --immediate \
+              --cover-tests --with-coverage \
+              --with-xunit --xunit-file=${xunit_output} \
+              --cover-package=${COVER_PACKAGES} \
+              quickapp_tests
+        when: always
+    - run:
         name: post-circle-tests
         command: |
           TARGET=post-circle-tests
@@ -288,7 +317,6 @@ jobs:
           fi
 
     - store_test_results:
-        when: always
         path: out/test-results
 
     - run:
@@ -301,12 +329,10 @@ jobs:
 
 
     - store_artifacts:
-        when: always
         path: out/coverage
         destination: coverage
 
     - store_artifacts:
-        when: always
         path: out/tests
         destination: tests
 
@@ -315,6 +341,322 @@ jobs:
         when: always
         command: |
           bash <(curl -s https://codecov.io/bash)
-    resource_class: medium+
+    resource_class: medium
+  test-3.9-stage:
+    environment:
+      COLUMNS: '160'
+      # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
+      TEST_PACKAGES: decent_params_tests quickapp_tests
+      Z_SERVICE_LOG: zuper_zapp.envs.log
+      Z_SERVICE_PROC: zuper_proc_local.proc
+      Z_SERVICE_FS: zuper_fs_local.use_local_fs
+    docker:
+    - image: ${DOCKER_REGISTRY}/zupermind/zuper-ci-3.9:z7
+      auth:
+        username: $DOCKER_USERNAME
+        password: $DOCKER_PASSWORD
+    working_directory: ~/repo
+    steps:
+    - checkout
+    - run:
+        name: Build statistics
+        command: |
+          mkdir -p build-stats
+          env | sort | tee  build-stats/env.txt
+    - store_artifacts:
+        path: build-stats
+        destination: build-stats
+    - run:
+        name: Install deps
+        command: |
+          shyaml get-values install_requires < project.pp1.yaml > .requirements.txt
+          python3 -m pip install -U pip
+          python3 -m pip install  -r .requirements.txt
+          rm .requirements.txt
 
-# sigil 50c05a396c2f5c1082571645d996c97e
+    - run:
+        name: Install testing deps
+        command: |
+          shyaml get-values tests_require < project.pp1.yaml > .requirements_tests.txt
+          python3 -m pip  install -r .requirements_tests.txt
+          rm .requirements_tests.txt
+
+    - run:
+        name: Python stats
+        command: |
+          pipdeptree | tee  build-stats/pipdeptree.txt
+          python3 -m pip  list   | sort | tee  build-stats/pip-list.txt
+          python3 -m pip  freeze | sort | tee  build-stats/pip-freeze.txt
+
+    - store_artifacts:
+        path: build-stats
+        destination: build-stats
+
+    - run:
+        name: setup.py develop
+        command: |
+          pip install -e . --prefix ~/.local --no-deps
+
+    - run:
+        name: Make docs
+        command: |
+          FILE=src/conf.py
+          mkdir -p out/docs
+          if test -f "$FILE"; then
+              sphinx-build src out/docs
+          fi
+
+    - store_artifacts:
+        path: out/docs
+        destination: docs
+    - run:
+        background: true
+        name: services
+        command: |
+          TARGET=services
+          if make -n $TARGET ; then
+              make $TARGET
+          else
+              echo "Target $TARGET not defined"
+          fi
+    - run:
+        name: pre-circle-tests
+        command: |
+          TARGET=pre-circle-tests
+          if make -n $TARGET ; then
+              make $TARGET
+          else
+              echo "Target $TARGET not defined"
+          fi
+
+
+    # - run:
+    #     name: Notebooks
+    #     command: |
+    #       make -C notebooks cleanup all
+
+
+    - run:
+        name: decent_params_tests
+        command: |-
+          set -euxo pipefail
+          mkdir -p out/test-results
+          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-decent_params_tests-xunit.xml
+          nosetests \
+              --rednose --immediate \
+              --cover-tests --with-coverage \
+              --with-xunit --xunit-file=${xunit_output} \
+              --cover-package=${COVER_PACKAGES} \
+              decent_params_tests
+        when: always
+    - run:
+        name: quickapp_tests
+        command: |-
+          set -euxo pipefail
+          mkdir -p out/test-results
+          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
+          nosetests \
+              --rednose --immediate \
+              --cover-tests --with-coverage \
+              --with-xunit --xunit-file=${xunit_output} \
+              --cover-package=${COVER_PACKAGES} \
+              quickapp_tests
+        when: always
+    - run:
+        name: post-circle-tests
+        command: |
+          TARGET=post-circle-tests
+          if make -n $TARGET ; then
+              make $TARGET
+          else
+              echo "Target $TARGET not defined"
+          fi
+
+    - store_test_results:
+        path: out/test-results
+
+    - run:
+        name: Coverage report
+        when: always
+        command: |
+          coverage combine || true
+          coverage html -d out/coverage/${CIRCLE_NODE_INDEX}
+          coverage xml
+
+
+    - store_artifacts:
+        path: out/coverage
+        destination: coverage
+
+    - store_artifacts:
+        path: out/tests
+        destination: tests
+
+    - run:
+        name: CodeCov
+        when: always
+        command: |
+          bash <(curl -s https://codecov.io/bash)
+    resource_class: medium
+  test-3.9-prod:
+    environment:
+      COLUMNS: '160'
+      # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
+      TEST_PACKAGES: decent_params_tests quickapp_tests
+      Z_SERVICE_LOG: zuper_zapp.envs.log
+      Z_SERVICE_PROC: zuper_proc_local.proc
+      Z_SERVICE_FS: zuper_fs_local.use_local_fs
+    docker:
+    - image: ${DOCKER_REGISTRY}/zupermind/zuper-ci-3.9:z7
+      auth:
+        username: $DOCKER_USERNAME
+        password: $DOCKER_PASSWORD
+    working_directory: ~/repo
+    steps:
+    - checkout
+    - run:
+        name: Build statistics
+        command: |
+          mkdir -p build-stats
+          env | sort | tee  build-stats/env.txt
+    - store_artifacts:
+        path: build-stats
+        destination: build-stats
+    - run:
+        name: Install deps
+        command: |
+          shyaml get-values install_requires < project.pp1.yaml > .requirements.txt
+          python3 -m pip install -U pip
+          python3 -m pip install  -r .requirements.txt
+          rm .requirements.txt
+
+    - run:
+        name: Install testing deps
+        command: |
+          shyaml get-values tests_require < project.pp1.yaml > .requirements_tests.txt
+          python3 -m pip  install -r .requirements_tests.txt
+          rm .requirements_tests.txt
+
+    - run:
+        name: Python stats
+        command: |
+          pipdeptree | tee  build-stats/pipdeptree.txt
+          python3 -m pip  list   | sort | tee  build-stats/pip-list.txt
+          python3 -m pip  freeze | sort | tee  build-stats/pip-freeze.txt
+
+    - store_artifacts:
+        path: build-stats
+        destination: build-stats
+
+    - run:
+        name: setup.py develop
+        command: |
+          pip install -e . --prefix ~/.local --no-deps
+
+    - run:
+        name: Make docs
+        command: |
+          FILE=src/conf.py
+          mkdir -p out/docs
+          if test -f "$FILE"; then
+              sphinx-build src out/docs
+          fi
+
+    - store_artifacts:
+        path: out/docs
+        destination: docs
+    - run:
+        background: true
+        name: services
+        command: |
+          TARGET=services
+          if make -n $TARGET ; then
+              make $TARGET
+          else
+              echo "Target $TARGET not defined"
+          fi
+    - run:
+        name: pre-circle-tests
+        command: |
+          TARGET=pre-circle-tests
+          if make -n $TARGET ; then
+              make $TARGET
+          else
+              echo "Target $TARGET not defined"
+          fi
+
+
+    # - run:
+    #     name: Notebooks
+    #     command: |
+    #       make -C notebooks cleanup all
+
+
+    - run:
+        name: decent_params_tests
+        command: |-
+          set -euxo pipefail
+          mkdir -p out/test-results
+          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-decent_params_tests-xunit.xml
+          nosetests \
+              --rednose --immediate \
+              --cover-tests --with-coverage \
+              --with-xunit --xunit-file=${xunit_output} \
+              --cover-package=${COVER_PACKAGES} \
+              decent_params_tests
+        when: always
+    - run:
+        name: quickapp_tests
+        command: |-
+          set -euxo pipefail
+          mkdir -p out/test-results
+          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
+          nosetests \
+              --rednose --immediate \
+              --cover-tests --with-coverage \
+              --with-xunit --xunit-file=${xunit_output} \
+              --cover-package=${COVER_PACKAGES} \
+              quickapp_tests
+        when: always
+    - run:
+        name: post-circle-tests
+        command: |
+          TARGET=post-circle-tests
+          if make -n $TARGET ; then
+              make $TARGET
+          else
+              echo "Target $TARGET not defined"
+          fi
+
+    - store_test_results:
+        path: out/test-results
+
+    - run:
+        name: Coverage report
+        when: always
+        command: |
+          coverage combine || true
+          coverage html -d out/coverage/${CIRCLE_NODE_INDEX}
+          coverage xml
+
+
+    - store_artifacts:
+        path: out/coverage
+        destination: coverage
+
+    - store_artifacts:
+        path: out/tests
+        destination: tests
+
+    - run:
+        name: CodeCov
+        when: always
+        command: |
+          bash <(curl -s https://codecov.io/bash)
+    resource_class: medium
+
+# sigil 696a353aeae75fb86fa13dc0ce244a09
