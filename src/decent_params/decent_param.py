@@ -1,13 +1,7 @@
-from typing import List
+from typing import List, Optional
 
-import six
-
-# from contracts import describe_type, describe_value
 from decent_params import Choice
 from .exceptions import DecentParamsSemanticError
-
-# from optparse import Option
-
 
 not_given = "DefaultNotGiven"
 
@@ -15,13 +9,13 @@ not_given = "DefaultNotGiven"
 class DecentParam:
     def __init__(
         self,
-        ptype,
-        name,
-        default=not_given,
-        help: str = None,  # @ReservedAssignment
-        short=None,
-        allow_multi=False,
-        group=None,
+        ptype: type,
+        name: str,
+        default: object = not_given,
+        help: Optional[str] = None,  # @ReservedAssignment
+        short: Optional[str] = None,
+        allow_multi: bool = False,
+        group: Optional[str] = None,
     ):
         compulsory = default == not_given
         if compulsory:
@@ -54,16 +48,16 @@ class DecentParam:
         """ Possibly returns Choice(options) """
         # print('%s %s' % (s, self.ptype))
         sep = ","
-        if isinstance(s, six.string_types) and sep in s:
+        if isinstance(s, str) and sep in s:
             return Choice([self.value_from_string(x) for x in s.split(sep)])
 
-        if self.ptype in six.string_types:
+        if self.ptype is str:
             return self.ptype(s)
-        if self.ptype == float:
+        if self.ptype is float:
             return float(s)
-        if self.ptype == int:
+        if self.ptype is int:
             return int(s)  # TODO: check
-        if self.ptype == bool:
+        if self.ptype is bool:
             res = bool(s)  # TODO: check
             # print('s %s -> %s' % (s, res))
             return res
