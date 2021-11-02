@@ -66,7 +66,7 @@ class ParamsTest(unittest.TestCase):
 
     @raises(UserError)
     def decent_params_test2(self):
-        """ Test compulsory """
+        """Test compulsory"""
         p = DecentParams()
         p.add_string("a")
         p.add_string("b")

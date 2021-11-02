@@ -54,7 +54,7 @@ class DecentParams:
         self.params[p.name] = p
 
     def accept_extra(self, description=None):
-        """ Declares that extra arguments are ok. """
+        """Declares that extra arguments are ok."""
         self.accepts_extra = True
         self.accepts_extra_description = description
 

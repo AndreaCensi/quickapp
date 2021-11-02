@@ -45,7 +45,7 @@ class DecentParam:
         self._value = self.value_from_string(s)
 
     def value_from_string(self, s: str):
-        """ Possibly returns Choice(options) """
+        """Possibly returns Choice(options)"""
         # print('%s %s' % (s, self.ptype))
         sep = ","
         if isinstance(s, str) and sep in s:
@@ -127,7 +127,7 @@ class DecentParamsResults:
         return self._extra
 
     def get_params(self):
-        """ Returns the DecentParams structure which originated these results. """
+        """Returns the DecentParams structure which originated these results."""
         return self._params
 
     def __getitem__(self, name: str):
@@ -154,7 +154,7 @@ class DecentParamsResults:
 
 
 class DecentParamMultiple(DecentParam):
-    """ Allow multiple values """
+    """Allow multiple values"""
 
     def __init__(self, ptype, name, default=not_given, **args):
         if default is not not_given:

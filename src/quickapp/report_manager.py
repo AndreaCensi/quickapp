@@ -274,7 +274,7 @@ def sort_by_type(allreports_filename):
 
 
 def find_others(type2reports, key):
-    """ find the closest report for different type """
+    """find the closest report for different type"""
     report_type = key["report"]
 
     key = dict(**key)
@@ -292,7 +292,7 @@ def find_others(type2reports, key):
 
 
 def get_most_similar(reports_different_type, key):
-    """ Returns the report of another type that is most similar to this report. """
+    """Returns the report of another type that is most similar to this report."""
 
     def score(key1):
         v1 = set(key1.values())
@@ -545,7 +545,7 @@ def index_reports(reports, index, update=None):  # @UnusedVariable
     alltimes = np.array([mtime(b) for _, b in existing])
 
     def order(filename):
-        """ returns between 0 and 1 the order statistics """
+        """returns between 0 and 1 the order statistics"""
         assert os.path.exists(filename)
         histime = mtime(filename)
         compare = alltimes < histime

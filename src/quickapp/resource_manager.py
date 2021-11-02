@@ -91,7 +91,7 @@ class ResourceManager:
         return res
 
     def _make_prefix(self, rtype, **params):
-        """ Creates the job prefix for the given resource. """
+        """Creates the job prefix for the given resource."""
         # use the user-defined if available
         if rtype in self.make_prefix:
             f = self.make_prefix[rtype]

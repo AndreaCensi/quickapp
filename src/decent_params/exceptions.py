@@ -14,13 +14,13 @@ class DecentParamsException(ZException):
 
 
 class DecentParamsDefinitionError(ZException):
-    """ These are raised when constructing data structures """
+    """These are raised when constructing data structures"""
 
     pass
 
 
 class DecentParamsUserError(UserError):
-    """ These are raised when interrpreting arguments """
+    """These are raised when interrpreting arguments"""
 
     #
     # def __init__(self, dp, msg):

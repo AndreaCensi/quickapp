@@ -69,7 +69,7 @@ class QuickAppBase(ABC):
 
     @abstractmethod
     def define_program_options(self, params):
-        """ Must be implemented by the subclass. """
+        """Must be implemented by the subclass."""
         raise NotImplementedError(type(self))
 
     @abstractmethod
@@ -82,7 +82,7 @@ class QuickAppBase(ABC):
 
     @classmethod
     def get_sys_main(cls):
-        """ Returns a function to be used as main function for a script. """
+        """Returns a function to be used as main function for a script."""
 
         @zapp1()
         async def entry(ze: ZappEnv) -> ExitCode:
@@ -172,7 +172,7 @@ class QuickAppBase(ABC):
         return self.parent
 
     async def main(self, sti: SyncTaskInterface, args: Optional[List[str]] = None, parent=None) -> ExitCode:
-        """ Main entry point. Returns an integer as an error code. """
+        """Main entry point. Returns an integer as an error code."""
         sti.logger.info(f"{type(self).__name__}.main", args=args, parent=parent)
         # sys.stderr.write(f'HERE! ars = {args} \n')
 

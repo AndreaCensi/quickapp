@@ -31,18 +31,18 @@ __all__ = [
 
 
 class QuickApp(QuickAppBase):
-    """ Template for an application that uses compmake to define jobs. """
+    """Template for an application that uses compmake to define jobs."""
 
     # Interface to be implemented
     @abstractmethod
     async def define_jobs_context(self, sti: SyncTaskInterface, context):
-        """ Define jobs in the current context. """
+        """Define jobs in the current context."""
 
         raise NotImplementedError(type(self))
 
     @abstractmethod
     def define_options(self, params: DecentParams):
-        """ Define options for the application. """
+        """Define options for the application."""
 
         raise NotImplementedError(type(self))
 

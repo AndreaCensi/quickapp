@@ -186,7 +186,7 @@ class QuickAppContext:
             self._parent.count_comp_invocations()
 
     def get_output_dir(self):
-        """ Returns a suitable output directory for data files """
+        """Returns a suitable output directory for data files"""
         # only create output dir on demand
         if not os.path.exists(self._output_dir):
             os.makedirs(self._output_dir)
@@ -335,7 +335,7 @@ class QuickAppContext:
         rm.add(self, report, report_type, **params)
 
     def get_report(self, report_type: str, **params) -> Promise:
-        """ Returns the promise to the given report """
+        """Returns the promise to the given report"""
         rm = self.get_report_manager()
         return rm.get(report_type, **params)
 
@@ -350,7 +350,7 @@ class QuickAppContext:
         self.extra_report_keys.update(keys)
 
     def _get_promise(self) -> Promise:
-        """ Returns the promise object representing this context. """
+        """Returns the promise object representing this context."""
         if self._promise is None:
             # warnings.warn('Need IDs for contexts, using job_prefix.')
             # warnings.warn('XXX: Note that this sometimes creates a context '
@@ -360,18 +360,18 @@ class QuickAppContext:
         return self._promise
 
     def has_branched(self):
-        """ Returns True if any comp_dynamic was issued. """
+        """Returns True if any comp_dynamic was issued."""
         return len(self.branched_contexts) > 0 or any([c.has_branched() for c in self.branched_children])
 
 
 def wrap_state(config_state, f, *args, **kwargs):
-    """ Used internally by comp_config() """
+    """Used internally by comp_config()"""
     config_state.restore()
     return f(*args, **kwargs)
 
 
 def wrap_state_dynamic(context, config_state, f, *args, **kwargs):
-    """ Used internally by comp_config_dynamic() """
+    """Used internally by comp_config_dynamic()"""
     config_state.restore()
     return f(context, *args, **kwargs)
 
@@ -408,17 +408,17 @@ def _dynreports_merge(branched: List[dict]):
 
 
 def _dynreports_getres(res: dict):
-    """ gets only the result """
+    """gets only the result"""
     return res["f-result"]
 
 
 def _dynreports_getbra(res) -> dict:
-    """ gets only the result """
+    """gets only the result"""
     return res["context-res"]
 
 
 def get_branched_contexts(context):
-    """ Returns all promises created by context_comp_dynamic() for this and children. """
+    """Returns all promises created by context_comp_dynamic() for this and children."""
     res = list(context.branched_contexts)
     for c in context.branched_children:
         res.extend(get_branched_contexts(c))

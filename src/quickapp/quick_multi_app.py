@@ -38,7 +38,7 @@ class QuickMultiCmdApp(QuickAppBase):
     # noinspection PyMethodParameters
     @classmethod
     def get_sub(appcls):
-        """ Returns the subclass for the subcommands """
+        """Returns the subclass for the subcommands"""
         # mainly because eclipse does not see ".sub" as valid.
         if not hasattr(appcls, "sub"):
             # from contracts import ContractsMeta
@@ -124,14 +124,14 @@ class QuickMultiCmdApp(QuickAppBase):
 
     @classmethod
     def _get_subs_names_fmt(cls):
-        """ Returns 'cmd1, cmd2, cmd3; """
+        """Returns 'cmd1, cmd2, cmd3;"""
         names = cls._get_subs_names()
         possibilities = ", ".join("%r" % x for x in names)
         return possibilities
 
     @classmethod
     def _get_subs_as_dict(cls):
-        """ Returns a dict: cmd_name -> cmd """
+        """Returns a dict: cmd_name -> cmd"""
         return dict([(x.cmd, x) for x in cls._get_subs()])
 
     @classmethod
