@@ -17,6 +17,7 @@ from zuper_commons.text import indent
 from zuper_commons.types import ZException, ZValueError
 from zuper_utils_asyncio import SyncTaskInterface
 from zuper_zapp import zapp1, ZappEnv
+
 from . import logger
 from .exceptions import QuickAppException
 
@@ -46,16 +47,16 @@ class QuickAppBase(ABC):
         prog = self.get_prog_name()
         self.logger = ZLogger(prog)
 
-    def info(self, msg: str = None, *args, **kwargs):
+    def info(self, msg: Optional[str] = None, *args, **kwargs):
         return self.logger.info(msg, *args, stacklevel=1, **kwargs)
 
-    def warn(self, msg: str = None, *args, **kwargs):
+    def warn(self, msg: Optional[str] = None, *args, **kwargs):
         return self.logger.warn(msg, *args, stacklevel=1, **kwargs)
 
-    def error(self, msg: str = None, *args, **kwargs):
+    def error(self, msg: Optional[str] = None, *args, **kwargs):
         return self.logger.error(msg, *args, stacklevel=1, **kwargs)
 
-    def debug(self, msg: str = None, *args, **kwargs):
+    def debug(self, msg: Optional[str] = None, *args, **kwargs):
         return self.logger.debug(msg, *args, stacklevel=1, **kwargs)
 
     def __getstate__(self):

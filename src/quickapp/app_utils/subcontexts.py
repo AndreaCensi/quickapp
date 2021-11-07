@@ -1,5 +1,5 @@
 # from contracts import contract
-from typing import Sequence
+from typing import Optional, Sequence
 
 from .minimal_name import _context_names_heuristics
 
@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 
-def iterate_context_names(context, it1: Sequence, key: str = None):
+def iterate_context_names(context, it1: Sequence, key: Optional[str] = None):
     """
     Creates child contexts with minimal names.
 
@@ -37,7 +37,9 @@ def iterate_context_names(context, it1: Sequence, key: str = None):
         yield e_c, x
 
 
-def iterate_context_names_pair(context, it1: Sequence, it2: Sequence, key1: str = None, key2: str = None):
+def iterate_context_names_pair(
+    context, it1: Sequence, it2: Sequence, key1: Optional[str] = None, key2: Optional[str] = None
+):
     """
     Yields tuples of (context, s1, s2).
     """
@@ -55,9 +57,9 @@ def iterate_context_names_triplet(
     it1: Sequence,
     it2: Sequence,
     it3: Sequence,
-    key1: str = None,
-    key2: str = None,
-    key3: str = None,
+    key1: Optional[str] = None,
+    key2: Optional[str] = None,
+    key3: Optional[str] = None,
 ):
     """
     Yields tuples of (context, s1, s2, s3).

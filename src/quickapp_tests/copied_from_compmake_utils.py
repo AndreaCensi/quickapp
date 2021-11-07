@@ -2,9 +2,7 @@ import os
 import traceback
 from contextlib import asynccontextmanager
 from tempfile import mkdtemp
-from typing import AsyncIterator, Awaitable, Callable, cast, TypeVar
-
-from nose.tools import assert_equal
+from typing import AsyncIterator, Awaitable, Callable, cast, Optional, TypeVar
 
 from compmake import (
     all_jobs,
@@ -19,6 +17,7 @@ from compmake import (
     read_rc_files,
     StorageFilesystem,
 )
+from nose.tools import assert_equal
 from zuper_commons.cmds import ExitCode
 from zuper_commons.types import ZAssertionError, ZException, ZValueError
 from zuper_utils_asyncio import create_sync_task2, SyncTaskInterface
@@ -72,7 +71,7 @@ class Env:
         res = await self.up_to_date(job_id)
         self.assert_equal(res, status, "Want %r uptodate? %s" % (job_id, status))
 
-    def assert_equal(self, first: X, second: X, msg: str = None):
+    def assert_equal(self, first: X, second: X, msg: Optional[str] = None):
         assert_equal(first, second, msg)
 
     async def assert_jobs_equal(self, expr: str, jobs, ignore_dyn_reports=True):
@@ -139,7 +138,7 @@ class Env:
         return up
 
 
-async def make_environment(sti: SyncTaskInterface, rootd: str = None) -> Env:
+async def make_environment(sti: SyncTaskInterface, rootd: Optional[str] = None) -> Env:
     if rootd is None:
         rootd = mkdtemp()
     env = Env(rootd, sti)
@@ -148,7 +147,7 @@ async def make_environment(sti: SyncTaskInterface, rootd: str = None) -> Env:
 
 
 @asynccontextmanager
-async def environment(sti: SyncTaskInterface, rootd: str = None) -> AsyncIterator[Env]:
+async def environment(sti: SyncTaskInterface, rootd: Optional[str] = None) -> AsyncIterator[Env]:
     env = await make_environment(sti, rootd)
     try:
         yield env
