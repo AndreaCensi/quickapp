@@ -1,5 +1,5 @@
 __version__ = "7.2"
-__date__ = "2021-08-14T09:54:31.016899+00:00"
+__date__ = ""
 
 from zuper_commons.logs import ZLogger
 
@@ -24,3 +24,5 @@ symbols = [QuickMultiCmdApp, QuickApp, QuickAppBase, add_subcommand, ResourceMan
 
 for s in symbols:
     s.__module__ = "quickapp"
+
+logger.hello_module_finished(__name__)
