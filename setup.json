@@ -6,6 +6,7 @@
     "reprep-z7",
     "six",
     "zuper-commons-z7",
+    "zuper-params-z7",
     "zuper-utils-asyncio-z7",
     "zuper-zapp-z7"
   ],
@@ -21,8 +22,6 @@
   "zip_safe": true,
   "include_package_data": true,
   "modules": [
-    "decent_params",
-    "decent_params.utils",
     "quickapp",
     "quickapp.app_utils",
     "quickapp.rm",

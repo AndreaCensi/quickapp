@@ -31,8 +31,8 @@ jobs:
       COLUMNS: '160'
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-      COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
-      TEST_PACKAGES: decent_params_tests quickapp_tests
+      COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
+      TEST_PACKAGES: quickapp_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
@@ -122,19 +122,6 @@ jobs:
     #       make -C notebooks cleanup all
 
 
-    - run:
-        name: decent_params_tests
-        command: |-
-          set -euxo pipefail
-          mkdir -p out/test-results
-          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-decent_params_tests-xunit.xml
-          nosetests \
-              --rednose --immediate \
-              --cover-tests --with-coverage \
-              --with-xunit --xunit-file=${xunit_output} \
-              --cover-package=${COVER_PACKAGES} \
-              decent_params_tests
-        when: always
     - run:
         name: quickapp_tests
         command: |-
@@ -189,8 +176,8 @@ jobs:
       COLUMNS: '160'
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-      COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
-      TEST_PACKAGES: decent_params_tests quickapp_tests
+      COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
+      TEST_PACKAGES: quickapp_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
@@ -281,19 +268,6 @@ jobs:
 
 
     - run:
-        name: decent_params_tests
-        command: |-
-          set -euxo pipefail
-          mkdir -p out/test-results
-          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-decent_params_tests-xunit.xml
-          nosetests \
-              --rednose --immediate \
-              --cover-tests --with-coverage \
-              --with-xunit --xunit-file=${xunit_output} \
-              --cover-package=${COVER_PACKAGES} \
-              decent_params_tests
-        when: always
-    - run:
         name: quickapp_tests
         command: |-
           set -euxo pipefail
@@ -347,8 +321,8 @@ jobs:
       COLUMNS: '160'
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-      COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
-      TEST_PACKAGES: decent_params_tests quickapp_tests
+      COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
+      TEST_PACKAGES: quickapp_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
@@ -438,19 +412,6 @@ jobs:
     #       make -C notebooks cleanup all
 
 
-    - run:
-        name: decent_params_tests
-        command: |-
-          set -euxo pipefail
-          mkdir -p out/test-results
-          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-decent_params_tests-xunit.xml
-          nosetests \
-              --rednose --immediate \
-              --cover-tests --with-coverage \
-              --with-xunit --xunit-file=${xunit_output} \
-              --cover-package=${COVER_PACKAGES} \
-              decent_params_tests
-        when: always
     - run:
         name: quickapp_tests
         command: |-
@@ -505,8 +466,8 @@ jobs:
       COLUMNS: '160'
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-      COVER_PACKAGES: decent_params,decent_params_tests,quickapp,quickapp_tests,reprep_quickapp
-      TEST_PACKAGES: decent_params_tests quickapp_tests
+      COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
+      TEST_PACKAGES: quickapp_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
@@ -597,19 +558,6 @@ jobs:
 
 
     - run:
-        name: decent_params_tests
-        command: |-
-          set -euxo pipefail
-          mkdir -p out/test-results
-          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-decent_params_tests-xunit.xml
-          nosetests \
-              --rednose --immediate \
-              --cover-tests --with-coverage \
-              --with-xunit --xunit-file=${xunit_output} \
-              --cover-package=${COVER_PACKAGES} \
-              decent_params_tests
-        when: always
-    - run:
         name: quickapp_tests
         command: |-
           set -euxo pipefail
@@ -659,4 +607,4 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
     resource_class: medium
 
-# sigil f40d626924b8b723a39a38eb10540621
+# sigil 353e0d46c89115588827be4793faba3a
