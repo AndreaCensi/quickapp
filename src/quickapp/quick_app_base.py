@@ -5,19 +5,18 @@ from abc import ABC, abstractmethod
 from pprint import pformat
 from typing import Any, Dict, List, Optional
 
-from decent_params import (
+from zuper_commons import ZLogger
+from zuper_commons.cmds import ExitCode
+from zuper_commons.text import indent
+from zuper_commons.types import ZException, ZValueError
+from zuper_params import (
     DecentParams,
     DecentParamsResults,
     DecentParamsUserError,
     UserError,
 )
-from zuper_commons import ZLogger
-from zuper_commons.cmds import ExitCode
-from zuper_commons.text import indent
-from zuper_commons.types import ZException, ZValueError
 from zuper_utils_asyncio import SyncTaskInterface
 from zuper_zapp import zapp1, ZappEnv
-
 from . import logger
 from .exceptions import QuickAppException
 

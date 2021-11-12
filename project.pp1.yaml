@@ -5,7 +5,6 @@ version_file: '1'
 modules:
 - quickapp
 - reprep_quickapp
-- decent_params
 
 install_requires:
 - zuper-commons-z7
@@ -16,6 +15,7 @@ install_requires:
 - numpy
 - six
 - zuper-zapp-z7
+- zuper-params-z7
 
 
 tests_require:
