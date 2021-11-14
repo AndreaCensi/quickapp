@@ -1,10 +1,10 @@
-from collections import defaultdict
 import traceback
-
-# from contracts import contract, describe_type
+from collections import defaultdict
 
 from compmake import Promise
 from conf_tools.utils import check_is_in, indent
+
+# from contracts import contract, describe_type
 
 
 __all__ = ["ResourceManager"]
@@ -15,7 +15,7 @@ class ResourceManager:
         pass
 
     def __init__(self, context):
-        from quickapp.compmake_context import QuickAppContext
+        from .compmake_context import QuickAppContext
 
         assert isinstance(context, QuickAppContext), context
         from reprep.report_utils import StoreResults

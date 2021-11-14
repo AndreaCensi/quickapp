@@ -4,6 +4,8 @@ from contextlib import asynccontextmanager
 from tempfile import mkdtemp
 from typing import AsyncIterator, Awaitable, Callable, cast, Optional, TypeVar
 
+from nose.tools import assert_equal
+
 from compmake import (
     all_jobs,
     CacheQueryDB,
@@ -17,7 +19,6 @@ from compmake import (
     read_rc_files,
     StorageFilesystem,
 )
-from nose.tools import assert_equal
 from zuper_commons.cmds import ExitCode
 from zuper_commons.types import ZAssertionError, ZException, ZValueError
 from zuper_utils_asyncio import create_sync_task2, SyncTaskInterface

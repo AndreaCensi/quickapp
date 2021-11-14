@@ -2,9 +2,9 @@ from typing import List, Type, Union
 
 from nose.tools import assert_equal
 
-from .copied_from_compmake_utils import Env
 from quickapp import QuickAppBase
 from zuper_commons.types import ZTypeError
+from .copied_from_compmake_utils import Env
 
 
 async def run_quickapp(

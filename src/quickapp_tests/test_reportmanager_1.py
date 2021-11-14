@@ -1,7 +1,7 @@
-from .copied_from_compmake_utils import Env, run_with_env
 from quickapp import iterate_context_names, QuickApp
-from quickapp_tests.quickappbase import run_quickapp
 from reprep import Report
+from .copied_from_compmake_utils import Env, run_with_env
+from .quickappbase import run_quickapp
 
 
 def report_example1(param1, param2):

@@ -14,11 +14,11 @@ from compmake import (
     ShellExitRequested,
     StorageFilesystem,
 )
-from quickapp import logger, QUICKAPP_COMPUTATION_ERROR
 from zuper_commons.text import indent
 from zuper_params import DecentParams
 from zuper_params.utils import UserError, wrap_script_entry_point
 from zuper_utils_asyncio import SyncTaskInterface
+from . import logger, QUICKAPP_COMPUTATION_ERROR
 from .compmake_context import context_get_merge_data, QuickAppContext
 from .exceptions import QuickAppException
 from .quick_app_base import QuickAppBase

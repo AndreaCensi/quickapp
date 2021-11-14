@@ -1,4 +1,4 @@
-from quickapp import QuickApp, iterate_context_names
+from quickapp import iterate_context_names, QuickApp
 from reprep import Report
 
 

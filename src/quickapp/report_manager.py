@@ -14,7 +14,6 @@ from zuper_commons.types import check_isinstance, ZValueError
 from zuper_commons.ui import duration_compact
 from . import logger
 
-
 __all__ = [
     "ReportManager",
     "_dynreports_create_index",
@@ -98,7 +97,7 @@ class ReportManager:
         :param report_type: A string that describes the "type" of the report
         :param kwargs:  str->str,int,float  parameters used for grouping
         """
-        from quickapp.compmake_context import QuickAppContext
+        from .compmake_context import QuickAppContext
 
         assert isinstance(context, QuickAppContext)
         if not isinstance(report_type, str):
