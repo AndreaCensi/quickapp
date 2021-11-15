@@ -1,6 +1,6 @@
 import unittest
 
-from .minimal_name import minimal_names, minimal_names_at_boundaries
+from quickapp.app_utils.minimal_name import minimal_names, minimal_names_at_boundaries
 
 
 class TestMinimal(unittest.TestCase):
