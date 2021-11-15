@@ -31,7 +31,7 @@ jobs:
       COLUMNS: '160'
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-      COVER_PACKAGES: quickapp,quickapp_tests,quickapp_tests.copied_from_compmake_utils,quickapp_tests.example_recursive_reports,quickapp_tests.quickappbase,quickapp_tests.test_1,quickapp_tests.test_2,quickapp_tests.test_child_context,quickapp_tests.test_dynamic_1,quickapp_tests.test_dynamic_2_qa,quickapp_tests.test_dynamic_3_qa,quickapp_tests.test_dynamic_4_qa,quickapp_tests.test_recursive_reports,quickapp_tests.test_recursive_reports2,quickapp_tests.test_reportmanager_1,quickapp_tests.test_subcommands,reprep_quickapp
+      COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: quickapp_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_proc_local.proc
@@ -174,7 +174,7 @@ jobs:
       COLUMNS: '160'
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-      COVER_PACKAGES: quickapp,quickapp_tests,quickapp_tests.copied_from_compmake_utils,quickapp_tests.example_recursive_reports,quickapp_tests.quickappbase,quickapp_tests.test_1,quickapp_tests.test_2,quickapp_tests.test_child_context,quickapp_tests.test_dynamic_1,quickapp_tests.test_dynamic_2_qa,quickapp_tests.test_dynamic_3_qa,quickapp_tests.test_dynamic_4_qa,quickapp_tests.test_recursive_reports,quickapp_tests.test_recursive_reports2,quickapp_tests.test_reportmanager_1,quickapp_tests.test_subcommands,reprep_quickapp
+      COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: quickapp_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_proc_local.proc
@@ -317,7 +317,7 @@ jobs:
       COLUMNS: '160'
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-      COVER_PACKAGES: quickapp,quickapp_tests,quickapp_tests.copied_from_compmake_utils,quickapp_tests.example_recursive_reports,quickapp_tests.quickappbase,quickapp_tests.test_1,quickapp_tests.test_2,quickapp_tests.test_child_context,quickapp_tests.test_dynamic_1,quickapp_tests.test_dynamic_2_qa,quickapp_tests.test_dynamic_3_qa,quickapp_tests.test_dynamic_4_qa,quickapp_tests.test_recursive_reports,quickapp_tests.test_recursive_reports2,quickapp_tests.test_reportmanager_1,quickapp_tests.test_subcommands,reprep_quickapp
+      COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: quickapp_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_proc_local.proc
@@ -460,7 +460,7 @@ jobs:
       COLUMNS: '160'
       # default is /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-      COVER_PACKAGES: quickapp,quickapp_tests,quickapp_tests.copied_from_compmake_utils,quickapp_tests.example_recursive_reports,quickapp_tests.quickappbase,quickapp_tests.test_1,quickapp_tests.test_2,quickapp_tests.test_child_context,quickapp_tests.test_dynamic_1,quickapp_tests.test_dynamic_2_qa,quickapp_tests.test_dynamic_3_qa,quickapp_tests.test_dynamic_4_qa,quickapp_tests.test_recursive_reports,quickapp_tests.test_recursive_reports2,quickapp_tests.test_reportmanager_1,quickapp_tests.test_subcommands,reprep_quickapp
+      COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: quickapp_tests
       Z_SERVICE_LOG: zuper_zapp.envs.log
       Z_SERVICE_PROC: zuper_proc_local.proc
@@ -599,4 +599,4 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
     resource_class: medium
 
-# sigil 773b64b97288ead9c65367f36e700d64
+# sigil 230d8a8a3a8f5b584b171cbcecf0d548
