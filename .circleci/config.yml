@@ -33,7 +33,7 @@ jobs:
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: quickapp_tests
-      Z_SERVICE_LOG: zuper_zapp.envs.log
+      Z_SERVICE_LOG: zuper_loghandle.log
       Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
     docker:
@@ -176,7 +176,7 @@ jobs:
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: quickapp_tests
-      Z_SERVICE_LOG: zuper_zapp.envs.log
+      Z_SERVICE_LOG: zuper_loghandle.log
       Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
     docker:
@@ -319,7 +319,7 @@ jobs:
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: quickapp_tests
-      Z_SERVICE_LOG: zuper_zapp.envs.log
+      Z_SERVICE_LOG: zuper_loghandle.log
       Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
     docker:
@@ -462,7 +462,7 @@ jobs:
       PATH: /root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: quickapp_tests
-      Z_SERVICE_LOG: zuper_zapp.envs.log
+      Z_SERVICE_LOG: zuper_loghandle.log
       Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
     docker:
@@ -599,4 +599,4 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
     resource_class: medium
 
-# sigil 230d8a8a3a8f5b584b171cbcecf0d548
+# sigil c7b937d87bc6a81ccdd51006285d9f2d
