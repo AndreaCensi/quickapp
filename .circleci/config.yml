@@ -9,22 +9,22 @@ workflows:
         context: z7-stage
         filters:
           branches:
-            only: /z7-stage.*/
+            only: /.*z7-stage.*/
     - test-3.8-prod:
         context: z7-prod
         filters:
           branches:
-            only: /z7-prod.*/
+            only: /.*z7-prod.*/
     - test-3.9-stage:
         context: z7-stage
         filters:
           branches:
-            only: /z7-stage.*/
+            only: /.*z7-stage.*/
     - test-3.9-prod:
         context: z7-prod
         filters:
           branches:
-            only: /z7-prod.*/
+            only: /.*z7-prod.*/
 jobs:
   test-3.8-stage:
     environment:
@@ -167,7 +167,10 @@ jobs:
         name: CodeCov
         when: always
         command: |
-          bash <(curl -s https://codecov.io/bash)
+          # bash <(curl -s https://codecov.io/bash)
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov -t ${CODECOV_TOKEN}
     resource_class: medium
   test-3.8-prod:
     environment:
@@ -310,7 +313,10 @@ jobs:
         name: CodeCov
         when: always
         command: |
-          bash <(curl -s https://codecov.io/bash)
+          # bash <(curl -s https://codecov.io/bash)
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov -t ${CODECOV_TOKEN}
     resource_class: medium
   test-3.9-stage:
     environment:
@@ -453,7 +459,10 @@ jobs:
         name: CodeCov
         when: always
         command: |
-          bash <(curl -s https://codecov.io/bash)
+          # bash <(curl -s https://codecov.io/bash)
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov -t ${CODECOV_TOKEN}
     resource_class: medium
   test-3.9-prod:
     environment:
@@ -596,7 +605,10 @@ jobs:
         name: CodeCov
         when: always
         command: |
-          bash <(curl -s https://codecov.io/bash)
+          # bash <(curl -s https://codecov.io/bash)
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov -t ${CODECOV_TOKEN}
     resource_class: medium
 
-# sigil 250ae9d619f0b9b4507a971c504417e7
+# sigil 5674fb34e4dd8b0fe3a40dc42d38b265
