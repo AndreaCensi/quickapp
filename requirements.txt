@@ -1,4 +1,0 @@
-reprep-z7
-DecentLogs-z7
-compmake-z7
-ConfTools-z7
