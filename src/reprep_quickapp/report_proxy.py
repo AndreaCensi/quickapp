@@ -1,3 +1,4 @@
+import traceback
 from copy import deepcopy
 
 from compmake import Promise
@@ -88,7 +89,7 @@ def rp_figure_sub(resources: dict, id_figure: str, what: str, caption=None):
     try:
         figure.sub(what, caption=caption)
     except (NotExistent, Exception) as e:
-        logger.error(e)
+        logger.error(traceback.format_exc())
 
 
 def execute_proxy(operations):
