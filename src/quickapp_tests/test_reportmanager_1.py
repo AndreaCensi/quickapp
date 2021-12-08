@@ -39,7 +39,7 @@ class QuickAppDemoReport(QuickApp):
 
 
 @run_with_env
-async def test_order(env: Env):
+async def test_order(env: Env) -> None:
     logger = env.sti.logger
     await run_quickapp(env, QuickAppDemoReport, cmd="ls")
     logger.info("---- now make")

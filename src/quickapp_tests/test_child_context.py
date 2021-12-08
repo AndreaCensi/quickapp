@@ -26,7 +26,7 @@ class QuickAppDemoChild(QuickApp):
 
 
 @run_with_env
-async def test_dynamic(env: Env):
+async def test_dynamic(env: Env) -> None:
     ret_found = await run_quickapp(env, QuickAppDemoChild, "make")
     assert not ret_found, ret_found
 
@@ -45,7 +45,7 @@ class QuickAppDemoChild2(QuickApp):
 
 
 @run_with_env
-async def test_child_(env: Env):
+async def test_child_(env: Env) -> None:
     await run_quickapp(env, qapp=QuickAppDemoChild2, cmd="ls")
 
     # These are the jobs currently defined

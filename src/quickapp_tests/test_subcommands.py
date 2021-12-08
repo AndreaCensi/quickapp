@@ -46,7 +46,7 @@ class DemoAppCmd2(DemoApp.get_sub()):
 
 @known_failure
 @run_with_env
-async def test_subcommands(env: Env):
+async def test_subcommands(env: Env) -> None:
     args = [
         "-c",
         "make all",

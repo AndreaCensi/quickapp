@@ -47,7 +47,7 @@ class QuickAppDemo2(QuickApp):
 
 
 @run_with_env
-async def test_compapp(env: Env):
+async def test_compapp(env: Env) -> None:
     cases = []
 
     def add(args0: List[str], ret0: ExitCode):

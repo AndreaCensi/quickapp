@@ -29,7 +29,7 @@ class QuickAppDemoChild3(QuickApp):
 
 
 @run_with_env
-async def test_dynamic3(env: Env):
+async def test_dynamic3(env: Env) -> None:
     await run_quickapp(env, qapp=QuickAppDemoChild3, cmd="ls")
 
     await env.assert_cmd_success("check_consistency")

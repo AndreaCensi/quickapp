@@ -61,7 +61,7 @@ class QuickAppDemoReport2(QuickApp):
 
 
 @run_with_env
-async def test_rec_rep2(env: Env):
+async def test_rec_rep2(env: Env) -> None:
     await run_quickapp(env, QuickAppDemoReport2, cmd="make recurse=1")
 
 

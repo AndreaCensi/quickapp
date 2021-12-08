@@ -27,7 +27,7 @@ class QuickAppDemoChild3(QuickApp):
 
 
 @run_with_env
-async def test_dynamic2(env: Env):
+async def test_dynamic2(env: Env) -> None:
     logger = env.sti.logger
     await run_quickapp(env, qapp=QuickAppDemoChild3, cmd="ls")
     logger.info("ls 1")

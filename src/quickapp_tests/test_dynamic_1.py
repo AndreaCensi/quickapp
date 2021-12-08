@@ -28,7 +28,7 @@ class QuickAppDemoChild1(QuickApp):
 
 
 @run_with_env
-async def test_dynamic1(env: Env):
+async def test_dynamic1(env: Env) -> None:
     await run_quickapp(env, qapp=QuickAppDemoChild1, cmd="ls")
     defined = await env.all_jobs()
     assert_equal(
