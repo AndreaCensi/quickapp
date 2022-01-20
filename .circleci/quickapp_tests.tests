@@ -1,0 +1,12 @@
+quickapp_tests.subcontexts_test
+quickapp_tests.test_1
+quickapp_tests.test_2
+quickapp_tests.test_child_context
+quickapp_tests.test_dynamic_1
+quickapp_tests.test_dynamic_2_qa
+quickapp_tests.test_dynamic_3_qa
+quickapp_tests.test_dynamic_4_qa
+quickapp_tests.test_recursive_reports
+quickapp_tests.test_recursive_reports2
+quickapp_tests.test_reportmanager_1
+quickapp_tests.test_subcommands
