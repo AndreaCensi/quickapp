@@ -112,14 +112,14 @@ jobs:
         name: quickapp_tests
         command: |-
           set -euxo pipefail
-              mkdir -p out/test-results
-              xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
-              nosetests \
-                  --rednose --immediate \
-                  --cover-tests --with-coverage \
-                  --with-xunit --xunit-file=${xunit_output} \
-                  --cover-package=${COVER_PACKAGES} \
-                  quickapp_tests
+          mkdir -p out/test-results
+          xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
+          nosetests \
+              --rednose --immediate \
+              --cover-tests --with-coverage \
+              --with-xunit --xunit-file=${xunit_output} \
+              --cover-package=${COVER_PACKAGES} \
+              quickapp_tests
     - run:
         name: post-circle-tests
         command: |
@@ -268,8 +268,11 @@ jobs:
           fi
           mkdir -p out/test-results
           xunit_output=$PWD/out/test-results/nose-${CIRCLE_NODE_INDEX}-quickapp_tests-xunit.xml
-          nose2 --with-coverage --plugin nose2.plugins.junitxml --junit-xml --junit-xml-path ${xunit_output}
-          $TEST_MODULES
+          nose2 --with-coverage \
+              --plugin nose2.plugins.junitxml \
+              --junit-xml \
+              --junit-xml-path ${xunit_output} \
+              $TEST_MODULES
           # TODO: cover packages
     - run:
         name: post-circle-tests
@@ -310,4 +313,4 @@ jobs:
           ./codecov -t ${CODECOV_TOKEN}
     resource_class: small
 
-# sigil 960bd523fc0e7b825ceb0e2913e1aa54
+# sigil b28868b91eaaa49bdeddbf5be6a847db
