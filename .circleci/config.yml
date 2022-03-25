@@ -43,14 +43,14 @@ jobs:
         command: |
           shyaml get-values install_requires < project.pp1.yaml > .requirements.txt
           python3 -m pip install -U pip
-          python3 -m pip install --no-binary :all: -r .requirements.txt
+          python3 -m pip install  -r .requirements.txt
           rm .requirements.txt
 
     - run:
         name: Install testing deps
         command: |
           shyaml get-values tests_require < project.pp1.yaml > .requirements_tests.txt
-          python3 -m pip install --no-binary :all: -r .requirements_tests.txt
+          python3 -m pip install  -r .requirements_tests.txt
           rm .requirements_tests.txt
 
     - run:
@@ -166,4 +166,4 @@ jobs:
           ./codecov -t ${CODECOV_TOKEN}
     resource_class: small
 
-# sigil a8f49d120de644649c8950ae1e515930
+# sigil c98bc16cd062975cd00d271771b65b8f
