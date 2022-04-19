@@ -95,7 +95,7 @@ class QuickMultiCmdApp(QuickAppBase):
         return await sub_inst.main(sti, args=cmd_args, parent=self)
 
     @classmethod
-    def get_epilog(cls):
+    def get_epilog(cls) -> str:
         subs = cls._get_subs()
         if not subs:
             return "Warning: no commands defined."
@@ -105,7 +105,7 @@ class QuickMultiCmdApp(QuickAppBase):
         return s
 
     @classmethod
-    def get_epilog_commands(cls):
+    def get_epilog_commands(cls) -> str:
         s = ""
 
         for sub in cls._get_subs():
@@ -123,7 +123,7 @@ class QuickMultiCmdApp(QuickAppBase):
         return s
 
     @classmethod
-    def _get_subs_names_fmt(cls):
+    def _get_subs_names_fmt(cls) -> str:
         """Returns 'cmd1, cmd2, cmd3;"""
         names = cls._get_subs_names()
         possibilities = ", ".join("%r" % x for x in names)
