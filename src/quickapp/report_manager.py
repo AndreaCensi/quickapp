@@ -6,9 +6,6 @@ import numpy as np
 
 from compmake import Context, Promise
 from conf_tools.utils import friendly_path
-from reprep import Report
-from reprep.report_utils import StoreResults
-from reprep.utils import frozendict2
 from zuper_commons.text import natsorted
 from zuper_commons.types import check_isinstance, ZValueError
 from zuper_commons.ui import duration_compact
@@ -85,6 +82,8 @@ class ReportManager:
                 raise ValueError(msg)
 
     def get(self, report_type, **kwargs):
+        from reprep.utils import frozendict2
+
         key = frozendict2(report=report_type, **kwargs)
         return self.allreports[key]
 
@@ -110,6 +109,7 @@ class ReportManager:
 
         # check the format is ok
         self._check_report_format(report_type, **kwargs)
+        from reprep.utils import frozendict2
 
         key = frozendict2(report=report_type, **kwargs)
 
@@ -313,6 +313,8 @@ def get_most_similar(reports_different_type, key):
 
 
 def create_links_html(this_report, other_reports_same_type, index_filename, most_similar_other_type):
+    from reprep.report_utils import StoreResults
+
     check_isinstance(other_reports_same_type, StoreResults)
     """
     :param this_report: dictionary with the keys describing the report
@@ -463,6 +465,8 @@ def write_report_and_update(
     static_dir,
     write_pickle=False,
 ):
+    from reprep import Report
+
     check_isinstance(report, Report)
 
     links = create_links_html(
