@@ -165,10 +165,9 @@ jobs:
         name: CodeCov
         when: always
         command: |
-          # bash <(curl -s https://codecov.io/bash)
           curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x codecov
-          ./codecov -t ${CODECOV_TOKEN}
+          ./codecov  
     resource_class: small
 
-# sigil 0ecf455acd58f1ca83492f6ed33bdecc
+# sigil 8644253345a549121c1936d461e99ef9
