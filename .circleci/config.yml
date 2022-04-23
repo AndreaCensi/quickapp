@@ -109,6 +109,10 @@ jobs:
 
 
     - run:
+        name: Add more packages
+        command: python3 -m pip install zuper-fs-local-z7 zuper-proc-local-z7 zuper-notes-z7
+          zuper-loghandle-z7
+    - run:
         name: quickapp_tests
         command: |
           set -euxo pipefail
@@ -167,4 +171,4 @@ jobs:
           ./codecov -t ${CODECOV_TOKEN}
     resource_class: small
 
-# sigil ec61c8bc68b0a2c369e4ae15815dac4b
+# sigil 0ecf455acd58f1ca83492f6ed33bdecc
