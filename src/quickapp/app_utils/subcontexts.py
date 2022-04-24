@@ -5,11 +5,11 @@ from .minimal_name import _context_names_heuristics
 
 __all__ = [
     "iterate_context_names",
+    "iterate_context_names_pair",
+    "iterate_context_names_quartet",
+    "iterate_context_names_triplet",
     "iterate_context_pairs",
     "iterate_context_triplets",
-    "iterate_context_names_pair",
-    "iterate_context_names_triplet",
-    "iterate_context_names_quartet",
 ]
 
 
