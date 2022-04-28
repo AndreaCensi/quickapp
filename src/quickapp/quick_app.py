@@ -17,7 +17,7 @@ from compmake import (
 from zuper_commons.text import indent
 from zuper_params import DecentParams
 from zuper_params.utils import UserError, wrap_script_entry_point
-from zuper_utils_asyncio import SyncTaskInterface
+from zuper_utils_asyncio import MyAsyncExitStack, SyncTaskInterface
 from . import logger, QUICKAPP_COMPUTATION_ERROR
 from .compmake_context import context_get_merge_data, QuickAppContext
 from .exceptions import QuickAppException
@@ -115,78 +115,80 @@ class QuickApp(QuickAppBase):
         db = StorageFilesystem(storage, compress=True)
         currently_executing = [cast(CMJobID, "root")]
         # The original Compmake context
-        oc = ContextImp(db=db, currently_executing=currently_executing)
-        await oc.init(sti)
-        # Our wrapper
-        qc = QuickAppContext(cc=oc, parent=None, qapp=self, job_prefix=None, output_dir=output_dir)
-        sti.logger.info("reading rc files")
-        await read_rc_files(sti, oc)
 
-        original = oc.get_comp_prefix()
-        await self.define_jobs_context(sti, qc)
-        oc.comp_prefix(original)
+        async with MyAsyncExitStack(sti) as AES:
+            oc = await AES.init(ContextImp(db=db, currently_executing=currently_executing))
+            await oc.init(sti)
+            # Our wrapper
+            qc = QuickAppContext(cc=oc, parent=None, qapp=self, job_prefix=None, output_dir=output_dir)
+            sti.logger.info("reading rc files")
+            await read_rc_files(sti, oc)
 
-        merged = context_get_merge_data(qc)
+            original = oc.get_comp_prefix()
+            await self.define_jobs_context(sti, qc)
+            oc.comp_prefix(original)
 
-        # Only create the index job if we have reports defined
-        # or some branched context (which might create reports)
-        has_reports = len(qc.get_report_manager().allreports) > 0
-        has_branched = qc.has_branched()
-        if has_reports or has_branched:
-            # self.info('Creating reports')
-            oc.comp_dynamic(_dynreports_create_index, merged)
-        else:
-            pass
-            # self.info('Not creating reports.')
+            merged = context_get_merge_data(qc)
 
-        ndefined = len(oc.get_jobs_defined_in_this_session())
-        if ndefined == 0:
-            # self.comp was never called
-            msg = "No jobs defined."
-            raise ValueError(msg)
-        else:
-            if options.console:
-                await oc.compmake_console(sti)
-                return 0
+            # Only create the index job if we have reports defined
+            # or some branched context (which might create reports)
+            has_reports = len(qc.get_report_manager().allreports) > 0
+            has_branched = qc.has_branched()
+            if has_reports or has_branched:
+                # self.info('Creating reports')
+                oc.comp_dynamic(_dynreports_create_index, merged)
             else:
-                cq = CacheQueryDB(oc.get_compmake_db())
-                targets = cq.all_jobs()
-                todo, done, ready = cq.list_todo_targets(targets)
+                pass
+                # self.info('Not creating reports.')
 
-                if not todo and options.command is None:
-                    msg = "Note: there is nothing for me to do. "
-                    msg += "\n(Jobs todo: %s done: %s ready: %s)" % (
-                        len(todo),
-                        len(done),
-                        len(ready),
-                    )
-                    msg += """\
-This application uses a cache system for the results.
-This means that if you call it second time with the same arguments,
- and if you do not change any input, it will not do anything."""
-                    self.warn(msg)
+            ndefined = len(oc.get_jobs_defined_in_this_session())
+            if ndefined == 0:
+                # self.comp was never called
+                msg = "No jobs defined."
+                raise ValueError(msg)
+            else:
+                if options.console:
+                    await oc.compmake_console(sti)
                     return 0
-
-                if options.command is None:
-                    command = "make recurse=1"
                 else:
-                    command = options.command
+                    cq = CacheQueryDB(oc.get_compmake_db())
+                    targets = cq.all_jobs()
+                    todo, done, ready = cq.list_todo_targets(targets)
 
-                await read_rc_files(sti, context=oc)
-                try:
-                    _ = await oc.batch_command(sti, command)
-                    # print('qapp: ret0 = %s'  % ret0)
-                except CommandFailed:
-                    # print('qapp: CommandFailed')
-                    ret = QUICKAPP_COMPUTATION_ERROR
-                except ShellExitRequested:
-                    # print('qapp: ShellExitRequested')
-                    ret = 0
-                else:
-                    # print('qapp: else ret = 0')
-                    ret = 0
+                    if not todo and options.command is None:
+                        msg = "Note: there is nothing for me to do. "
+                        msg += "\n(Jobs todo: %s done: %s ready: %s)" % (
+                            len(todo),
+                            len(done),
+                            len(ready),
+                        )
+                        msg += """\
+    This application uses a cache system for the results.
+    This means that if you call it second time with the same arguments,
+     and if you do not change any input, it will not do anything."""
+                        self.warn(msg)
+                        return 0
 
-                return ret
+                    if options.command is None:
+                        command = "make recurse=1"
+                    else:
+                        command = options.command
+
+                    await read_rc_files(sti, context=oc)
+                    try:
+                        _ = await oc.batch_command(sti, command)
+                        # print('qapp: ret0 = %s'  % ret0)
+                    except CommandFailed:
+                        # print('qapp: CommandFailed')
+                        ret = QUICKAPP_COMPUTATION_ERROR
+                    except ShellExitRequested:
+                        # print('qapp: ShellExitRequested')
+                        ret = 0
+                    else:
+                        # print('qapp: else ret = 0')
+                        ret = 0
+
+                    return ret
 
     async def call_recursive(
         self,
