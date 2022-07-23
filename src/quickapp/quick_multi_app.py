@@ -9,7 +9,10 @@ from zuper_params import DecentParams, UserError
 from zuper_utils_asyncio import SyncTaskInterface
 from .quick_app_base import QuickAppBase
 
-__all__ = ["QuickMultiCmdApp", "add_subcommand"]
+__all__ = [
+    "QuickMultiCmdApp",
+    "add_subcommand",
+]
 
 
 class QuickMultiCmdApp(QuickAppBase):

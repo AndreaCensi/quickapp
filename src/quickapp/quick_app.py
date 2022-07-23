@@ -3,7 +3,7 @@ import shutil
 import sys
 import traceback
 from abc import abstractmethod
-from typing import cast, Dict, List, Union
+from typing import cast, Dict, List, Optional, Union
 
 from compmake import (
     CacheQueryDB,
@@ -35,22 +35,22 @@ class QuickApp(QuickAppBase):
 
     # Interface to be implemented
     @abstractmethod
-    async def define_jobs_context(self, sti: SyncTaskInterface, context):
+    async def define_jobs_context(self, sti: SyncTaskInterface, context) -> None:
         """Define jobs in the current context."""
 
         raise NotImplementedError(type(self))
 
     @abstractmethod
-    def define_options(self, params: DecentParams):
+    def define_options(self, params: DecentParams) -> None:
         """Define options for the application."""
 
         raise NotImplementedError(type(self))
 
-    def define_program_options(self, params: DecentParams):
+    def define_program_options(self, params: DecentParams) -> None:
         self._define_options_compmake(params)
         self.define_options(params)
 
-    def get_qapp_parent(self):
+    def get_qapp_parent(self) -> "Optional[QuickApp]":
         parent = self.parent
         while parent is not None:
             # logger.info('Checking %s' % parent)
@@ -59,7 +59,7 @@ class QuickApp(QuickAppBase):
             parent = parent.parent
         return None
 
-    async def go2(self, sti: SyncTaskInterface):
+    async def go2(self, sti: SyncTaskInterface) -> int:
         sti.logger.info("in go2()")
         # check that if we have a parent who is a quickapp,
         # then use its context

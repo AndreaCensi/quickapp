@@ -6,7 +6,10 @@ from quickapp import QuickAppContext
 from quickapp.report_manager import basename_from_key
 from reprep import logger, NotExistent, Report
 
-__all__ = ["ReportProxy", "get_node"]
+__all__ = [
+    "ReportProxy",
+    "get_node",
+]
 
 
 class FigureProxy:

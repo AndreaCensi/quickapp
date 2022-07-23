@@ -1,13 +1,14 @@
 import os
 from typing import List, Sequence, Tuple
 
-__all__ = ["_context_names_heuristics"]
+__all__ = [
+    "_context_names_heuristics",
+]
 
 
 def minimal_names_at_boundaries(
     objects: List[str], separators: List[str] = None
 ) -> Tuple[str, List[str], str]:
-
     """
     Converts a list of object IDs to a minimal non-ambiguous list of names.
 

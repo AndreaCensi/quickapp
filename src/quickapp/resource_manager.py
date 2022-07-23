@@ -7,7 +7,9 @@ from conf_tools.utils import check_is_in, indent
 # from contracts import contract, describe_type
 
 
-__all__ = ["ResourceManager"]
+__all__ = [
+    "ResourceManager",
+]
 
 
 class ResourceManager:
