@@ -136,7 +136,7 @@ class QuickAppContext:
 
     def comp_dynamic(
         self,
-        f: Callable[Concatenate[Context, P], X],
+        f: "Callable[Concatenate[QuickAppContext, P], X]",
         *args: P.args,
         job_id: Optional[str] = None,
         **kwargs: P.kwargs,
