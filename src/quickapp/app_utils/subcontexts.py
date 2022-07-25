@@ -12,8 +12,10 @@ __all__ = [
     "iterate_context_triplets",
 ]
 
+from .. import QuickAppContext
 
-def iterate_context_names(context, it1: Sequence, key: Optional[str] = None):
+
+def iterate_context_names(context: QuickAppContext, it1: Sequence, key: Optional[str] = None):
     """
     Creates child contexts with minimal names.
 

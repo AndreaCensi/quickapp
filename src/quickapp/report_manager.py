@@ -1,11 +1,14 @@
 import os
 import time
 from pprint import pformat
+from typing import Any
 
 import numpy as np
 
 from compmake import Context, Promise
 from conf_tools.utils import friendly_path
+from reprep import Report
+from zuper_commons.fs import DirPath, FilePath
 from zuper_commons.text import natsorted
 from zuper_commons.types import check_isinstance, ZValueError
 from zuper_commons.ui import duration_compact
@@ -14,6 +17,7 @@ from . import logger
 __all__ = [
     "ReportManager",
     "_dynreports_create_index",
+    "write_report",
 ]
 
 
@@ -491,7 +495,9 @@ def write_report_and_update(
     index_reports(reports=all_reports, index=index_filename, update=html)
 
 
-def write_report(report, report_html, static_dir, write_pickle=False, **kwargs):
+def write_report(
+    report: Report, report_html: FilePath, static_dir: DirPath, write_pickle: bool = False, **kwargs: Any
+) -> FilePath:
     logger.debug(f"Writing to {friendly_path(report_html)} ")
     #     if False:
     #         # Note here they might overwrite each other

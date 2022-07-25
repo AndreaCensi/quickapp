@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import Any, Callable, Concatenate, List, ParamSpec, TypeVar
 
 import six
 
@@ -15,9 +15,12 @@ __all__ = [
     "context_get_merge_data",
 ]
 
+P = ParamSpec("P")
+X = TypeVar("X")
+
 
 class QuickAppContext:
-    def __getstate__(self):
+    def __getstate__(self) -> Any:
         # Copy the object's state from self.__dict__ which contains
         # all our instance attributes. Always use the dict.copy()
         # method to avoid modifying the original state.
@@ -111,7 +114,7 @@ class QuickAppContext:
     #
     # Wrappers form Compmake's "comp".
     #
-    def comp(self, f, *args, **kwargs) -> Promise:
+    def comp(self, f: Callable[P, X], *args: P.args, **kwargs: P.kwargs) -> Promise:
         """
         Simple wrapper for Compmake's comp function.
         Use this instead of "comp".
@@ -129,7 +132,9 @@ class QuickAppContext:
         self._jobs[promise.job_id] = promise
         return promise
 
-    def comp_dynamic(self, f, *args, **kwargs) -> Promise:
+    def comp_dynamic(
+        self, f: Callable[Concatenate[Context, P], X], *args: P.args, **kwargs: P.kwargs
+    ) -> Promise:
         # XXX: we really dont need it
         context = self._get_promise()
         # context = self

@@ -68,7 +68,7 @@ class QuickAppBase(ABC):
         self._init_logger()
 
     @abstractmethod
-    def define_program_options(self, params):
+    def define_program_options(self, params: DecentParams) -> None:
         """Must be implemented by the subclass."""
         raise NotImplementedError(type(self))
 
@@ -86,7 +86,6 @@ class QuickAppBase(ABC):
 
         @zapp1()
         async def entry(ze: ZappEnv) -> ExitCode:
-
             sti = ze.sti
             logger = sti.logger
 
