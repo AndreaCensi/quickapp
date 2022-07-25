@@ -303,7 +303,7 @@ class QuickAppContext:
         self,
         sti: SyncTaskInterface,
         task,
-        extra_dep: List[str] = None,
+        extra_dep: Optional[List[str]] = None,
         add_job_prefix=None,
         add_outdir=None,
         separate_resource_manager=False,

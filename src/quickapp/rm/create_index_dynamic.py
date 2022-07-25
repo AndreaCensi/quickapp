@@ -4,13 +4,13 @@ __all__ = [
     "write_report_single",
 ]
 
-from zuper_commons.fs import DirPath
+from zuper_commons.fs import DirPath, FilePath
 
 from zuper_commons.types import check_isinstance
 
 
 def write_report_single(
-    report: Report, report_nid: str, report_html, static_dir: DirPath, write_pickle: bool = False
+    report: Report, report_nid: str, report_html: FilePath, static_dir: DirPath, write_pickle: bool = False
 ) -> None:
     from quickapp.report_manager import write_report
 

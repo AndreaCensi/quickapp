@@ -1,9 +1,7 @@
 from typing import List, Type, Union
 
-from nose.tools import assert_equal
-
 from quickapp import QuickAppBase
-from zuper_commons.types import ZTypeError
+from zuper_commons.types import ZTypeError, ZValueError
 from .copied_from_compmake_utils import Env
 
 
@@ -12,7 +10,7 @@ async def run_quickapp(
     qapp: Type[QuickAppBase],
     cmd: Union[str, List[str]],
     return_retcode: bool = False,
-):
+) -> int:
     if isinstance(cmd, str):
         # if ' ' in cmd:
         #     raise ZValueError('pass a list', cmd=cmd)
@@ -32,4 +30,5 @@ async def run_quickapp(
     if return_retcode:
         return retcode
     else:
-        assert_equal(0, retcode)
+        if retcode != 0:
+            raise ZValueError(f"quickapp returned {retcode}", qapp=qapp, retcode=retcode, jobs=jobs)

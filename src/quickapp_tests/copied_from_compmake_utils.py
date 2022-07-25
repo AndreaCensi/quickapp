@@ -117,8 +117,9 @@ class Env:
             await self.batch_command(cmds)
         except MakeFailed as e:
             print("Detected MakeFailed")
-            print("Failed jobs: %s" % e.failed)
-            for job_id in e.failed:
+            failed = e.info["failed"]
+            print("Failed jobs: %s" % failed)
+            for job_id in failed:
                 await self.cc.interpret_commands_wrap(self.sti, "details %s" % job_id)
             msg = "Command %r failed." % cmds
             raise ZAssertionError(msg) from e

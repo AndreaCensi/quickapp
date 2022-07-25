@@ -197,7 +197,7 @@ class QuickApp(QuickAppBase):
         child_name,
         cmd_class,
         args: Union[Dict[str, object], List[str]],
-        extra_dep: List[str] = None,
+        extra_dep: Optional[List[str]] = None,
         add_outdir=None,
         add_job_prefix=None,
         separate_resource_manager=False,
@@ -259,7 +259,7 @@ class QuickApp(QuickAppBase):
             raise QuickAppException(msg)
 
 
-def quickapp_main(quickapp_class, args: List[str] = None, sys_exit: bool = True):
+def quickapp_main(quickapp_class, args: Optional[List[str]] = None, sys_exit: bool = True) -> int:
     """
     Use like this:
 

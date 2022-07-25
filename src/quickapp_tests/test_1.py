@@ -82,7 +82,7 @@ async def test_compapp(env: Env) -> None:
         ret_found = await run_quickapp(env, QuickAppDemo2, args, return_retcode=True)
         different = (not (ret_found in [0, None]) and (ret in [0, None])) and (ret_found != ret)
         if different:
-            raise ZAssertionError(expected=ret, fount=ret, c=c)
+            raise ZAssertionError(expected=ret, found=ret_found, c=c)
         # msg = f"Expected {ret!r}, got {ret_found!r}.\nArguments: {c['args']} "
         # assert_equal(ret, ret_found, msg)
         rmtree(tmpdir)

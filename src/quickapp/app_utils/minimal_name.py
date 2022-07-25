@@ -1,5 +1,5 @@
 import os
-from typing import List, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 __all__ = [
     "_context_names_heuristics",
@@ -7,7 +7,7 @@ __all__ = [
 
 
 def minimal_names_at_boundaries(
-    objects: List[str], separators: List[str] = None
+    objects: List[str], separators: Optional[List[str]] = None
 ) -> Tuple[str, List[str], str]:
     """
     Converts a list of object IDs to a minimal non-ambiguous list of names.
@@ -48,10 +48,10 @@ def minimal_names_at_boundaries(
     objectsu = list(map(convert, objects))
     astokens = [x.split(s0) for x in objectsu]
 
-    def is_valid_prefix(p):
+    def is_valid_prefix(p: str) -> bool:
         return all(x.startswith(p) for x in objectsu)
 
-    def is_valid_postfix(p):
+    def is_valid_postfix(p: str) -> bool:
         return all(x.endswith(p) for x in objectsu)
 
     # max number of tokens
