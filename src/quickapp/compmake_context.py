@@ -1,5 +1,5 @@
 import os
-from typing import Any, Callable, Concatenate, List, ParamSpec, TypeVar
+from typing import Any, Callable, Concatenate, List, Optional, ParamSpec, TypeVar
 
 import six
 
@@ -109,12 +109,14 @@ class QuickAppContext:
         """
         job_checkpoint = self.comp(checkpoint, job_name, prev_jobs=list(self._jobs.values()), job_id=job_name)
         self._extra_dep.append(job_checkpoint)
+        assert isinstance(job_checkpoint, Promise)
         return job_checkpoint
 
     #
     # Wrappers form Compmake's "comp".
     #
-    def comp(self, f: Callable[P, X], *args: P.args, **kwargs: P.kwargs) -> Promise:
+    def comp(self, f: Callable[P, X], *args: P.args, job_id: Optional[str] = None, **kwargs: P.kwargs) -> X:
+        # Promise:
         """
         Simple wrapper for Compmake's comp function.
         Use this instead of "comp".
@@ -128,18 +130,22 @@ class QuickAppContext:
 
         extra_dep = self._extra_dep + other_extra
         kwargs["extra_dep"] = extra_dep
-        promise = self.cc.comp(f, *args, **kwargs)
+        promise = self.cc.comp(f, *args, job_id=job_id, **kwargs)
         self._jobs[promise.job_id] = promise
         return promise
 
     def comp_dynamic(
-        self, f: Callable[Concatenate[Context, P], X], *args: P.args, **kwargs: P.kwargs
-    ) -> Promise:
+        self,
+        f: Callable[Concatenate[Context, P], X],
+        *args: P.args,
+        job_id: Optional[str] = None,
+        **kwargs: P.kwargs,
+    ) -> X:
         # XXX: we really dont need it
         context = self._get_promise()
         # context = self
 
-        compmake_args = {}
+        compmake_args = {"job_id": job_id}
         compmake_args_name = ["job_id", "extra_dep", "command_name"]
         for n in compmake_args_name:
             if n in kwargs:
