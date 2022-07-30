@@ -1,9 +1,8 @@
 import os
 import shutil
 import sys
-import traceback
 from abc import abstractmethod
-from typing import cast, Dict, List, Optional, Union
+from typing import cast, List, Optional
 
 from compmake import (
     CacheQueryDB,
@@ -14,7 +13,6 @@ from compmake import (
     ShellExitRequested,
     StorageFilesystem,
 )
-from zuper_commons.text import indent
 from zuper_params import DecentParams
 from zuper_params.utils import UserError, wrap_script_entry_point
 from zuper_utils_asyncio import MyAsyncExitStack, SyncTaskInterface
