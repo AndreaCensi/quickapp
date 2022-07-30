@@ -79,6 +79,7 @@ class QuickAppContext:
 
         self.branched_contexts = []
         self.branched_children = []
+        self.children_names = set()
 
     n_comp_invocations: int
 
@@ -236,6 +237,10 @@ class QuickAppContext:
         #     qapp = self._qapp
 
         name_friendly = name.replace("-", "_")
+        if name_friendly in self.children_names:
+            msg = f'Child with name "{name_friendly}" already exists.'
+            raise ZValueError(msg)
+        self.children_names.add(name_friendly)
 
         if add_job_prefix is None:
             add_job_prefix = name_friendly
@@ -291,6 +296,7 @@ class QuickAppContext:
             extra_dep=_extra_dep,
         )
         self.branched_children.append(c1)
+
         return c1
 
     def add_job_defined_in_this_session(self, job_id: CMJobID):
