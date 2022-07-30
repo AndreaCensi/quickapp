@@ -1,8 +1,9 @@
 import os
-from typing import List, Optional, Sequence, Tuple
+from typing import Callable, List, Optional, Sequence, Tuple
 
 __all__ = [
     "_context_names_heuristics",
+    "good_context_name",
 ]
 
 
@@ -113,14 +114,14 @@ def get_descriptive_names(values: List) -> List[str]:
     return list(map(str, values))
 
 
-def name_field(ob):
+def name_field(ob: object) -> Optional[str]:
     if hasattr(ob, "__name__"):
         return getattr(ob, "__name__")
     else:
         return None
 
 
-def try_heuristics(objects, fun):
+def try_heuristics(objects: list[object], fun: Callable[[object], Optional[str]]) -> Optional[List[str]]:
     """
     fun must return either a string or None
     """

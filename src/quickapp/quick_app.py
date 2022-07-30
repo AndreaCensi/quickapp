@@ -68,7 +68,7 @@ class QuickApp(QuickAppBase):
             # self.info('Found parent: %s' % qapp_parent)
             qc = qapp_parent.child_context
             await self.define_jobs_context(sti, qc)
-            return
+            return 0
         else:
             # self.info('Parent not found')
             pass
@@ -120,7 +120,7 @@ class QuickApp(QuickAppBase):
             oc = await AES.init(ContextImp(db=db, currently_executing=currently_executing))
             await oc.init(sti)
             # Our wrapper
-            qc = QuickAppContext(cc=oc, parent=None, qapp=self, job_prefix=None, output_dir=output_dir)
+            qc = QuickAppContext(cc=oc, parent=None, job_prefix=None, output_dir=output_dir)
             sti.logger.info("reading rc files")
             await read_rc_files(sti, oc)
 
@@ -190,73 +190,73 @@ class QuickApp(QuickAppBase):
 
                     return ret
 
-    async def call_recursive(
-        self,
-        sti: SyncTaskInterface,
-        context,
-        child_name,
-        cmd_class,
-        args: Union[Dict[str, object], List[str]],
-        extra_dep: Optional[List[str]] = None,
-        add_outdir=None,
-        add_job_prefix=None,
-        separate_resource_manager=False,
-        separate_report_manager=False,
-        extra_report_keys=None,
-    ):
-        if extra_dep is None:
-            extra_dep = []
-        instance = cmd_class()
-        instance.set_parent(self)
-        is_quickapp = isinstance(instance, QuickApp)
-
-        try:
-            # we are already in a context; just define jobs
-            child_context = context.child(
-                qapp=instance,
-                name=child_name,
-                extra_dep=extra_dep,
-                add_outdir=add_outdir,
-                extra_report_keys=extra_report_keys,
-                separate_resource_manager=separate_resource_manager,
-                separate_report_manager=separate_report_manager,
-                add_job_prefix=add_job_prefix,
-            )  # XXX
-
-            if isinstance(args, list):
-                try:
-                    instance.set_options_from_args(args)
-                except SystemExit as e:
-                    if e.code == 0:
-                        return 0
-                    raise
-            elif isinstance(args, dict):
-                instance.set_options_from_dict(args)
-            else:
-                assert False
-
-            if not is_quickapp:
-                self.child_context = child_context
-                res = await instance.go2(sti)
-            else:
-                instance.context = child_context
-                res = instance.define_jobs_context(child_context)
-
-            # Add his jobs to our list of jobs
-            context._jobs.update(child_context.all_jobs_dict())
-            return res
-
-        except Exception as e:
-            msg = "While trying to run  %s\n" % cmd_class.__name__
-            msg += "with arguments = %s\n" % args
-            if "_options" in instance.__dict__:
-                msg += " parsed options: %s\n" % instance.get_options()
-                msg += " params: %s\n" % instance.get_options().get_params()
-            if isinstance(e, QuickAppException):
-                msg += indent(str(e), "> ")
-            else:
-                msg += indent(traceback.format_exc(), "> ")
-            raise QuickAppException(msg)
+    # async def call_recursive(
+    #     self,
+    #     sti: SyncTaskInterface,
+    #     context,
+    #     child_name,
+    #     cmd_class,
+    #     args: Union[Dict[str, object], List[str]],
+    #     extra_dep: Optional[List[str]] = None,
+    #     add_outdir=None,
+    #     add_job_prefix=None,
+    #     separate_resource_manager=False,
+    #     separate_report_manager=False,
+    #     extra_report_keys=None,
+    # ):
+    #     if extra_dep is None:
+    #         extra_dep = []
+    #     instance = cmd_class()
+    #     instance.set_parent(self)
+    #     is_quickapp = isinstance(instance, QuickApp)
+    #
+    #     try:
+    #         # we are already in a context; just define jobs
+    #         child_context = context.child(
+    #             qapp=instance,
+    #             name=child_name,
+    #             extra_dep=extra_dep,
+    #             add_outdir=add_outdir,
+    #             extra_report_keys=extra_report_keys,
+    #             separate_resource_manager=separate_resource_manager,
+    #             separate_report_manager=separate_report_manager,
+    #             add_job_prefix=add_job_prefix,
+    #         )  # XXX
+    #
+    #         if isinstance(args, list):
+    #             try:
+    #                 instance.set_options_from_args(args)
+    #             except SystemExit as e:
+    #                 if e.code == 0:
+    #                     return 0
+    #                 raise
+    #         elif isinstance(args, dict):
+    #             instance.set_options_from_dict(args)
+    #         else:
+    #             assert False
+    #
+    #         if not is_quickapp:
+    #             self.child_context = child_context
+    #             res = await instance.go2(sti)
+    #         else:
+    #             instance.context = child_context
+    #             res = instance.define_jobs_context(child_context)
+    #
+    #         # Add his jobs to our list of jobs
+    #         context._jobs.update(child_context.all_jobs_dict())
+    #         return res
+    #
+    #     except Exception as e:
+    #         msg = "While trying to run  %s\n" % cmd_class.__name__
+    #         msg += "with arguments = %s\n" % args
+    #         if "_options" in instance.__dict__:
+    #             msg += " parsed options: %s\n" % instance.get_options()
+    #             msg += " params: %s\n" % instance.get_options().get_params()
+    #         if isinstance(e, QuickAppException):
+    #             msg += indent(str(e), "> ")
+    #         else:
+    #             msg += indent(traceback.format_exc(), "> ")
+    #         raise QuickAppException(msg)
 
 
 def quickapp_main(quickapp_class, args: Optional[List[str]] = None, sys_exit: bool = True) -> int:

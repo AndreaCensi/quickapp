@@ -1,12 +1,10 @@
 import os
 from typing import Any, Callable, Concatenate, List, Optional, ParamSpec, TypeVar
 
-import six
-
 from compmake import CMJobID, Context, load_static_storage, Promise
-from conf_tools import GlobalConfig
-from zuper_commons.types import check_isinstance, ZTypeError
-from zuper_utils_asyncio import SyncTaskInterface
+from conf_tools import ConfigState, GlobalConfig
+from zuper_commons.fs import DirPath, joind, joinf
+from zuper_commons.types import check_isinstance, ZTypeError, ZValueError
 from .report_manager import ReportManager
 from .resource_manager import ResourceManager
 
@@ -20,42 +18,40 @@ X = TypeVar("X")
 
 
 class QuickAppContext:
-    def __getstate__(self) -> Any:
-        # Copy the object's state from self.__dict__ which contains
-        # all our instance attributes. Always use the dict.copy()
-        # method to avoid modifying the original state.
-        state = self.__dict__.copy()
-        if "cc" in state:
-            state.pop("cc")
-        # # Remove the unpicklable entries.
-        # for k, v in state.items():
-        #     try:
-        #         pickle.dumps(v)
-        #     except BaseException as e:
-        #         msg = f'Cannot pickle member {k!r}'
-        #         raise ZValueError(msg, k=k, v=v) from e
-
-        return state
+    parent: "Optional[QuickAppContext]"
+    _resource_manager: ResourceManager
+    _report_manager: ReportManager
+    private_report_manager: bool
+    _output_dir: DirPath
+    _extra_dep: list[Promise]
+    _promise: Optional[Promise]
+    _jobs: dict[CMJobID, Promise] = {}
+    branched_children: "list[QuickAppContext]"
+    branched_contexts: "list[Promise]"
+    _job_prefix: str
+    ngenerations: int
 
     def __init__(
         self,
         cc: Context,
-        qapp,
-        parent,
-        job_prefix,
-        output_dir,
-        extra_dep: List = None,
-        resource_manager=None,
+        # qapp: "QuickApp",
+        parent: "Optional[QuickAppContext]",
+        job_prefix: Optional[str],
+        output_dir: DirPath,
+        extra_dep: Optional[list[CMJobID]] = None,
+        resource_manager: Optional[ResourceManager] = None,
         extra_report_keys=None,
         report_manager=None,
     ):
+        self.ngenerations = 0
         check_isinstance(cc, Context)
         check_isinstance(parent, (QuickAppContext, type(None)))
         if extra_dep is None:
             extra_dep = []
         self.cc = cc
+        self._promise = None
         # can be removed once subtask() is removed
-        self._qapp = qapp
+        # self._qapp = qapp
         # only used for count invocation
         self._parent = parent
         self._job_prefix = job_prefix
@@ -65,8 +61,8 @@ class QuickAppContext:
 
         if report_manager is None:
             self.private_report_manager = True  # only create indexe if this is true
-            reports = os.path.join(output_dir, "report")
-            reports_index = os.path.join(output_dir, "report.html")
+            reports = joind(output_dir, "report")
+            reports_index = joinf(output_dir, "report.html")
             report_manager = ReportManager(self, reports, reports_index)
         else:
             self.private_report_manager = False
@@ -81,10 +77,10 @@ class QuickAppContext:
             extra_report_keys = {}
         self.extra_report_keys = extra_report_keys
 
-        self._promise = None
-
         self.branched_contexts = []
         self.branched_children = []
+
+    n_comp_invocations: int
 
     def __str__(self) -> str:
         return f"QuickAppContext({self._job_prefix})"
@@ -107,7 +103,10 @@ class QuickAppContext:
 
         Returns the checkpoint job (CompmakePromise).
         """
-        job_checkpoint = self.comp(checkpoint, job_name, prev_jobs=list(self._jobs.values()), job_id=job_name)
+        # noinspection PyTypeChecker
+        job_checkpoint: Promise = self.comp(
+            checkpoint, job_name, prev_jobs=list(self._jobs.values()), job_id=job_name
+        )  # type: ignore
         self._extra_dep.append(job_checkpoint)
         assert isinstance(job_checkpoint, Promise)
         return job_checkpoint
@@ -141,9 +140,11 @@ class QuickAppContext:
         job_id: Optional[str] = None,
         **kwargs: P.kwargs,
     ) -> X:
-        # XXX: we really dont need it
+        # jb = job_id if job_id else f.__name__
+        # jn = f'{jb}-context-{id(self)}'
+        # context = self.comp(load_static_storage, self, job_id=jn)
+        # assert context is not None
         context = self._get_promise()
-        # context = self
 
         compmake_args = {"job_id": job_id}
         compmake_args_name = ["job_id", "extra_dep", "command_name"]
@@ -169,7 +170,7 @@ class QuickAppContext:
 
         result = self.comp(_dynreports_getres, both)
         data = self.comp(_dynreports_getbra, both)
-        self.branched_contexts.append(data)
+        self.branched_contexts.append(data)  # type: ignore
         return result
 
     def comp_config(self, f, *args, **kwargs) -> Promise:
@@ -207,13 +208,12 @@ class QuickAppContext:
     def child(
         self,
         name: str,
-        qapp=None,
         add_job_prefix=None,
-        add_outdir=None,
+        add_outdir: Optional[DirPath] = None,
         extra_dep: list = None,
         extra_report_keys=None,
-        separate_resource_manager=False,
-        separate_report_manager=False,
+        separate_resource_manager: bool = False,
+        separate_report_manager: bool = False,
     ) -> "QuickAppContext":
         if extra_dep is None:
             extra_dep = []
@@ -231,9 +231,9 @@ class QuickAppContext:
             separate_resource_manager: If True, create a child of the ResourceManager,
             otherwise we just use the current one and its context.
         """
-        check_isinstance(name, six.string_types)
-        if qapp is None:
-            qapp = self._qapp
+        check_isinstance(name, str)
+        # if qapp is None:
+        #     qapp = self._qapp
 
         name_friendly = name.replace("-", "_")
 
@@ -243,7 +243,7 @@ class QuickAppContext:
         if add_outdir is None:
             add_outdir = name_friendly
 
-        if add_job_prefix != "":
+        if add_job_prefix:
             if self._job_prefix is None:
                 job_prefix = add_job_prefix
             else:
@@ -251,18 +251,18 @@ class QuickAppContext:
         else:
             job_prefix = self._job_prefix
 
-        if add_outdir != "":
-            output_dir = os.path.join(self._output_dir, name)
+        if add_outdir:
+            output_dir = joind(self._output_dir, add_outdir)
         else:
             output_dir = self._output_dir
 
         if separate_report_manager:
-            if add_outdir == "":
+            if not add_outdir:
                 msg = (
                     "Asked for separate report manager, but without changing output dir. "
                     "This will make the report overwrite each other."
                 )
-                raise ValueError(msg)
+                raise ZValueError(msg, name=name)
 
             report_manager = None
         else:
@@ -282,13 +282,12 @@ class QuickAppContext:
 
         c1 = QuickAppContext(
             cc=self.cc,
-            qapp=qapp,
             parent=self,
             job_prefix=job_prefix,
+            output_dir=output_dir,
             report_manager=report_manager,
             resource_manager=resource_manager,
             extra_report_keys=extra_report_keys_,
-            output_dir=output_dir,
             extra_dep=_extra_dep,
         )
         self.branched_children.append(c1)
@@ -299,32 +298,32 @@ class QuickAppContext:
         if self._parent is not None:
             self._parent.add_job_defined_in_this_session(job_id)
 
-    async def subtask(
-        self,
-        sti: SyncTaskInterface,
-        task,
-        extra_dep: Optional[List[str]] = None,
-        add_job_prefix=None,
-        add_outdir=None,
-        separate_resource_manager=False,
-        separate_report_manager=False,
-        extra_report_keys=None,
-        **task_config,
-    ):
-        extra_dep = extra_dep or []
-        return await self._qapp.call_recursive(
-            sti,
-            context=self,
-            child_name=task.cmd,
-            cmd_class=task,
-            args=task_config,
-            extra_dep=extra_dep,
-            add_outdir=add_outdir,
-            add_job_prefix=add_job_prefix,
-            extra_report_keys=extra_report_keys,
-            separate_report_manager=separate_report_manager,
-            separate_resource_manager=separate_resource_manager,
-        )
+    # async def subtask(
+    #     self,
+    #     sti: SyncTaskInterface,
+    #     task,
+    #     extra_dep: Optional[List[str]] = None,
+    #     add_job_prefix=None,
+    #     add_outdir=None,
+    #     separate_resource_manager=False,
+    #     separate_report_manager=False,
+    #     extra_report_keys=None,
+    #     **task_config,
+    # ):
+    #     extra_dep = extra_dep or []
+    #     return await self._qapp.call_recursive(
+    #         sti,
+    #         context=self,
+    #         child_name=task.cmd,
+    #         cmd_class=task,
+    #         args=task_config,
+    #         extra_dep=extra_dep,
+    #         add_outdir=add_outdir,
+    #         add_job_prefix=add_job_prefix,
+    #         extra_report_keys=extra_report_keys,
+    #         separate_report_manager=separate_report_manager,
+    #         separate_resource_manager=separate_resource_manager,
+    #     )
 
     # Resource managers
     def get_resource_manager(self) -> ResourceManager:
@@ -370,18 +369,40 @@ class QuickAppContext:
             self._promise = self.comp(load_static_storage, self, job_id=self._promise_job_id)
         return self._promise
 
-    def has_branched(self):
+    def has_branched(self) -> bool:
         """Returns True if any comp_dynamic was issued."""
         return len(self.branched_contexts) > 0 or any([c.has_branched() for c in self.branched_children])
 
+    def __getstate__(self) -> Any:
+        # Copy the object's state from self.__dict__ which contains
+        # all our instance attributes. Always use the dict.copy()
+        # method to avoid modifying the original state.
+        state = self.__dict__.copy()
+        # logger.info('getstate', state=state)
+        # if state['_promise'] is None:
+        #     raise ZValueError('pickling before promise is created')
+        if "cc" in state:
+            state.pop("cc")
 
-def wrap_state(config_state, f, *args, **kwargs):
+        state["ngenerations"] += 1
+        # # Remove the unpicklable entries.
+        # for k, v in state.items():
+        #     try:
+        #         pickle.dumps(v)
+        #     except BaseException as e:
+        #         msg = f'Cannot pickle member {k!r}'
+        #         raise ZValueError(msg, k=k, v=v) from e
+
+        return state
+
+
+def wrap_state(config_state: ConfigState, f, *args, **kwargs):
     """Used internally by comp_config()"""
     config_state.restore()
     return f(*args, **kwargs)
 
 
-def wrap_state_dynamic(context, config_state, f, *args, **kwargs):
+def wrap_state_dynamic(context: QuickAppContext, config_state: ConfigState, f, *args, **kwargs):
     """Used internally by comp_config_dynamic()"""
     config_state.restore()
     return f(context, *args, **kwargs)
@@ -392,9 +413,10 @@ def checkpoint(name, prev_jobs):
     pass
 
 
-def _dynreports_wrap_dynamic(context: Context, qc, function, args, kw) -> dict:
+def _dynreports_wrap_dynamic(context: Context, qc: QuickAppContext, function, args, kw) -> dict:
     """"""
-
+    assert qc is not None, (function,)
+    # assert qc._promise is not None, qc.__dict__
     qc.cc = context
 
     res = {}
@@ -436,7 +458,7 @@ def get_branched_contexts(context):
     return res
 
 
-def context_get_merge_data(context):
+def context_get_merge_data(context: QuickAppContext) -> Any:
     rm = context.get_report_manager()
     data = [dict(report_manager=rm)]
 

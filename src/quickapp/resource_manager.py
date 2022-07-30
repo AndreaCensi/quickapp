@@ -101,7 +101,7 @@ class ResourceManager:
 
         keys = sorted(list(params.keys()))
 
-        from quickapp.app_utils.minimal_name import good_context_name
+        from .app_utils.minimal_name import good_context_name
 
         vals = [good_context_name(str(params[k])) for k in keys]
         rtype = rtype.replace("-", "_")
