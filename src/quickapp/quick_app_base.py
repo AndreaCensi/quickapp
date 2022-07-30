@@ -21,6 +21,7 @@ from . import logger
 from .exceptions import QuickAppException
 
 __all__ = [
+    "DecentParams",
     "QuickAppBase",
 ]
 
