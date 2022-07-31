@@ -12,8 +12,7 @@ install_requires:
 - compmake-z7
 - reprep-z7
 - zuper-utils-asyncio-z7
-- numpy
-- six
+- numpy 
 - zuper-zapp-z7
 - zuper-params-z7
 
