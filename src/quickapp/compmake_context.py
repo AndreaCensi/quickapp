@@ -1,3 +1,4 @@
+import inspect
 import os
 from typing import Any, Callable, Concatenate, List, Optional, ParamSpec, TypeVar
 
@@ -160,15 +161,25 @@ class QuickAppContext:
         #:arg:extra_dep: extra dependencies (not passed as arguments)
         #:arg:command_name: used to define job name if job_id not provided.
 
-        both = self.cc.comp_dynamic(
-            _dynreports_wrap_dynamic,
-            qc=context,
-            function=f,
-            args=args,
-            kw=kwargs,
-            **compmake_args,
-        )
-
+        is_async = inspect.iscoroutinefunction(f)
+        if is_async:
+            both = self.cc.comp_dynamic(
+                _dynreports_wrap_dynamic_async,
+                qc=context,
+                function=f,
+                args=args,
+                kw=kwargs,
+                **compmake_args,
+            )
+        else:
+            both = self.cc.comp_dynamic(
+                _dynreports_wrap_dynamic,
+                qc=context,
+                function=f,
+                args=args,
+                kw=kwargs,
+                **compmake_args,
+            )
         result = self.comp(_dynreports_getres, both)
         data = self.comp(_dynreports_getbra, both)
         self.branched_contexts.append(data)  # type: ignore
@@ -236,10 +247,10 @@ class QuickAppContext:
         # if qapp is None:
         #     qapp = self._qapp
 
-        name_friendly = name.replace("-", "_")
+        name_friendly = name.replace("-", "_").replace(".", "_")
         if name_friendly in self.children_names:
             msg = f'Child with name "{name_friendly}" already exists.'
-            raise ZValueError(msg)
+            raise ZValueError(msg, job_prefix=self._job_prefix, children_names=self.children_names)
         self.children_names.add(name_friendly)
 
         if add_job_prefix is None:
@@ -417,6 +428,23 @@ def wrap_state_dynamic(context: QuickAppContext, config_state: ConfigState, f, *
 # noinspection PyUnusedLocal
 def checkpoint(name, prev_jobs):
     pass
+
+
+async def _dynreports_wrap_dynamic_async(context: Context, qc: QuickAppContext, function, args, kw) -> dict:
+    """"""
+    assert qc is not None, (function,)
+    # assert qc._promise is not None, qc.__dict__
+    qc.cc = context
+
+    res = {}
+    try:
+        res["f-result"] = await function(qc, *args, **kw)
+    except TypeError as e:
+        msg = "Could not call %r" % function
+        raise ZTypeError(msg, args=args, kw=kw) from e
+
+    res["context-res"] = context_get_merge_data(qc)
+    return res
 
 
 def _dynreports_wrap_dynamic(context: Context, qc: QuickAppContext, function, args, kw) -> dict:

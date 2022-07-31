@@ -1,10 +1,7 @@
 import os
 from typing import Callable, List, Optional, Sequence, Tuple
 
-__all__ = [
-    "_context_names_heuristics",
-    "good_context_name",
-]
+__all__ = ["_context_names_heuristics", "good_context_name", "minimal_names", "minimal_names_at_boundaries"]
 
 
 def minimal_names_at_boundaries(

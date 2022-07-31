@@ -1,14 +1,14 @@
 import os
 import time
 from pprint import pformat
-from typing import Any
+from typing import Any, Optional, TYPE_CHECKING
 
 import numpy as np
 
 from compmake import Context, Promise
 from conf_tools.utils import friendly_path
 from reprep import Report
-from zuper_commons.fs import DirPath, FilePath
+from zuper_commons.fs import DirPath, FilePath, joinf
 from zuper_commons.text import natsorted
 from zuper_commons.types import check_isinstance, ZValueError
 from zuper_commons.ui import duration_compact
@@ -20,14 +20,29 @@ __all__ = [
     "write_report",
 ]
 
+if TYPE_CHECKING:
+    from reprep.report_utils import StoreResults
+    from .compmake_context import QuickAppContext
+
 
 class ReportManager:
-    def __init__(self, context, outdir, index_filename=None):
+    context: "QuickAppContext"
+    outdir: DirPath
+    index_filename: FilePath
+    allreports: "StoreResults"
+    allreports_filename: "StoreResults"
+    html_resources_prefix: str
+    index_job_created: bool
+    static_dir: DirPath
+
+    def __init__(
+        self, context: "QuickAppContext", outdir: DirPath, index_filename: Optional[FilePath] = None
+    ):
         # TODO: remove context
         self.context = context
         self.outdir = outdir
         if index_filename is None:
-            index_filename = os.path.join(self.outdir, "report_index.html")
+            index_filename = joinf(self.outdir, "report_index.html")
         self.index_filename = index_filename
         from reprep.report_utils import StoreResults
 
@@ -83,15 +98,15 @@ class ReportManager:
             if not keys == keys0:
                 msg = "Report %r %r" % (report_type, keys)
                 msg += "\ndoes not match previous format %r" % keys0
-                raise ValueError(msg)
+                raise ZValueError(msg)
 
-    def get(self, report_type, **kwargs):
+    def get(self, report_type: str, **kwargs):
         from reprep.utils import frozendict2
 
         key = frozendict2(report=report_type, **kwargs)
         return self.allreports[key]
 
-    def add(self, context, report, report_type: str, **kwargs):
+    def add(self, context: "QuickAppContext", report: "Promise", report_type: str, **kwargs: Any) -> None:
         """
         Adds a report to the collection.
 
@@ -169,7 +184,7 @@ class ReportManager:
         #             job_id=write_job_id,
         #         )
 
-    def create_index_job(self, context: Context):
+    def create_index_job(self, context: Context) -> None:
         if self.index_job_created:
             msg = "create_index_job() was already called once"
             raise ValueError(msg)
@@ -191,14 +206,14 @@ class ReportManager:
 
 
 def create_write_jobs(
-    context,
-    allreports_filename,
+    context: Context,
+    allreports_filename: "StoreResults",
     allreports,
-    html_resources_prefix,
-    index_filename,
-    suffix,
-    static_dir,
-):
+    html_resources_prefix: str,
+    index_filename: FilePath,
+    suffix: str,
+    static_dir: DirPath,
+) -> None:
     # Do not pass as argument, it will take lots of memory!
     # XXX FIXME: there should be a way to make this update or not
     # otherwise new report do not appear
@@ -712,7 +727,7 @@ def make_sections(allruns, common=None):
     return dict(type="division", field=field, division=division, common=common)
 
 
-def _dynreports_create_index(context, merged_data):
+def _dynreports_create_index(context: Context, merged_data):
     rm = merged_data["report_manager"]
     rm.create_index_job(context)
 
