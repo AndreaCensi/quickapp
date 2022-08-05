@@ -2,9 +2,10 @@ import logging
 import sys
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from typing import Type
+from typing import Dict, List, Type
 
 from conf_tools.utils import indent, termcolor_colored
+from zuper_commons.cmds import ExitCode
 from zuper_params import DecentParams, UserError
 from zuper_utils_asyncio import SyncTaskInterface
 from .quick_app_base import QuickAppBase
@@ -18,7 +19,7 @@ __all__ = [
 class QuickMultiCmdApp(QuickAppBase):
     sub: "Type[QuickAppBase]"
 
-    def define_program_options(self, params: DecentParams):
+    def define_program_options(self, params: DecentParams) -> None:
         self._define_options_compmake(params)
         self.define_multicmd_options(params)
         params.accept_extra()
@@ -26,21 +27,21 @@ class QuickMultiCmdApp(QuickAppBase):
 
     @abstractmethod
     def define_multicmd_options(self, params: DecentParams):
-        pass
+        ...
 
     @abstractmethod
     def initial_setup(self):
-        pass
+        ...
 
     @classmethod
-    def get_usage(cls):
+    def get_usage(cls) -> str:
         names = cls._get_subs_names()
         commands = " | ".join(names)
         return "%prog " + "[--config DIR1:DIR2:...] {%s} [command options]" % commands
 
     # noinspection PyMethodParameters
     @classmethod
-    def get_sub(appcls):
+    def get_sub(appcls) -> Type[QuickAppBase]:
         """Returns the subclass for the subcommands"""
         # mainly because eclipse does not see ".sub" as valid.
         if not hasattr(appcls, "sub"):
@@ -64,7 +65,7 @@ class QuickMultiCmdApp(QuickAppBase):
             appcls.sub = SubCmd
         return appcls.sub
 
-    async def go2(self, sti: SyncTaskInterface):
+    async def go2(self, sti: SyncTaskInterface) -> ExitCode:
         self.initial_setup()
 
         cmds = self._get_subs_as_dict()
@@ -133,16 +134,16 @@ class QuickMultiCmdApp(QuickAppBase):
         return possibilities
 
     @classmethod
-    def _get_subs_as_dict(cls):
+    def _get_subs_as_dict(cls) -> Dict[str, Type[QuickAppBase]]:
         """Returns a dict: cmd_name -> cmd"""
         return dict([(x.cmd, x) for x in cls._get_subs()])
 
     @classmethod
-    def _get_subs_names(cls):
+    def _get_subs_names(cls) -> List[str]:
         return [x.cmd for x in cls._get_subs()]
 
     @classmethod
-    def _get_subs(cls):
+    def _get_subs(cls) -> List[Type[QuickAppBase]]:
         return QuickMultiCmdApp.subs[cls]
 
     # QuickMultiCmdApp subclass -> (list of  QuickAppBase)

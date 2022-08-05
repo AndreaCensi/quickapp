@@ -1,5 +1,5 @@
 # from contracts import contract
-from typing import Iterator, Optional, Sequence, Tuple
+from typing import Iterator, Optional, Sequence, Tuple, TypeVar
 
 from .minimal_name import _context_names_heuristics
 
@@ -14,10 +14,12 @@ __all__ = [
 
 from .. import QuickAppContext
 
+X = TypeVar("X")
+
 
 def iterate_context_names(
-    context: QuickAppContext, it1: Sequence, key: Optional[str] = None
-) -> Iterator[Tuple[QuickAppContext, str]]:
+    context: QuickAppContext, it1: Sequence[X], key: Optional[str] = None
+) -> Iterator[Tuple[QuickAppContext, X]]:
     """
     Creates child contexts with minimal names.
 

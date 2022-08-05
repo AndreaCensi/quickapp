@@ -1,8 +1,10 @@
-from quickapp import iterate_context_names, QuickApp
+from quickapp import iterate_context_names, QuickApp, QuickAppContext
 from reprep import Report
+from zuper_params import DecentParams
+from zuper_utils_asyncio import SyncTaskInterface
 
 
-def report_example1(param1, param2):
+def report_example1(param1: str, param2: int) -> Report:
     r = Report()
     r.text("type", "This is one report")
     r.text("param1", "%s" % param1)
@@ -10,7 +12,7 @@ def report_example1(param1, param2):
     return r
 
 
-def report_example2(param1, param2):
+def report_example2(param1: str, param2: int) -> Report:
     r = Report()
     r.text("type", "This is another report")
     r.text("param1", "%s" % param1)
@@ -32,10 +34,10 @@ def instance_reports(context):
 
 
 class QuickAppDemoReport(QuickApp):
-    def define_options(self, params):
+    def define_options(self, params: DecentParams) -> None:
         pass
 
-    async def define_jobs_context(self, sti, context):
+    async def define_jobs_context(self, sti: SyncTaskInterface, context: QuickAppContext) -> None:
         context.comp_dynamic(instance_reports)
 
         # context.create_dynamic_index_job()

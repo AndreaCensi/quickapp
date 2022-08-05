@@ -33,16 +33,12 @@ class QuickApp(QuickAppBase):
 
     # Interface to be implemented
     @abstractmethod
-    async def define_jobs_context(self, sti: SyncTaskInterface, context) -> None:
+    async def define_jobs_context(self, sti: SyncTaskInterface, context: QuickAppContext) -> None:
         """Define jobs in the current context."""
-
-        raise NotImplementedError(type(self))
 
     @abstractmethod
     def define_options(self, params: DecentParams) -> None:
         """Define options for the application."""
-
-        raise NotImplementedError(type(self))
 
     def define_program_options(self, params: DecentParams) -> None:
         self._define_options_compmake(params)
@@ -257,7 +253,7 @@ class QuickApp(QuickAppBase):
     #         raise QuickAppException(msg)
 
 
-def quickapp_main(quickapp_class, args: Optional[List[str]] = None, sys_exit: bool = True) -> int:
+def quickapp_main(quickapp_class: type, args: Optional[List[str]] = None, sys_exit: bool = True) -> int:
     """
     Use like this:
 

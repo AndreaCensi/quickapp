@@ -3,7 +3,7 @@ import sys
 import traceback
 from abc import ABC, abstractmethod
 from pprint import pformat
-from typing import Any, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
 
 from zuper_commons import ZLogger
 from zuper_commons.cmds import ExitCode
@@ -36,6 +36,9 @@ class QuickAppBase(ABC):
 
     """
 
+    cmd: ClassVar[str] = "unset"
+    usage: ClassVar[str] = ""
+
     # __metaclass__ = ContractsMeta
     options: DecentParamsResults
 
@@ -43,35 +46,34 @@ class QuickAppBase(ABC):
         self.parent = parent
         self._init_logger()
 
-    def _init_logger(self):
+    def _init_logger(self) -> None:
         prog = self.get_prog_name()
         self.logger = ZLogger(prog)
 
-    def info(self, msg: Optional[str] = None, *args, **kwargs):
-        return self.logger.info(msg, *args, stacklevel=1, **kwargs)
+    def info(self, msg: Optional[str] = None, *args: object, **kwargs: object) -> None:
+        self.logger.info(msg, *args, stacklevel=1, **kwargs)
 
-    def warn(self, msg: Optional[str] = None, *args, **kwargs):
-        return self.logger.warn(msg, *args, stacklevel=1, **kwargs)
+    def warn(self, msg: Optional[str] = None, *args: object, **kwargs: object) -> None:
+        self.logger.warn(msg, *args, stacklevel=1, **kwargs)
 
-    def error(self, msg: Optional[str] = None, *args, **kwargs):
-        return self.logger.error(msg, *args, stacklevel=1, **kwargs)
+    def error(self, msg: Optional[str] = None, *args: object, **kwargs: object) -> None:
+        self.logger.error(msg, *args, stacklevel=1, **kwargs)
 
-    def debug(self, msg: Optional[str] = None, *args, **kwargs):
-        return self.logger.debug(msg, *args, stacklevel=1, **kwargs)
+    def debug(self, msg: Optional[str] = None, *args: object, **kwargs: object) -> None:
+        self.logger.debug(msg, *args, stacklevel=1, **kwargs)
 
-    def __getstate__(self):
+    def __getstate__(self) -> dict[str, Any]:
         d = dict(self.__dict__)
         del d["logger"]
         return d
 
-    def __setstate__(self, d):
+    def __setstate__(self, d: Any) -> None:
         self.__dict__.update(d)
         self._init_logger()
 
     @abstractmethod
     def define_program_options(self, params: DecentParams) -> None:
         """Must be implemented by the subclass."""
-        raise NotImplementedError(type(self))
 
     @abstractmethod
     async def go2(self, sti: SyncTaskInterface) -> ExitCode:
@@ -79,7 +81,6 @@ class QuickAppBase(ABC):
         Must be implemented. This should return either None to mean success,
         or an integer error code.
         """
-        raise NotImplementedError(type(self))
 
     @classmethod
     def get_sys_main(cls):
@@ -99,12 +100,12 @@ class QuickAppBase(ABC):
         return entry
 
     @classmethod
-    def __call__(cls, *args, **kwargs):
+    def __call__(cls, *args: object, **kwargs: object) -> Any:
         main = cls.get_sys_main()
         return main(*args, **kwargs)
 
     @classmethod
-    def get_program_description(cls):
+    def get_program_description(cls) -> str:
         """
         Returns a description for the program. This is by default
         looked in the docstring or in the "description" attribute
@@ -123,14 +124,14 @@ class QuickAppBase(ABC):
         return docs
 
     @classmethod
-    def get_short_description(cls):
+    def get_short_description(cls) -> Optional[str]:
         longdesc = cls.get_program_description()
         if longdesc is None:
             return None
         return longdesc.strip()  # Todo: extract first sentence
 
     @classmethod
-    def get_usage(cls):
+    def get_usage(cls) -> str:
         """
         Returns an usage string for the program. The pattern ``%prog``
         will be substituted with the name of the program.
@@ -143,14 +144,14 @@ class QuickAppBase(ABC):
         return usage
 
     @classmethod
-    def get_epilog(cls):
+    def get_epilog(cls) -> Optional[str]:
         """
         Returns the string used as an epilog in the help text.
         """
         return None
 
     @classmethod
-    def get_prog_name(cls):
+    def get_prog_name(cls) -> str:
         """
         Returns the string used as the program name. By default
         it is contained in the ``cmd`` attribute.
@@ -160,18 +161,23 @@ class QuickAppBase(ABC):
         else:
             return cls.__dict__["cmd"]
 
-    def get_options(self):
+    def get_options(self) -> DecentParamsResults:
         return self.options
 
-    def set_parent(self, parent):
+    def set_parent(self, parent: "QuickAppBase") -> None:
         self.parent = parent
 
-    def get_parent(self):
+    def get_parent(self) -> Optional["QuickAppBase"]:
         if self.parent is not None:
             assert self.parent != self
         return self.parent
 
-    async def main(self, sti: SyncTaskInterface, args: Optional[List[str]] = None, parent=None) -> ExitCode:
+    async def main(
+        self,
+        sti: SyncTaskInterface,
+        args: Optional[List[str]] = None,
+        parent: "Optional[QuickAppBase]" = None,
+    ) -> ExitCode:
         """Main entry point. Returns an integer as an error code."""
         sti.logger.info(f"{type(self).__name__}.main", args=args, parent=parent)
         # sys.stderr.write(f'HERE! ars = {args} \n')
@@ -218,7 +224,7 @@ class QuickAppBase(ABC):
             msg = f"Expected None or an integer fomr self.go(), got {ret}"
             raise ValueError(msg)
 
-    def set_options_from_dict(self, config: Dict[str, Any]):
+    def set_options_from_dict(self, config: Dict[str, Any]) -> None:
         """
         Reads the configuration from a dictionary.
 
@@ -244,7 +250,7 @@ class QuickAppBase(ABC):
             msg += indent(traceback.format_exc(), "> ")
             raise QuickAppException(msg)  # XXX class
 
-    def set_options_from_args(self, args: List[str]):
+    def set_options_from_args(self, args: List[str]) -> None:
         """
         Reads the configuration from command line arguments.
 
@@ -294,7 +300,7 @@ class QuickAppBase(ABC):
 
     # Implementation
 
-    def _define_options_compmake(self, params: DecentParams):
+    def _define_options_compmake(self, params: DecentParams) -> None:
         script_name = self.get_prog_name()
         s = script_name
         s = s.replace(".py", "")

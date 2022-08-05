@@ -35,7 +35,6 @@ class QuickAppContext:
     def __init__(
         self,
         cc: Context,
-        # qapp: "QuickApp",
         parent: "Optional[QuickAppContext]",
         job_prefix: Optional[str],
         output_dir: DirPath,
@@ -137,7 +136,7 @@ class QuickAppContext:
 
     def comp_dynamic(
         self,
-        f: "Callable[Concatenate[QuickAppContext, P], X]",
+        f: Callable[Concatenate[Context, P], X],
         *args: P.args,
         job_id: Optional[str] = None,
         **kwargs: P.kwargs,

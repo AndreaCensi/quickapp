@@ -2,9 +2,9 @@ import os
 import traceback
 from contextlib import asynccontextmanager
 from tempfile import mkdtemp
-from typing import AsyncIterator, Awaitable, Callable, cast, Optional, TypeVar
+from typing import AsyncIterator, Awaitable, Callable, cast, Collection, List, Optional, TypeVar
 
-from nose.tools import assert_equal
+from typing_extensions import Concatenate, ParamSpec
 
 from compmake import (
     all_jobs,
@@ -19,12 +19,16 @@ from compmake import (
     read_rc_files,
     StorageFilesystem,
 )
+from quickapp import QuickAppContext
 from zuper_commons.cmds import ExitCode
+from zuper_commons.fs import DirPath
+from zuper_commons.test_utils import my_assert_equal
 from zuper_commons.types import ZAssertionError, ZException, ZValueError
 from zuper_utils_asyncio import create_sync_task2, SyncTaskInterface
 from zuper_zapp import async_run_timeout, setup_environment2, with_log_control
 
 X = TypeVar("X")
+PS = ParamSpec("PS")
 
 
 class Env:
@@ -34,17 +38,19 @@ class Env:
     cc: ContextImp
     cq: CacheQueryDB
 
-    def __init__(self, root, sti: SyncTaskInterface):
+    def __init__(self, root: DirPath, sti: SyncTaskInterface):
         self.rootd = root
         self.sti = sti
 
-    def comp(self, *args, **kwargs):
-        return self.cc.comp(*args, **kwargs)
+    def comp(self, f: Callable[PS, X], *args: PS.args, **kwargs: PS.kwargs) -> X:
+        return self.cc.comp(f, *args, **kwargs)
 
-    def comp_dynamic(self, *args, **kwargs):
-        return self.cc.comp_dynamic(*args, **kwargs)
+    def comp_dynamic(
+        self, fd: Callable[Concatenate[QuickAppContext, PS], X], *args: PS.args, **kwargs: PS.kwargs
+    ) -> X:
+        return self.cc.comp_dynamic(fd, *args, **kwargs)
 
-    async def init(self):
+    async def init(self) -> None:
         self.db = StorageFilesystem(self.rootd, compress=True)
         self.cc = ContextImp(self.db, name="env")
         await self.cc.init(self.sti)
@@ -52,32 +58,32 @@ class Env:
         self.cc.set_compmake_config("console_status", False)
         await read_rc_files(self.sti, context=self.cc)
 
-    async def aclose(self):
+    async def aclose(self) -> None:
         await self.cc.aclose()
 
-    async def all_jobs(self):
+    async def all_jobs(self) -> List[CMJobID]:
         """Returns the list of jobs corresponding to the given expression."""
         # db = StorageFilesystem(self.env, compress=True)
         return sorted(list(all_jobs(self.db)))
 
-    async def get_job(self, job_id) -> Job:
+    async def get_job(self, job_id: CMJobID) -> Job:
         return get_job(job_id=job_id, db=self.db)
 
-    async def assert_defined_by(self, job_id, expected):
-        assert_equal((await self.get_job(job_id)).defined_by, expected)
+    async def assert_defined_by(self, job_id: str, expected) -> None:
+        my_assert_equal((await self.get_job(job_id)).defined_by, expected)
 
-    async def get_jobs(self, expression: str):
+    async def get_jobs(self, expression: str) -> List[CMJobID]:
         """Returns the list of jobs corresponding to the given expression."""
         return list(parse_job_list(expression, context=self.cc))
 
-    async def assert_job_uptodate(self, job_id, status):
+    async def assert_job_uptodate(self, job_id: CMJobID, status: bool) -> None:
         res = await self.up_to_date(job_id)
         self.assert_equal(res, status, "Want %r uptodate? %s" % (job_id, status))
 
-    def assert_equal(self, first: X, second: X, msg: Optional[str] = None):
-        assert_equal(first, second, msg)
+    def assert_equal(self, first: X, second: X, msg: Optional[str] = None) -> None:
+        my_assert_equal(first, second, msg)
 
-    async def assert_jobs_equal(self, expr: str, jobs, ignore_dyn_reports=True):
+    async def assert_jobs_equal(self, expr: str, jobs, ignore_dyn_reports: bool = True):
 
         # js = 'not-valid-yet'
         js = await self.get_jobs(expr)
@@ -90,13 +96,13 @@ class Env:
             print("differs from %s" % jobs)
             raise
 
-    def assert_equal_set(self, a, b):
+    def assert_equal_set(self, a: Collection[X], b: Collection[X]) -> None:
         sa = set(a)
         sb = set(b)
         if sa != sb:
             raise ZAssertionError("different sets", sa=sa, sb=sb, only_sa=sa - sb, only_sb=sb - sa)
 
-    async def assert_cmd_fail(self, cmds):
+    async def assert_cmd_fail(self, cmds: str) -> None:
         """Executes the (list of) commands and checks it was succesful."""
         print("@ %s     [supposed to fail]" % cmds)
         try:
@@ -110,7 +116,7 @@ class Env:
             msg = "Command did not fail."
             raise ZAssertionError(msg, cmds=cmds)
 
-    async def assert_cmd_success(self, cmds):
+    async def assert_cmd_success(self, cmds: str) -> None:
         """Executes the (list of) commands and checks it was succesful."""
         print("@ %s" % cmds)
         try:
@@ -132,17 +138,17 @@ class Env:
 
         await self.cc.interpret_commands_wrap(self.sti, "check_consistency raise_if_error=1")
 
-    async def batch_command(self, s: str):
+    async def batch_command(self, s: str) -> None:
         await self.cc.interpret_commands_wrap(self.sti, s)
         # await self.cc.batch_command(self.sti, s)
 
-    async def up_to_date(self, job_id: str) -> bool:
+    async def up_to_date(self, job_id: CMJobID) -> bool:
         up, reason, timestamp = self.cq.up_to_date(cast(CMJobID, job_id))
         self.sti.logger.info("up_to_date(%r): %s, %r, %s" % (job_id, up, reason, timestamp))
         return up
 
 
-async def make_environment(sti: SyncTaskInterface, rootd: Optional[str] = None) -> Env:
+async def make_environment(sti: SyncTaskInterface, rootd: Optional[DirPath] = None) -> Env:
     if rootd is None:
         rootd = mkdtemp()
     env = Env(rootd, sti)
@@ -151,7 +157,7 @@ async def make_environment(sti: SyncTaskInterface, rootd: Optional[str] = None) 
 
 
 @asynccontextmanager
-async def environment(sti: SyncTaskInterface, rootd: Optional[str] = None) -> AsyncIterator[Env]:
+async def environment(sti: SyncTaskInterface, rootd: Optional[DirPath] = None) -> AsyncIterator[Env]:
     env = await make_environment(sti, rootd)
     try:
         yield env

@@ -1,5 +1,6 @@
 import traceback
 from collections import defaultdict
+from typing import Any, Callable, List, TYPE_CHECKING
 
 from compmake import Promise
 from conf_tools.utils import check_is_in, indent
@@ -11,10 +12,21 @@ __all__ = [
     "ResourceManager",
 ]
 
+if TYPE_CHECKING:
+    from .compmake_context import QuickAppContext
+    from reprep.report_utils import StoreResults
+
+from zuper_commons.types import ZException
+
+
+class CannotProvide(ZException):
+    pass
+
 
 class ResourceManager:
-    class CannotProvide(Exception):
-        pass
+    context: "QuickAppContext"
+    allresources: "StoreResults"
+    providers: dict[str, List[object]]
 
     def __init__(self, context):
         from .compmake_context import QuickAppContext
@@ -27,7 +39,7 @@ class ResourceManager:
         self.make_prefix = {}  # rtype => function to make prefix
         self._context = context
 
-    def set_resource_provider(self, rtype: str, provider):
+    def set_resource_provider(self, rtype: str, provider: Callable[..., Any]) -> None:
         """
         provider: any callable. It will be called with "context" as first
             argument, and with any remaining params. It needs to return
@@ -36,7 +48,7 @@ class ResourceManager:
         """
         self.providers[rtype].append(provider)
 
-    def set_resource_prefix_function(self, rtype, make_prefix):
+    def set_resource_prefix_function(self, rtype: str, make_prefix: Callable[..., Any]) -> None:
         """
         make_prefix: a function that takes (rtype, **params) and
         returns a string.
@@ -46,7 +58,7 @@ class ResourceManager:
     def get_resource(self, rtype: str, **params):
         return self.get_resource_job(self._context, rtype, **params)
 
-    def get_resource_job(self, context, rtype: str, **params):
+    def get_resource_job(self, context, rtype: str, **params: object):
         # print('RM %s %s get_resource %s %s' % (id(self), self._context, rtype, params))
         key = dict(rtype=rtype, **params)
         already_done = key in self.allresources
@@ -66,7 +78,7 @@ class ResourceManager:
             try:
                 res_i = provider(c, **params)
                 ok.append((provider, res_i))
-            except ResourceManager.CannotProvide as e:
+            except CannotProvide as e:
                 errors.append(e)
             except Exception as e:
                 msg = "Error while trying to get resource.\n"
@@ -92,7 +104,7 @@ class ResourceManager:
         self.set_resource(res, rtype, **params)
         return res
 
-    def _make_prefix(self, rtype, **params):
+    def _make_prefix(self, rtype: str, **params):
         """Creates the job prefix for the given resource."""
         # use the user-defined if available
         if rtype in self.make_prefix:
