@@ -15,6 +15,7 @@ install_requires:
 - numpy
 - zuper-zapp-z7
 - zuper-params-z7
+- typing_extensions
 
 
 tests_require:
