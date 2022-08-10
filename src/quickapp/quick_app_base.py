@@ -310,7 +310,7 @@ class QuickAppBase(ABC):
         g = "Generic arguments for Quickapp"
         # TODO: use  add_help=False to ARgParsre
         # params.add_flag('help', short='-h', help='Shows help message')
-        params.add_flag("contracts", help="Activate PyContracts", group=g)
+        params.add_flag("contracts", help="[deprecated]", group=g)
         params.add_flag("profile", help="Use Python Profiler", group=g)
         params.add_flag("compress", help="Compress stored data", group=g)
         params.add_string(
