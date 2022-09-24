@@ -117,7 +117,7 @@ class QuickMultiCmdApp(QuickAppBase):
             # XXX: fixme
             cmd_short = sub.get_short_description()
 
-            cmd_name = termcolor_colored(cmd_name, attrs=["bold"])
+            cmd_name = termcolor_colored(cmd_name, "white", attrs=["bold"])
             s += "  %30s  %s\n" % (cmd_name, cmd_short)
             if issubclass(sub, QuickMultiCmdApp):
                 s += "\n"
