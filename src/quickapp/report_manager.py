@@ -542,7 +542,7 @@ def index_reports(reports, index, update=None):  # @UnusedVariable
 
     dirname = os.path.dirname(index)
     if not os.path.exists(dirname):
-        os.makedirs(dirname)
+        os.makedirs(dirname, exist_ok=True)
 
     # logger.info('Writing on %s' % friendly_path(index))
 

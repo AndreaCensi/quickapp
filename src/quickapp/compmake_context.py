@@ -212,7 +212,7 @@ class QuickAppContext:
         """Returns a suitable output directory for data files"""
         # only create output dir on demand
         if not os.path.exists(self._output_dir):
-            os.makedirs(self._output_dir)
+            os.makedirs(self._output_dir, exist_ok=True)
 
         return self._output_dir
 
