@@ -161,7 +161,7 @@ class QuickAppBase(ABC):
         else:
             return cls.__dict__["cmd"]
 
-    def get_options(self) -> DecentParamsResults:
+    def get_options(self) -> Any:
         return self.options
 
     def set_parent(self, parent: "QuickAppBase") -> None:
