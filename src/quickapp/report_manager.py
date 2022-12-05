@@ -7,7 +7,7 @@ import numpy as np
 
 from compmake import Context, Promise
 from conf_tools.utils import friendly_path
-from reprep import Report
+
 from zuper_commons.fs import DirPath, FilePath, joinf
 from zuper_commons.text import natsorted
 from zuper_commons.types import check_isinstance, ZValueError
@@ -510,8 +510,12 @@ def write_report_and_update(
     index_reports(reports=all_reports, index=index_filename, update=html)
 
 
+if TYPE_CHECKING:
+    from reprep import Report
+
+
 def write_report(
-    report: Report, report_html: FilePath, static_dir: DirPath, write_pickle: bool = False, **kwargs: Any
+    report: "Report", report_html: FilePath, static_dir: DirPath, write_pickle: bool = False, **kwargs: Any
 ) -> FilePath:
     logger.debug(f"Writing to {friendly_path(report_html)} ")
     #     if False:
