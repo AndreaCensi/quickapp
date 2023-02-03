@@ -106,12 +106,14 @@ class QuickApp(QuickAppBase):
         else:
             storage = os.path.join(output_dir, "compmake")
         # logger.debug("Creating storage", where=storage, compress=options.compress)
-        db = StorageFilesystem(storage, compress=True)
+        # db = StorageFilesystem(storage, compress=True)
         currently_executing = [cast(CMJobID, "root")]
         # The original Compmake context
 
         async with MyAsyncExitStack(sti) as AES:
-            oc = await AES.init(ContextImp(db=db, currently_executing=currently_executing, name="quickapp"))
+            oc = await AES.init(
+                ContextImp(db=storage, currently_executing=currently_executing, name="quickapp")
+            )
             await oc.init(sti)
             # Our wrapper
             qc = QuickAppContext(cc=oc, parent=None, job_prefix=None, output_dir=output_dir)

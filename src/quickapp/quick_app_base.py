@@ -91,7 +91,7 @@ class QuickAppBase(ABC):
             sti = ze.sti
             logger = sti.logger
 
-            logger.info("starting application")
+            # logger.info("starting application")
             await sti.started_and_yield()
             args = ze.args
             instance = cls()

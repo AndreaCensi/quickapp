@@ -51,8 +51,9 @@ class Env:
         return self.cc.comp_dynamic(fd, *args, **kwargs)
 
     async def init(self) -> None:
-        self.db = StorageFilesystem(self.rootd, compress=True)
-        self.cc = ContextImp(self.db, name="env")
+        # self.db = StorageFilesystem(self.rootd, compress=True)
+        self.cc = ContextImp(self.rootd, name="env")
+        self.db = self.cc.compmake_db
         await self.cc.init(self.sti)
         self.cq = CacheQueryDB(db=self.db)
         self.cc.set_compmake_config("console_status", False)
