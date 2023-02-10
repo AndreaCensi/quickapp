@@ -20,7 +20,13 @@
   },
   "zip_safe": true,
   "include_package_data": true,
-  "modules": [
+  "packages": [
+    "quickapp",
+    "quickapp.app_utils",
+    "quickapp.rm",
+    "reprep_quickapp"
+  ],
+  "py_modules": [
     "quickapp",
     "quickapp.app_utils",
     "quickapp.app_utils.minimal_name",
