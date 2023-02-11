@@ -23,6 +23,7 @@ jobs:
       DEPS_INSTALL_TIMEOUT: 10m
       COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: quickapp_tests
+      PIP_INDEX_URL: ${PIP_INDEX_URL_SRC}
       Z_SERVICE_LOG: zuper_loghandle.log
       Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
@@ -184,6 +185,7 @@ jobs:
       DEPS_INSTALL_TIMEOUT: 10m
       COVER_PACKAGES: quickapp,quickapp_tests,reprep_quickapp
       TEST_PACKAGES: quickapp_tests
+      PIP_INDEX_URL: ${PIP_INDEX_URL_SRC}
       Z_SERVICE_LOG: zuper_loghandle.log
       Z_SERVICE_PROC: zuper_proc_local.proc
       Z_SERVICE_FS: zuper_fs_local.use_local_fs
@@ -335,4 +337,4 @@ jobs:
           ./codecov  
     resource_class: small
 
-# sigil a397251f3dbfd2ab5b3b0e39032e2b42
+# sigil ff87e9fae8c201163aba3c000b3a00e1
