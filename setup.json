@@ -20,7 +20,7 @@
   },
   "zip_safe": true,
   "include_package_data": true,
-  "packages": [
+  "modules": [
     "quickapp",
     "quickapp.app_utils",
     "quickapp.rm",
