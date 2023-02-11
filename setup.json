@@ -20,11 +20,30 @@
   },
   "zip_safe": true,
   "include_package_data": true,
-  "modules": [
+  "packages": [
     "quickapp",
     "quickapp.app_utils",
     "quickapp.rm",
     "reprep_quickapp"
+  ],
+  "py_modules": [
+    "quickapp",
+    "quickapp.app_utils",
+    "quickapp.app_utils.minimal_name",
+    "quickapp.app_utils.subcontexts",
+    "quickapp.compmake_context",
+    "quickapp.exceptions",
+    "quickapp.quick_app",
+    "quickapp.quick_app_base",
+    "quickapp.quick_multi_app",
+    "quickapp.report_manager",
+    "quickapp.resource_manager",
+    "quickapp.rm",
+    "quickapp.rm.configuration",
+    "quickapp.rm.create_index_dynamic",
+    "quickapp.rm.generated_report",
+    "reprep_quickapp",
+    "reprep_quickapp.report_proxy"
   ],
   "version": "7.2",
   "author": "Andrea Censi",
