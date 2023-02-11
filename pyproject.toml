@@ -1,0 +1,19 @@
+[project]
+name = "QuickApp-z7"
+version = "7.2"
+authors = [{name = "Andrea Censi", email = "info@zupermind.com"}]
+dependencies = ["zuper-commons-z7", "ConfTools-z7", "compmake-z7", "reprep-z7", "zuper-utils-asyncio-z7", "numpy", "zuper-zapp-z7", "zuper-params-z7", "typing_extensions"]
+
+[project.scripts]
+
+[tool]
+[tool.poetry]
+name = "QuickApp-z7"
+version = "7.2"
+description = ""
+authors = ["Andrea Censi <info@zupermind.com>"]
+packages = [{include = "quickapp", from = "src"}, {include = "quickapp/app_utils", from = "src"}, {include = "quickapp/rm", from = "src"}, {include = "reprep_quickapp", from = "src"}]
+
+[tool.setuptools]
+packages = ["quickapp", "quickapp.app_utils", "quickapp.rm", "reprep_quickapp"]
+package-dir = {"" = "src"}
