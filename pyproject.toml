@@ -14,6 +14,11 @@ dependencies = [
     "zuper-zapp-z7",
     ]
 
+[project.optional-dependencies]
+test = [
+    "nose",
+    ]
+
 [tool]
 [tool.poetry]
 name = "QuickApp-z7"
