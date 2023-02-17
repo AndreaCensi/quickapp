@@ -351,11 +351,11 @@ class QuickAppContext:
         check_isinstance(res, Promise)
         self._extra_dep.append(res)
 
-    def get_resource(self, rtype, **params):
+    def get_resource(self, rtype: str, **params: Any) -> Promise:
         rm = self.get_resource_manager()
         return rm.get_resource_job(self, rtype, **params)
 
-    def add_report(self, report, report_type: str, **params) -> None:
+    def add_report(self, report: Any, report_type: str, **params: Any) -> None:
         rm = self.get_report_manager()
         params.update(self.extra_report_keys)
         rm.add(self, report, report_type, **params)
@@ -365,7 +365,7 @@ class QuickAppContext:
         rm = self.get_report_manager()
         return rm.get(report_type, **params)
 
-    def get_report_manager(self):
+    def get_report_manager(self) -> ReportManager:
         return self._report_manager
 
     def add_extra_report_keys(self, **keys):
