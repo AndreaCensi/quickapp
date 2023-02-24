@@ -11,6 +11,7 @@ from zuper_commons.text import indent
 from zuper_commons.types import ZException, ZValueError
 from zuper_params import (
     DecentParams,
+    DecentParamsHelp,
     DecentParamsResults,
     DecentParamsUserError,
     UserError,
@@ -196,7 +197,8 @@ class QuickAppBase(ABC):
             self.logger.user_error(str(e))
             sys.stderr.write(str(e) + "\n")
             return ExitCode.WRONG_ARGUMENTS
-
+        except DecentParamsHelp:
+            return ExitCode.OK
         profile = os.environ.get("QUICKAPP_PROFILE", False)
 
         if not profile:
@@ -281,6 +283,8 @@ class QuickAppBase(ABC):
         except UserError:
             raise
         except SystemExit:
+            raise
+        except DecentParamsHelp:
             raise
         except Exception as e:
             msg = "Could not interpret arguments"
