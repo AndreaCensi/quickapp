@@ -11,7 +11,6 @@ from compmake import (
     ContextImp,
     read_rc_files,
     ShellExitRequested,
-    StorageFilesystem,
 )
 from zuper_params import DecentParams
 from zuper_params.utils import UserError, wrap_script_entry_point
