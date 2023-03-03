@@ -1,6 +1,6 @@
 import inspect
 import os
-from typing import Any, Callable, Concatenate, List, Optional, ParamSpec, TypeVar
+from typing import Any, Callable, Concatenate, List, Mapping, Optional, ParamSpec, TypeVar
 
 from compmake import CMJobID, Context, load_static_storage, Promise
 from conf_tools import ConfigState, GlobalConfig
@@ -219,10 +219,10 @@ class QuickAppContext:
     def child(
         self,
         name: str,
-        add_job_prefix=None,
+        add_job_prefix: Optional[str] = None,
         add_outdir: Optional[DirPath] = None,
-        extra_dep: list = None,
-        extra_report_keys=None,
+        extra_dep: list[Any] = None,
+        extra_report_keys: Optional[Mapping[str, Any]] = None,
         separate_resource_manager: bool = False,
         separate_report_manager: bool = False,
     ) -> "QuickAppContext":
