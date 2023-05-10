@@ -41,13 +41,19 @@ jobs:
         command: |
           set -x 
           mkdir -p build-stats
-          image_name=`cat /.circleci-runner-config.json | jq -r .Job.docker[0].Image | envsubst`
-          registry_to_login=`echo ${image_name} | cut -d'/' -f1`
-          #regctl registry login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}" "${registry_to_login}"
+          # image_name=`cat /.circleci-runner-config.json | jq -r .Job.docker[0].Image | envsubst`
+          # registry_to_login=`echo ${image_name} | cut -d'/' -f1`
+          # regctl registry login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}" "${registry_to_login}"
+
+          # regctl manifest get --format raw-body "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-manifest.json
+          # regctl image digest "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-digest.txt
+          # echo ${image_name} > build-stats/jobs/${CIRCLE_JOB}/image-name.txt
+
+          mkdir -p build-stats/envs
           mkdir -p build-stats/jobs/${CIRCLE_JOB}
-          regctl manifest get --format raw-body "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-manifest.json
-          regctl image digest "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-digest.txt
-          echo ${image_name} > build-stats/jobs/${CIRCLE_JOB}/image-name.txt
+          mkdir -p build-stats/jobs/${CIRCLE_JOB}/envs
+          echo -n "${Z_REQS_SHA:-not-present}" > build-stats/jobs/${CIRCLE_JOB}/envs/Z_REQS_SHA
+          echo -n "${Z_REQS_SHA:-not-present}" > build-stats/envs/Z_REQS_SHA
 
     - store_artifacts:
         path: build-stats
@@ -220,13 +226,19 @@ jobs:
         command: |
           set -x 
           mkdir -p build-stats
-          image_name=`cat /.circleci-runner-config.json | jq -r .Job.docker[0].Image | envsubst`
-          registry_to_login=`echo ${image_name} | cut -d'/' -f1`
-          #regctl registry login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}" "${registry_to_login}"
+          # image_name=`cat /.circleci-runner-config.json | jq -r .Job.docker[0].Image | envsubst`
+          # registry_to_login=`echo ${image_name} | cut -d'/' -f1`
+          # regctl registry login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}" "${registry_to_login}"
+
+          # regctl manifest get --format raw-body "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-manifest.json
+          # regctl image digest "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-digest.txt
+          # echo ${image_name} > build-stats/jobs/${CIRCLE_JOB}/image-name.txt
+
+          mkdir -p build-stats/envs
           mkdir -p build-stats/jobs/${CIRCLE_JOB}
-          regctl manifest get --format raw-body "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-manifest.json
-          regctl image digest "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-digest.txt
-          echo ${image_name} > build-stats/jobs/${CIRCLE_JOB}/image-name.txt
+          mkdir -p build-stats/jobs/${CIRCLE_JOB}/envs
+          echo -n "${Z_REQS_SHA:-not-present}" > build-stats/jobs/${CIRCLE_JOB}/envs/Z_REQS_SHA
+          echo -n "${Z_REQS_SHA:-not-present}" > build-stats/envs/Z_REQS_SHA
 
     - store_artifacts:
         path: build-stats
@@ -399,13 +411,19 @@ jobs:
         command: |
           set -x 
           mkdir -p build-stats
-          image_name=`cat /.circleci-runner-config.json | jq -r .Job.docker[0].Image | envsubst`
-          registry_to_login=`echo ${image_name} | cut -d'/' -f1`
-          #regctl registry login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}" "${registry_to_login}"
+          # image_name=`cat /.circleci-runner-config.json | jq -r .Job.docker[0].Image | envsubst`
+          # registry_to_login=`echo ${image_name} | cut -d'/' -f1`
+          # regctl registry login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}" "${registry_to_login}"
+
+          # regctl manifest get --format raw-body "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-manifest.json
+          # regctl image digest "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-digest.txt
+          # echo ${image_name} > build-stats/jobs/${CIRCLE_JOB}/image-name.txt
+
+          mkdir -p build-stats/envs
           mkdir -p build-stats/jobs/${CIRCLE_JOB}
-          regctl manifest get --format raw-body "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-manifest.json
-          regctl image digest "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-digest.txt
-          echo ${image_name} > build-stats/jobs/${CIRCLE_JOB}/image-name.txt
+          mkdir -p build-stats/jobs/${CIRCLE_JOB}/envs
+          echo -n "${Z_REQS_SHA:-not-present}" > build-stats/jobs/${CIRCLE_JOB}/envs/Z_REQS_SHA
+          echo -n "${Z_REQS_SHA:-not-present}" > build-stats/envs/Z_REQS_SHA
 
     - store_artifacts:
         path: build-stats
@@ -578,13 +596,19 @@ jobs:
         command: |
           set -x 
           mkdir -p build-stats
-          image_name=`cat /.circleci-runner-config.json | jq -r .Job.docker[0].Image | envsubst`
-          registry_to_login=`echo ${image_name} | cut -d'/' -f1`
-          #regctl registry login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}" "${registry_to_login}"
+          # image_name=`cat /.circleci-runner-config.json | jq -r .Job.docker[0].Image | envsubst`
+          # registry_to_login=`echo ${image_name} | cut -d'/' -f1`
+          # regctl registry login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}" "${registry_to_login}"
+
+          # regctl manifest get --format raw-body "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-manifest.json
+          # regctl image digest "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-digest.txt
+          # echo ${image_name} > build-stats/jobs/${CIRCLE_JOB}/image-name.txt
+
+          mkdir -p build-stats/envs
           mkdir -p build-stats/jobs/${CIRCLE_JOB}
-          regctl manifest get --format raw-body "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-manifest.json
-          regctl image digest "${image_name}" > build-stats/jobs/${CIRCLE_JOB}/image-digest.txt
-          echo ${image_name} > build-stats/jobs/${CIRCLE_JOB}/image-name.txt
+          mkdir -p build-stats/jobs/${CIRCLE_JOB}/envs
+          echo -n "${Z_REQS_SHA:-not-present}" > build-stats/jobs/${CIRCLE_JOB}/envs/Z_REQS_SHA
+          echo -n "${Z_REQS_SHA:-not-present}" > build-stats/envs/Z_REQS_SHA
 
     - store_artifacts:
         path: build-stats
@@ -733,4 +757,4 @@ jobs:
           ./codecov  
     resource_class: small
 
-# sigil 3188f25e22baa69a061f917e28b131c7
+# sigil fd24131c751ae220c9173aad5c2774cc
