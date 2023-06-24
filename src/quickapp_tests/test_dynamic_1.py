@@ -1,8 +1,6 @@
-from zuper_commons.test_utils import my_assert_equal
-
 from compmake import Context
-from quickapp import QuickApp, QuickAppContext, DecentParams
-
+from quickapp import DecentParams, QuickApp, QuickAppContext
+from zuper_commons.test_utils import my_assert_equal
 from .copied_from_compmake_utils import Env, run_with_env
 from .quickappbase import run_quickapp
 
@@ -31,8 +29,7 @@ class QuickAppDemoChild1(QuickApp):
 async def test_dynamic1(env: Env) -> None:
     await run_quickapp(env, qapp=QuickAppDemoChild1, cmd="ls")
     defined = await env.all_jobs()
-    assert_equal(
-        set(defined),
+    my_assert_equal(
         {
             "define_jobs1",
             "_dynreports_create_index",
@@ -41,6 +38,7 @@ async def test_dynamic1(env: Env) -> None:
             "_dynreports_merge",
             "context",
         },
+        set(defined),
     )
     env.sti.logger.info(defined=defined)
     await env.assert_cmd_success("make define_jobs1")
