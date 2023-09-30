@@ -4,15 +4,12 @@
     "compmake-z7",
     "numpy",
     "reprep-z7",
-    "typing_extensions",
     "zuper-commons-z7",
     "zuper-params-z7",
     "zuper-utils-asyncio-z7",
     "zuper-zapp-z7"
   ],
-  "tests_require": [
-    "nose"
-  ],
+  "tests_require": [],
   "srcdir": "src",
   "package_name": "QuickApp-z7",
   "entry_points": {

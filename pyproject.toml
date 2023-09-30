@@ -7,16 +7,10 @@ dependencies = [
     "compmake-z7",
     "numpy",
     "reprep-z7",
-    "typing_extensions",
     "zuper-commons-z7",
     "zuper-params-z7",
     "zuper-utils-asyncio-z7",
     "zuper-zapp-z7",
-    ]
-
-[project.optional-dependencies]
-test = [
-    "nose",
     ]
 
 [tool]

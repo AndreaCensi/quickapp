@@ -59,7 +59,6 @@ class QuickMultiCmdApp(QuickAppBase):
                     cmds.append(self)
 
             class SubCmd(QuickAppBase, ABC):
-
                 __metaclass__ = Register
 
             appcls.sub = SubCmd
