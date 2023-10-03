@@ -180,7 +180,7 @@ class QuickAppBase(ABC):
         parent: "Optional[QuickAppBase]" = None,
     ) -> ExitCode:
         """Main entry point. Returns an integer as an error code."""
-        sti.logger.info(f"{type(self).__name__}.main", args=args, parent=parent)
+        # sti.logger.info(f"{type(self).__name__}.main", args=args, parent=parent)
         # sys.stderr.write(f'HERE! ars = {args} \n')
 
         if "short" in type(self).__dict__:
@@ -277,9 +277,7 @@ class QuickAppBase(ABC):
 
             desc = cls.get_program_description()
             epilog = cls.get_epilog()
-            self.options = params.get_dpr_from_args(
-                prog=prog, args=args, usage=usage, description=desc, epilog=epilog
-            )
+            self.options = params.get_dpr_from_args(prog=prog, args=args, usage=usage, description=desc, epilog=epilog)
         except UserError:
             raise
         except SystemExit:
