@@ -2,18 +2,7 @@
 name = "QuickApp-z7"
 version = "7.2"
 authors = [{name = "Andrea Censi", email = "AndreaCensi@users.noreply.github.com"}]
-dependencies = [
-    "ConfTools-z7",
-    "compmake-z7",
-    "numpy",
-    "reprep-z7",
-    "zuper-commons-z7",
-    "zuper-params-z7",
-    "zuper-utils-asyncio-z7",
-    "zuper-zapp-z7",
-    ]
 
-[tool]
 [tool.poetry]
 name = "QuickApp-z7"
 version = "7.2"
@@ -26,11 +15,19 @@ packages = [
     {from = "src", include = "reprep_quickapp"},
     ]
 
-[tool.setuptools]
-packages = [
-    "quickapp",
-    "quickapp.app_utils",
-    "quickapp.rm",
-    "reprep_quickapp",
-    ]
-package-dir = {"" = "src"}
+[tool.poetry.dependencies]
+ConfTools-z7 = "*"
+compmake-z7 = "*"
+numpy = "*"
+reprep-z7 = "*"
+zuper-commons-z7 = "*"
+zuper-params-z7 = "*"
+zuper-utils-asyncio-z7 = "*"
+zuper-zapp-z7 = "*"
+
+[tool.poetry.group.test.dependencies]
+
+[build-system]
+requires = [
+    "poetry-core>=1.0.0",]
+build-backend = "poetry.core.masonry.api"
