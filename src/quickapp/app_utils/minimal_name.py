@@ -9,9 +9,7 @@ __all__ = [
 ]
 
 
-def minimal_names_at_boundaries(
-    objects: List[str], separators: Optional[List[str]] = None
-) -> Tuple[str, List[str], str]:
+def minimal_names_at_boundaries(objects: List[str], separators: Optional[List[str]] = None) -> Tuple[str, List[str], str]:
     """
     Converts a list of object IDs to a minimal non-ambiguous list of names.
 

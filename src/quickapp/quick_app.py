@@ -110,9 +110,7 @@ class QuickApp(QuickAppBase):
         # The original Compmake context
 
         async with MyAsyncExitStack(sti) as AES:
-            oc = await AES.init(
-                ContextImp(db=storage, currently_executing=currently_executing, name="quickapp")
-            )
+            oc = await AES.init(ContextImp(db=storage, currently_executing=currently_executing, name="quickapp"))
             await oc.init(sti)
             # Our wrapper
             qc = QuickAppContext(cc=oc, parent=None, job_prefix=None, output_dir=output_dir)
