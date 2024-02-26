@@ -35,9 +35,7 @@ class ReportManager:
     index_job_created: bool
     static_dir: DirPath
 
-    def __init__(
-        self, context: "QuickAppContext", outdir: DirPath, index_filename: Optional[FilePath] = None
-    ):
+    def __init__(self, context: "QuickAppContext", outdir: DirPath, index_filename: Optional[FilePath] = None):
         # TODO: remove context
         self.context = context
         self.outdir = outdir
@@ -655,19 +653,13 @@ def index_reports(reports, index, update=None):  # @UnusedVariable
                 if not bottom["key"]:
                     write_li(k=d, filename=bottom["value"], element="li")
                 else:
-                    f.write(
-                        '<li> <p id="%s"><a class="self" href="#%s">%s = %s</a></p>\n'
-                        % (html_id, html_id, field, value)
-                    )
+                    f.write('<li> <p id="%s"><a class="self" href="#%s">%s = %s</a></p>\n' % (html_id, html_id, field, value))
                     f.write("<ul>")
                     write_li(k=bottom["key"], filename=bottom["value"], element="li")
                     f.write("</ul>")
                     f.write("</li>")
             else:
-                f.write(
-                    '<li> <p id="%s"><a class="self" href="#%s">%s = %s</a></p>\n'
-                    % (html_id, html_id, field, value)
-                )
+                f.write('<li> <p id="%s"><a class="self" href="#%s">%s = %s</a></p>\n' % (html_id, html_id, field, value))
 
                 write_sections(bottom, parents)
                 f.write("</li>")
@@ -698,10 +690,7 @@ def make_sections(allruns, common=None):
         value = allruns[key]
         return dict(type="sample", common=common, key=key, value=value)
 
-    fields_size = [
-        (field, len(list(allruns.groups_by_field_value(field))))
-        for field in allruns.field_names_in_all_keys()
-    ]
+    fields_size = [(field, len(list(allruns.groups_by_field_value(field)))) for field in allruns.field_names_in_all_keys()]
 
     # Now choose the one with the least choices
     fields_size.sort(key=lambda x: x[1])

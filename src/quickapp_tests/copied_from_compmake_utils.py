@@ -54,9 +54,7 @@ class Env:
     def comp(self, f: Callable[PS, X], *args: PS.args, **kwargs: PS.kwargs) -> X:
         return self.cc.comp(f, *args, **kwargs)
 
-    def comp_dynamic(
-        self, fd: Callable[Concatenate[QuickAppContext, PS], X], *args: PS.args, **kwargs: PS.kwargs
-    ) -> X:
+    def comp_dynamic(self, fd: Callable[Concatenate[QuickAppContext, PS], X], *args: PS.args, **kwargs: PS.kwargs) -> X:
         return self.cc.comp_dynamic(fd, *args, **kwargs)
 
     async def init(self) -> None:
