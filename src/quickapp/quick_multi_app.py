@@ -26,12 +26,10 @@ class QuickMultiCmdApp(QuickAppBase):
         params.subcommands = True
 
     @abstractmethod
-    def define_multicmd_options(self, params: DecentParams):
-        ...
+    def define_multicmd_options(self, params: DecentParams): ...
 
     @abstractmethod
-    def initial_setup(self):
-        ...
+    def initial_setup(self): ...
 
     @classmethod
     def get_usage(cls) -> str:
