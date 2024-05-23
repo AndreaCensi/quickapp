@@ -31,6 +31,7 @@ class QuickAppContext:
     branched_contexts: "list[Promise]"
     _job_prefix: str
     ngenerations: int
+    cc: Context
 
     def __init__(
         self,
