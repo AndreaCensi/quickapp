@@ -54,19 +54,19 @@ async def test_compapp(env: Env) -> None:
         cases.append(dict(args=args0, ret=ret0))
 
     add(
-        ["--compress", "-c", "clean;make", "--param1", "10", "--param2", "1"],
+        ["--compress", "-c", "clean;rmake", "--param1", "10", "--param2", "1"],
         ExitCode.OK,
     )
 
     # parse error
     add(
-        ["--compress", "-c", "clean;make", "--param1", "10", "--parm2", "1"],
+        ["--compress", "-c", "clean;rmake", "--param1", "10", "--parm2", "1"],
         ExitCode.WRONG_ARGUMENTS,
     )
 
     # computation exception
     add(
-        ["--compress", "-c", "clean;make", "--param1", "10", "--param2", "-1"],
+        ["--compress", "-c", "clean;rmake", "--param1", "10", "--param2", "-1"],
         QUICKAPP_COMPUTATION_ERROR,
     )
 

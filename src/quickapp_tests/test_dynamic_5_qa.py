@@ -44,7 +44,7 @@ class QuickAppDemoChild5(QuickApp):
 async def test_dynamic4(env: Env) -> None:
     pickle.dumps(f, protocol=pickle.HIGHEST_PROTOCOL)
 
-    await run_quickapp(env, qapp=QuickAppDemoChild5, cmd="rparmake")
+    await run_quickapp(env, qapp=QuickAppDemoChild5, cmd="rmake")
     # await env.assert_jobs_equal(
     #     "all",
     #     [

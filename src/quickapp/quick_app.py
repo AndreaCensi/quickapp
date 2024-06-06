@@ -156,7 +156,7 @@ class QuickApp(QuickAppBase):
                         return 0
 
                     if options.command is None:
-                        command = "make recurse=1"
+                        command = "rmake"
                     else:
                         command = options.command
 
