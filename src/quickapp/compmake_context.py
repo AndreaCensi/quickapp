@@ -3,6 +3,7 @@ import os
 from typing import Any, Callable, Concatenate, List, Mapping, Optional, ParamSpec, TypeVar
 
 from compmake import CMJobID, Context, load_static_storage, Promise
+from compmake.context import JobInterface
 from conf_tools import ConfigState, GlobalConfig
 from zuper_commons.fs import DirPath, joind, joinf
 from zuper_commons.types import check_isinstance, ZTypeError, ZValueError
@@ -18,7 +19,7 @@ P = ParamSpec("P")
 X = TypeVar("X")
 
 
-class QuickAppContext:
+class QuickAppContext(JobInterface):
     parent: "Optional[QuickAppContext]"
     _resource_manager: ResourceManager
     _report_manager: ReportManager
@@ -169,6 +170,7 @@ class QuickAppContext:
         #:arg:command_name: used to define job name if job_id not provided.
 
         is_async = inspect.iscoroutinefunction(f)
+        both: Promise[X]
         if is_async:
             both = self.cc.comp_dynamic(
                 _dynreports_wrap_dynamic_async,
@@ -187,8 +189,10 @@ class QuickAppContext:
                 kw=kwargs,
                 **compmake_args,
             )
-        result = self.comp(_dynreports_getres, both)
-        data = self.comp(_dynreports_getbra, both)
+        job_id1 = both.job_id + "-_dynreports_getres"
+        job_id2 = both.job_id + "-_dynreports_getbra"
+        result = self.comp(_dynreports_getres, both, job_id=job_id1)
+        data = self.comp(_dynreports_getbra, both, job_id=job_id2)
         self.branched_contexts.append(data)  # type: ignore
         return result
 
@@ -229,7 +233,7 @@ class QuickAppContext:
         name: str,
         add_job_prefix: Optional[str] = None,
         add_outdir: Optional[DirPath] = None,
-        extra_dep: list[Any] = None,
+        extra_dep: Optional[list[CMJobID]] = None,
         extra_report_keys: Optional[Mapping[str, Any]] = None,
         separate_resource_manager: bool = False,
         separate_report_manager: bool = False,

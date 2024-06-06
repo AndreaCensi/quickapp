@@ -1,4 +1,3 @@
-from compmake import Context
 from quickapp import DecentParams, QuickApp, QuickAppContext
 from zuper_commons.test_utils import my_assert_equal
 from .copied_from_compmake_utils import Env, run_with_env
@@ -9,11 +8,11 @@ def f():
     return 1
 
 
-def define_jobs2(context: Context):
+def define_jobs2(context: QuickAppContext):
     context.comp(f)
 
 
-def define_jobs1(context: Context):
+def define_jobs1(context: QuickAppContext):
     context.comp_dynamic(define_jobs2)
 
 
@@ -33,8 +32,8 @@ async def test_dynamic1(env: Env) -> None:
         {
             "define_jobs1",
             "_dynreports_create_index",
-            "_dynreports_getbra",
-            "_dynreports_getres",
+            "define_jobs1-_dynreports_getbra",
+            "define_jobs1-_dynreports_getres",
             "_dynreports_merge",
             "context",
         },
