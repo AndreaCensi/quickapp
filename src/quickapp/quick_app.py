@@ -45,7 +45,7 @@ class QuickApp(QuickAppBase):
         return None
 
     async def go2(self, sti: SyncTaskInterface) -> int:
-        sti.logger.info("in go2()")
+        # sti.logger.info("in go2()")
         # check that if we have a parent who is a quickapp,
         # then use its context
         qapp_parent = self.get_qapp_parent()
@@ -105,7 +105,8 @@ class QuickApp(QuickAppBase):
             oc = await AES.init(ContextImp(db=storage, currently_executing=currently_executing, name="quickapp"))
             await oc.init(sti)
             # Our wrapper
-            qc = QuickAppContext(cc=oc, parent=None, job_prefix=None, output_dir=output_dir)
+            job_prefix = options.prefix
+            qc = QuickAppContext(cc=oc, parent=None, job_prefix=job_prefix, output_dir=output_dir)
             sti.logger.info("reading rc files")
             await read_rc_files(sti, oc)
 
@@ -138,7 +139,7 @@ class QuickApp(QuickAppBase):
                 else:
                     cq = CacheQueryDB(oc.get_compmake_db())
                     targets = cq.all_jobs()
-                    todo, done, ready = cq.list_todo_targets(targets)
+                    *closure, todo, done, ready = cq.list_todo_targets(targets)
 
                     if not todo and options.command is None:
                         msg = "Note: there is nothing for me to do. "

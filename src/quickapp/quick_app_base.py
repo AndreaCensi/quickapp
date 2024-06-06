@@ -315,6 +315,8 @@ class QuickAppBase(ABC):
         params.add_flag("contracts", help="[deprecated]", group=g)
         params.add_flag("profile", help="Use Python Profiler", group=g)
         params.add_flag("compress", help="Compress stored data", group=g)
+
+        params.add_string("prefix", help="Prefix for jobs", default=None, group=g)
         params.add_string(
             "output",
             short="o",

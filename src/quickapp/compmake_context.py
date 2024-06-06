@@ -116,7 +116,14 @@ class QuickAppContext:
     #
     # Wrappers form Compmake's "comp".
     #
-    def comp(self, f: Callable[P, X], *args: P.args, job_id: Optional[str] = None, **kwargs: P.kwargs) -> X:
+    def comp(
+        self,
+        f: Callable[P, X],
+        *args: P.args,
+        job_id: Optional[str] = None,
+        command_name: Optional[str] = None,
+        **kwargs: P.kwargs,
+    ) -> X:
         # Promise:
         """
         Simple wrapper for Compmake's comp function.
@@ -131,7 +138,8 @@ class QuickAppContext:
 
         extra_dep = self._extra_dep + other_extra
         kwargs["extra_dep"] = extra_dep
-        promise = self.cc.comp(f, *args, job_id=job_id, **kwargs)
+
+        promise = self.cc.comp(f, *args, job_id=job_id, command_name=command_name, **kwargs)
         self._jobs[promise.job_id] = promise
         return promise
 
@@ -155,8 +163,7 @@ class QuickAppContext:
                 compmake_args[n] = kwargs[n]
                 del kwargs[n]
 
-        if not "command_name" in compmake_args:
-            compmake_args["command_name"] = f.__name__
+        compmake_args["command_name"] = compmake_args.get("command_name", None) or f.__name__
         #:arg:job_id:   sets the job id (respects job_prefix)
         #:arg:extra_dep: extra dependencies (not passed as arguments)
         #:arg:command_name: used to define job name if job_id not provided.
@@ -191,8 +198,8 @@ class QuickAppContext:
         """
         config_state = GlobalConfig.get_state()
         # so that compmake can use a good name
-        if not "command_name" in kwargs:
-            kwargs["command_name"] = f.__name__
+        command_name = kwargs.get("command_name", None) or f.__name__
+        kwargs["command_name"] = command_name
         return self.comp(wrap_state, config_state, f, *args, **kwargs)
 
     def comp_config_dynamic(self, f, *args, **kwargs) -> Promise:
@@ -200,8 +207,8 @@ class QuickAppContext:
         more jobs."""
         config_state = GlobalConfig.get_state()
         # so that compmake can use a good name
-        if not "command_name" in kwargs:
-            kwargs["command_name"] = f.__name__
+        command_name = kwargs.get("command_name", None) or f.__name__
+        kwargs["command_name"] = command_name
         return self.comp_dynamic(wrap_state_dynamic, config_state, f, *args, **kwargs)
 
     def count_comp_invocations(self) -> None:
