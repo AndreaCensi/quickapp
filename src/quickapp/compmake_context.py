@@ -86,7 +86,19 @@ class QuickAppContext(JobInterface):
     n_comp_invocations: int
 
     def __str__(self) -> str:
-        return f"QuickAppContext({self._job_prefix})"
+        nbranched_contextx = len(self.branched_contexts)
+        nbranched_children = len(self.branched_children)
+        nchildren_names = len(self.children_names)
+        return f"QuickAppContext({self._job_prefix}, {nbranched_contextx=}, {nbranched_children=}, {nchildren_names=})"
+
+    def __repr__(self) -> str:
+        nbranched_contextx = len(self.branched_contexts)
+        nbranched_children = len(self.branched_children)
+        nchildren_names = len(self.children_names)
+        return (
+            f"QuickAppContext({self._job_prefix}, {nbranched_contextx=}, {nbranched_children=}, {nchildren_names=}, "
+            f"{self._report_manager=!r})"
+        )
 
     # def all_jobs(self):
     #     return list(self._jobs.values())
