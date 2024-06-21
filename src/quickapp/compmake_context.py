@@ -2,11 +2,11 @@ import inspect
 import os
 from typing import Any, Callable, Concatenate, List, Mapping, Optional, ParamSpec, TypeVar
 
-from compmake import CMJobID, Context, load_static_storage, Promise
+from compmake import CMJobID, Context, Promise, load_static_storage
 from compmake.context import JobInterface
 from conf_tools import ConfigState, GlobalConfig
 from zuper_commons.fs import DirPath, joind, joinf
-from zuper_commons.types import check_isinstance, ZTypeError, ZValueError
+from zuper_commons.types import ZTypeError, ZValueError, check_isinstance
 from .report_manager import ReportManager
 from .resource_manager import ResourceManager
 
@@ -65,7 +65,7 @@ class QuickAppContext(JobInterface):
             self.private_report_manager = True  # only create indexe if this is true
             reports = joind(output_dir, "report")
             reports_index = joinf(output_dir, "report.html")
-            report_manager = ReportManager(self, reports, reports_index)
+            report_manager = ReportManager(reports, reports_index)
         else:
             self.private_report_manager = False
 
@@ -92,11 +92,11 @@ class QuickAppContext(JobInterface):
         return f"QuickAppContext({self._job_prefix}, {nbranched_contextx=}, {nbranched_children=}, {nchildren_names=})"
 
     def __repr__(self) -> str:
-        nbranched_contextx = len(self.branched_contexts)
+        nbranched_contexts = len(self.branched_contexts)
         nbranched_children = len(self.branched_children)
         nchildren_names = len(self.children_names)
         return (
-            f"QuickAppContext({self._job_prefix}, {nbranched_contextx=}, {nbranched_children=}, {nchildren_names=}, "
+            f"QuickAppContext({self._job_prefix}, {nbranched_contexts=!r}, {nbranched_children=}, {nchildren_names=}, "
             f"{self._report_manager=!r})"
         )
 
@@ -488,12 +488,14 @@ def _dynreports_wrap_dynamic(context: Context, qc: QuickAppContext, function, ar
 
 
 def _dynreports_merge(branched: List[dict]):
-    rm = None
+    rm: Optional[ReportManager] = None
     for i, b in enumerate(branched):
         if i == 0:
             rm = b["report_manager"]
         else:
             rm.merge(b["report_manager"])
+    if rm is not None:
+        rm.context = None
     return dict(report_manager=rm)
 
 
@@ -517,6 +519,7 @@ def get_branched_contexts(context):
 
 def context_get_merge_data(context: QuickAppContext) -> Any:
     rm = context.get_report_manager()
+
     data = [dict(report_manager=rm)]
 
     data.extend(get_branched_contexts(context))

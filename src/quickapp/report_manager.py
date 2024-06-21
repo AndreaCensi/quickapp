@@ -7,10 +7,9 @@ import numpy as np
 
 from compmake import Context, Promise
 from conf_tools.utils import friendly_path
-
 from zuper_commons.fs import DirPath, FilePath, joinf
 from zuper_commons.text import natsorted
-from zuper_commons.types import check_isinstance, ZValueError
+from zuper_commons.types import ZValueError, check_isinstance
 from zuper_commons.ui import duration_compact
 from . import logger
 
@@ -26,7 +25,6 @@ if TYPE_CHECKING:
 
 
 class ReportManager:
-    context: "QuickAppContext"
     outdir: DirPath
     index_filename: FilePath
     allreports: "StoreResults"
@@ -35,9 +33,26 @@ class ReportManager:
     index_job_created: bool
     static_dir: DirPath
 
-    def __init__(self, context: "QuickAppContext", outdir: DirPath, index_filename: Optional[FilePath] = None):
-        # TODO: remove context
-        self.context = context
+    def __repr__(self):
+        keys = [
+            "outdir",
+            "allreports",
+            "allreports_filename",
+            "_report_types_format",
+            "index_job_created",
+            "static_dir",
+            "html_resources_prefix",
+        ]
+        inside = [f"{k}={getattr(self, k)!r}" for k in keys]
+
+        return f"ReportManager({', '.join(inside)})" + "\n"  # + 'also\n' + repr(self.__dict__)
+
+        return (
+            f"ReportManager({self.outdir=}, {self.allreports=}, {self.allreports_filename=},"
+            f"{self._report_types_format=}, {self.index_job_created=}, {self.static_dir=})"
+        )
+
+    def __init__(self, outdir: DirPath, index_filename: Optional[FilePath] = None):
         self.outdir = outdir
         if index_filename is None:
             index_filename = joinf(self.outdir, "report_index.html")
