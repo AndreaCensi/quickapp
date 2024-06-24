@@ -9,6 +9,7 @@ from zuper_commons.fs import DirPath, joind, joinf
 from zuper_commons.types import ZTypeError, ZValueError, check_isinstance
 from .report_manager import ReportManager
 from .resource_manager import ResourceManager
+from . import logger
 
 __all__ = [
     "QuickAppContext",
@@ -28,6 +29,7 @@ class QuickAppContext(JobInterface):
     _extra_dep: list[Promise]
     _promise: Optional[Promise]
     _jobs: dict[CMJobID, Promise] = {}
+    children_names: "dict[str, QuickAppContext]"
     branched_children: "list[QuickAppContext]"
     branched_contexts: "list[Promise]"
     _job_prefix: str
@@ -81,7 +83,7 @@ class QuickAppContext(JobInterface):
 
         self.branched_contexts = []
         self.branched_children = []
-        self.children_names = set()
+        self.children_names = {}
 
     n_comp_invocations: int
 
@@ -273,8 +275,9 @@ class QuickAppContext(JobInterface):
         name_friendly = name.replace("-", "_").replace(".", "_")
         if name_friendly in self.children_names:
             msg = f'Child with name "{name_friendly}" already exists.'
+            logger.warning(msg)
+            return self.children_names[name_friendly]
             raise ZValueError(msg, job_prefix=self._job_prefix, children_names=self.children_names)
-        self.children_names.add(name_friendly)
 
         if add_job_prefix is None:
             add_job_prefix = name_friendly
@@ -330,6 +333,7 @@ class QuickAppContext(JobInterface):
             extra_dep=_extra_dep,
         )
         self.branched_children.append(c1)
+        self.children_names[name_friendly] = c1
 
         return c1
 
