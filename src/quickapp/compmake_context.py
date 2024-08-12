@@ -210,7 +210,7 @@ class QuickAppContext(JobInterface):
         self.branched_contexts.append(data)  # type: ignore
         return result
 
-    def comp_config(self, f, *args, **kwargs) -> Promise:
+    def comp_config(self, f: Callable[[P], X], *args: P.args, **kwargs: P.kwargs) -> Promise[X]:
         """
         Like comp, but we also automatically save the GlobalConfig state.
         """
