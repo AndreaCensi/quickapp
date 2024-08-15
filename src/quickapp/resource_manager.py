@@ -26,7 +26,7 @@ class CannotProvide(ZException):
 class ResourceManager:
     context: "QuickAppContext"
     allresources: "StoreResults"
-    providers: dict[str, List[object]]
+    providers: dict[str, list[object]]
 
     def __init__(self, context):
         from .compmake_context import QuickAppContext

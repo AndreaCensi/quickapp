@@ -19,7 +19,7 @@ X = TypeVar("X")
 
 def iterate_context_names(
     context: QuickAppContext, it1: Sequence[X], key: Optional[str] = None
-) -> Iterator[Tuple[QuickAppContext, X]]:
+) -> Iterator[tuple[QuickAppContext, X]]:
     """
     Creates child contexts with minimal names.
 

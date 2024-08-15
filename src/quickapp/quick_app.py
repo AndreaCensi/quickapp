@@ -245,7 +245,7 @@ class QuickApp(QuickAppBase):
     #         raise QuickAppException(msg)
 
 
-def quickapp_main(quickapp_class: type, args: Optional[List[str]] = None, sys_exit: bool = True) -> int:
+def quickapp_main(quickapp_class: type, args: Optional[list[str]] = None, sys_exit: bool = True) -> int:
     """
     Use like this:
 

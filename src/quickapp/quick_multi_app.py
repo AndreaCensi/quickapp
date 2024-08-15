@@ -131,16 +131,16 @@ class QuickMultiCmdApp(QuickAppBase):
         return possibilities
 
     @classmethod
-    def _get_subs_as_dict(cls) -> Dict[str, Type[QuickAppBase]]:
+    def _get_subs_as_dict(cls) -> dict[str, Type[QuickAppBase]]:
         """Returns a dict: cmd_name -> cmd"""
         return dict([(x.cmd, x) for x in cls._get_subs()])
 
     @classmethod
-    def _get_subs_names(cls) -> List[str]:
+    def _get_subs_names(cls) -> list[str]:
         return [x.cmd for x in cls._get_subs()]
 
     @classmethod
-    def _get_subs(cls) -> List[Type[QuickAppBase]]:
+    def _get_subs(cls) -> list[Type[QuickAppBase]]:
         return QuickMultiCmdApp.subs[cls]
 
     # QuickMultiCmdApp subclass -> (list of  QuickAppBase)

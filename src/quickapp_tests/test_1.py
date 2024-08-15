@@ -50,7 +50,7 @@ class QuickAppDemo2(QuickApp):
 async def test_compapp(env: Env) -> None:
     cases = []
 
-    def add(args0: List[str], ret0: ExitCode):
+    def add(args0: list[str], ret0: ExitCode):
         cases.append(dict(args=args0, ret=ret0))
 
     add(

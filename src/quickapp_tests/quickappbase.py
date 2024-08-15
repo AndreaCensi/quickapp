@@ -1,4 +1,4 @@
-from typing import List, Type, Union
+from typing import Type, Union
 
 from quickapp import QuickAppBase
 from zuper_commons.types import ZTypeError, ZValueError
@@ -8,7 +8,7 @@ from .copied_from_compmake_utils import Env
 async def run_quickapp(
     env: Env,
     qapp: Type[QuickAppBase],
-    cmd: Union[str, List[str]],
+    cmd: Union[str, list[str]],
     return_retcode: bool = False,
 ) -> int:
     if isinstance(cmd, str):

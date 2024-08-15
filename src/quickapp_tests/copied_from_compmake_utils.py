@@ -69,7 +69,7 @@ class Env:
     async def aclose(self) -> None:
         await self.cc.aclose()
 
-    async def all_jobs(self) -> List[CMJobID]:
+    async def all_jobs(self) -> list[CMJobID]:
         """Returns the list of jobs corresponding to the given expression."""
         # db = StorageFilesystem(self.env, compress=True)
         return sorted(list(all_jobs(self.db)))
@@ -80,7 +80,7 @@ class Env:
     async def assert_defined_by(self, job_id: str, expected) -> None:
         my_assert_equal((await self.get_job(job_id)).defined_by, expected)
 
-    async def get_jobs(self, expression: str) -> List[CMJobID]:
+    async def get_jobs(self, expression: str) -> list[CMJobID]:
         """Returns the list of jobs corresponding to the given expression."""
         return list(parse_job_list(expression, context=self.cc))
 

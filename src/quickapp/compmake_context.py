@@ -491,7 +491,7 @@ def _dynreports_wrap_dynamic(context: Context, qc: QuickAppContext, function, ar
     return res
 
 
-def _dynreports_merge(branched: List[dict]):
+def _dynreports_merge(branched: list[dict]):
     rm: Optional[ReportManager] = None
     for i, b in enumerate(branched):
         if i == 0:

@@ -176,7 +176,7 @@ class QuickAppBase(ABC):
     async def main(
         self,
         sti: SyncTaskInterface,
-        args: Optional[List[str]] = None,
+        args: Optional[list[str]] = None,
         parent: "Optional[QuickAppBase]" = None,
     ) -> ExitCode:
         """Main entry point. Returns an integer as an error code."""
@@ -226,7 +226,7 @@ class QuickAppBase(ABC):
             msg = f"Expected None or an integer fomr self.go(), got {ret}"
             raise ValueError(msg)
 
-    def set_options_from_dict(self, config: Dict[str, Any]) -> None:
+    def set_options_from_dict(self, config: dict[str, Any]) -> None:
         """
         Reads the configuration from a dictionary.
 
@@ -252,7 +252,7 @@ class QuickAppBase(ABC):
             msg += indent(traceback.format_exc(), "> ")
             raise QuickAppException(msg)  # XXX class
 
-    def set_options_from_args(self, args: List[str]) -> None:
+    def set_options_from_args(self, args: list[str]) -> None:
         """
         Reads the configuration from command line arguments.
 

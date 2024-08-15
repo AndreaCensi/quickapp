@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-def minimal_names_at_boundaries(objects: List[str], separators: Optional[List[str]] = None) -> Tuple[str, List[str], str]:
+def minimal_names_at_boundaries(objects: list[str], separators: Optional[list[str]] = None) -> tuple[str, list[str], str]:
     """
     Converts a list of object IDs to a minimal non-ambiguous list of names.
 
@@ -91,7 +91,7 @@ def minimal_names_at_boundaries(objects: List[str], separators: Optional[List[st
     return prefix, minimal, postfix
 
 
-def _context_names_heuristics(values: List) -> List[str]:
+def _context_names_heuristics(values: List) -> list[str]:
     # print('name heuristics did not work')
 
     names = get_descriptive_names(values)
@@ -102,7 +102,7 @@ def _context_names_heuristics(values: List) -> List[str]:
     return names
 
 
-def get_descriptive_names(values: List) -> List[str]:
+def get_descriptive_names(values: List) -> list[str]:
     x = id_field_heuristics(values)
     if x is not None:
         return x
@@ -121,7 +121,7 @@ def name_field(ob: object) -> Optional[str]:
         return None
 
 
-def try_heuristics(objects: list[object], fun: Callable[[object], Optional[str]]) -> Optional[List[str]]:
+def try_heuristics(objects: list[object], fun: Callable[[object], Optional[str]]) -> Optional[list[str]]:
     """
     fun must return either a string or None
     """
@@ -183,7 +183,7 @@ def good_context_name(id_object: str) -> str:
     return id_object
 
 
-def minimal_names(objects: Sequence[str]) -> Tuple[str, List[str], str]:
+def minimal_names(objects: Sequence[str]) -> tuple[str, list[str], str]:
     """
     Converts a list of object IDs to a minimal non-ambiguous list of names.
 
