@@ -178,7 +178,7 @@ class QuickAppContext(JobInterface):
                 compmake_args[n] = kwargs[n]
                 del kwargs[n]
 
-        compmake_args["command_name"] = compmake_args.get("command_name", None) or f.__name__
+        compmake_args["command_name"] = command_name = compmake_args.get("command_name", None) or f.__name__
         #:arg:job_id:   sets the job id (respects job_prefix)
         #:arg:extra_dep: extra dependencies (not passed as arguments)
         #:arg:command_name: used to define job name if job_id not provided.
@@ -203,8 +203,8 @@ class QuickAppContext(JobInterface):
                 kw=kwargs,
                 **compmake_args,
             )
-        job_id1 = both.job_id + "-_dynreports_getres"
-        job_id2 = both.job_id + "-_dynreports_getbra"
+        job_id1 = command_name + "-_dynreports_getres"
+        job_id2 = command_name + "-_dynreports_getbra"
         result = self.comp(_dynreports_getres, both, job_id=job_id1)
         data = self.comp(_dynreports_getbra, both, job_id=job_id2)
         self.branched_contexts.append(data)  # type: ignore
