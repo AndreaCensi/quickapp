@@ -203,10 +203,10 @@ class QuickAppContext(JobInterface):
                 kw=kwargs,
                 **compmake_args,
             )
-        job_id1 = command_name + "-_dynreports_getres"
-        job_id2 = command_name + "-_dynreports_getbra"
-        result = self.comp(_dynreports_getres, both, job_id=job_id1)
-        data = self.comp(_dynreports_getbra, both, job_id=job_id2)
+        use_command_name1 = command_name + "-_dynreports_getres"
+        use_command_name2 = command_name + "-_dynreports_getbra"
+        result = self.comp(_dynreports_getres, both, command_name=use_command_name1)
+        data = self.comp(_dynreports_getbra, both, command_name=use_command_name2)
         self.branched_contexts.append(data)  # type: ignore
         return result
 
