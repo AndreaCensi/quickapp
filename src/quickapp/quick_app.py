@@ -2,13 +2,13 @@ import os
 import shutil
 import sys
 from abc import abstractmethod
-from typing import List, Optional, cast
+from typing import cast, Self
 
-from compmake import CMJobID, CacheQueryDB, CommandFailed, ContextImp, ShellExitRequested, read_rc_files
+from compmake import CacheQueryDB, CMJobID, CommandFailed, ContextImp, read_rc_files, ShellExitRequested
 from zuper_params import DecentParams, UserError, wrap_script_entry_point
 from zuper_utils_asyncio import MyAsyncExitStack, SyncTaskInterface
-from . import QUICKAPP_COMPUTATION_ERROR, logger
-from .compmake_context import QuickAppContext, context_get_merge_data
+from . import logger, QUICKAPP_COMPUTATION_ERROR
+from .compmake_context import context_get_merge_data, QuickAppContext
 from .exceptions import QuickAppException
 from .quick_app_base import QuickAppBase
 from .report_manager import _dynreports_create_index
@@ -35,7 +35,7 @@ class QuickApp(QuickAppBase):
         self._define_options_compmake(params)
         self.define_options(params)
 
-    def get_qapp_parent(self) -> "Optional[QuickApp]":
+    def get_qapp_parent(self) -> Self | None:
         parent = self.parent
         while parent is not None:
             # logger.info('Checking %s' % parent)
@@ -143,7 +143,7 @@ class QuickApp(QuickAppBase):
 
                     if not todo and options.command is None:
                         msg = "Note: there is nothing for me to do. "
-                        msg += "\n(Jobs todo: %s done: %s ready: %s)" % (
+                        msg += "\n(Jobs todo: {} done: {} ready: {})".format(
                             len(todo),
                             len(done),
                             len(ready),
@@ -245,7 +245,7 @@ class QuickApp(QuickAppBase):
     #         raise QuickAppException(msg)
 
 
-def quickapp_main(quickapp_class: type, args: Optional[list[str]] = None, sys_exit: bool = True) -> int:
+def quickapp_main(quickapp_class: type, args: list[str] | None = None, sys_exit: bool = True) -> int:
     """
     Use like this:
 

@@ -2,7 +2,6 @@
 import os
 from shutil import rmtree
 from tempfile import mkdtemp
-from typing import List
 
 from quickapp import QuickApp, QUICKAPP_COMPUTATION_ERROR
 from reprep import Report
@@ -13,12 +12,12 @@ from .quickappbase import run_quickapp
 
 
 def actual_computation(param1, param2):
-    print("computing (%s %s)" % (param1, param2))
+    print("computing ({} {})".format(param1, param2))
     return [1, 2, 3, 4]
 
 
 def report_example(param2, samples):
-    print("report_example(%s, %s)" % (param2, samples))
+    print("report_example({}, {})".format(param2, samples))
     if param2 == -1:
         print("generating exception")
         raise Exception("fake exception")

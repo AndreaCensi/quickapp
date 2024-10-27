@@ -1,6 +1,7 @@
 import traceback
 from collections import defaultdict
-from typing import Any, Callable, List, TYPE_CHECKING
+from collections.abc import Callable
+from typing import Any, TYPE_CHECKING
 
 from compmake import Promise
 from conf_tools.utils import check_is_in, indent
@@ -82,7 +83,7 @@ class ResourceManager:
                 errors.append(e)
             except Exception as e:
                 msg = "Error while trying to get resource.\n"
-                msg += " type: %r params: %s\n" % (rtype, params)
+                msg += " type: {!r} params: {}\n".format(rtype, params)
                 msg += "While calling provider %r:\n" % provider
                 msg += indent(traceback.format_exc(), "> ")
                 raise Exception(msg) from e
@@ -94,7 +95,7 @@ class ResourceManager:
 
         if len(ok) >= 2:
             msg = "The same resource could be created by two providers."
-            msg += "\n%s %s" % (rtype, params)
+            msg += "\n{} {}".format(rtype, params)
             for prov, _ in ok:
                 msg += "\n - %s" % prov
             raise Exception(msg)

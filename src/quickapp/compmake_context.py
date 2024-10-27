@@ -1,33 +1,31 @@
 import inspect
 import os
-from typing import Any, Callable, Concatenate, List, Mapping, Optional, ParamSpec, TypeVar
+from collections.abc import Callable, Mapping
+from typing import Any, Concatenate
 
-from compmake import CMJobID, Context, Promise, load_static_storage
+from compmake import CMJobID, Context, load_static_storage, Promise
 from compmake.context import JobInterface
 from conf_tools import ConfigState, GlobalConfig
 from zuper_commons.fs import DirPath, joind, joinf
-from zuper_commons.types import ZTypeError, ZValueError, check_isinstance
+from zuper_commons.types import check_isinstance, ZTypeError, ZValueError
+from . import logger
 from .report_manager import ReportManager
 from .resource_manager import ResourceManager
-from . import logger
 
 __all__ = [
     "QuickAppContext",
     "context_get_merge_data",
 ]
 
-P = ParamSpec("P")
-X = TypeVar("X")
-
 
 class QuickAppContext(JobInterface):
-    parent: "Optional[QuickAppContext]"
+    parent: "QuickAppContext | None"
     _resource_manager: ResourceManager
     _report_manager: ReportManager
     private_report_manager: bool
     _output_dir: DirPath
     _extra_dep: list[Promise]
-    _promise: Optional[Promise]
+    _promise: Promise | None
     _jobs: dict[CMJobID, Promise] = {}
     children_names: "dict[str, QuickAppContext]"
     branched_children: "list[QuickAppContext]"
@@ -39,11 +37,11 @@ class QuickAppContext(JobInterface):
     def __init__(
         self,
         cc: Context,
-        parent: "Optional[QuickAppContext]",
-        job_prefix: Optional[str],
+        parent: "QuickAppContext | None",
+        job_prefix: str | None,
         output_dir: DirPath,
-        extra_dep: Optional[list[CMJobID]] = None,
-        resource_manager: Optional[ResourceManager] = None,
+        extra_dep: list[CMJobID] | None = None,
+        resource_manager: ResourceManager | None = None,
         extra_report_keys=None,
         report_manager=None,
     ):
@@ -131,12 +129,14 @@ class QuickAppContext(JobInterface):
     #
     # Wrappers form Compmake's "comp".
     #
-    def comp(
+    def comp[
+        **P, X
+    ](
         self,
         f: Callable[P, X],
         *args: P.args,
-        job_id: Optional[str] = None,
-        command_name: Optional[str] = None,
+        job_id: str | None = None,
+        command_name: str | None = None,
         **kwargs: P.kwargs,
     ) -> X:
         # Promise:
@@ -158,11 +158,13 @@ class QuickAppContext(JobInterface):
         self._jobs[promise.job_id] = promise
         return promise
 
-    def comp_dynamic(
+    def comp_dynamic[
+        **P, X
+    ](
         self,
         f: "Callable[Concatenate[QuickAppContext, P], X]",
         *args: P.args,
-        job_id: Optional[str] = None,
+        job_id: str | None = None,
         **kwargs: P.kwargs,
     ) -> X:
         # jb = job_id if job_id else f.__name__
@@ -210,7 +212,7 @@ class QuickAppContext(JobInterface):
         self.branched_contexts.append(data)  # type: ignore
         return result
 
-    def comp_config(self, f: Callable[[P], X], *args: P.args, **kwargs: P.kwargs) -> Promise[X]:
+    def comp_config[**P, X](self, f: Callable[[P], X], *args: P.args, **kwargs: P.kwargs) -> Promise[X]:
         """
         Like comp, but we also automatically save the GlobalConfig state.
         """
@@ -245,10 +247,10 @@ class QuickAppContext(JobInterface):
     def child(
         self,
         name: str,
-        add_job_prefix: Optional[str] = None,
-        add_outdir: Optional[DirPath] = None,
-        extra_dep: Optional[list[CMJobID]] = None,
-        extra_report_keys: Optional[Mapping[str, Any]] = None,
+        add_job_prefix: str | None = None,
+        add_outdir: DirPath | None = None,
+        extra_dep: list[CMJobID] | None = None,
+        extra_report_keys: Mapping[str, Any] | None = None,
         separate_resource_manager: bool = False,
         separate_report_manager: bool = False,
     ) -> "QuickAppContext":
@@ -399,7 +401,7 @@ class QuickAppContext(JobInterface):
     def add_extra_report_keys(self, **keys):
         for k in keys:
             if k in self.extra_report_keys:
-                msg = "key %r already in %s" % (k, list(self.extra_report_keys))
+                msg = "key {!r} already in {}".format(k, list(self.extra_report_keys))
                 raise ValueError(msg)
         self.extra_report_keys.update(keys)
 
@@ -492,7 +494,7 @@ def _dynreports_wrap_dynamic(context: Context, qc: QuickAppContext, function, ar
 
 
 def _dynreports_merge(branched: list[dict]):
-    rm: Optional[ReportManager] = None
+    rm: ReportManager | None = None
     for i, b in enumerate(branched):
         if i == 0:
             rm = b["report_manager"]

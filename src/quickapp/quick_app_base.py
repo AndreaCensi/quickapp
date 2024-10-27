@@ -3,7 +3,7 @@ import sys
 import traceback
 from abc import ABC, abstractmethod
 from pprint import pformat
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar
 
 from zuper_commons import ZLogger
 from zuper_commons.cmds import ExitCode
@@ -51,16 +51,16 @@ class QuickAppBase(ABC):
         prog = self.get_prog_name()
         self.logger = ZLogger(prog)
 
-    def info(self, msg: Optional[str] = None, *args: object, **kwargs: object) -> None:
+    def info(self, msg: str | None = None, *args: object, **kwargs: object) -> None:
         self.logger.info(msg, *args, stacklevel=1, **kwargs)
 
-    def warn(self, msg: Optional[str] = None, *args: object, **kwargs: object) -> None:
+    def warn(self, msg: str | None = None, *args: object, **kwargs: object) -> None:
         self.logger.warn(msg, *args, stacklevel=1, **kwargs)
 
-    def error(self, msg: Optional[str] = None, *args: object, **kwargs: object) -> None:
+    def error(self, msg: str | None = None, *args: object, **kwargs: object) -> None:
         self.logger.error(msg, *args, stacklevel=1, **kwargs)
 
-    def debug(self, msg: Optional[str] = None, *args: object, **kwargs: object) -> None:
+    def debug(self, msg: str | None = None, *args: object, **kwargs: object) -> None:
         self.logger.debug(msg, *args, stacklevel=1, **kwargs)
 
     def __getstate__(self) -> dict[str, Any]:
@@ -125,7 +125,7 @@ class QuickAppBase(ABC):
         return docs
 
     @classmethod
-    def get_short_description(cls) -> Optional[str]:
+    def get_short_description(cls) -> str | None:
         longdesc = cls.get_program_description()
         if longdesc is None:
             return None
@@ -145,7 +145,7 @@ class QuickAppBase(ABC):
         return usage
 
     @classmethod
-    def get_epilog(cls) -> Optional[str]:
+    def get_epilog(cls) -> str | None:
         """
         Returns the string used as an epilog in the help text.
         """
@@ -168,7 +168,7 @@ class QuickAppBase(ABC):
     def set_parent(self, parent: "QuickAppBase") -> None:
         self.parent = parent
 
-    def get_parent(self) -> Optional["QuickAppBase"]:
+    def get_parent(self) -> "QuickAppBase | None":
         if self.parent is not None:
             assert self.parent != self
         return self.parent
@@ -176,8 +176,8 @@ class QuickAppBase(ABC):
     async def main(
         self,
         sti: SyncTaskInterface,
-        args: Optional[list[str]] = None,
-        parent: "Optional[QuickAppBase]" = None,
+        args: list[str] | None = None,
+        parent: "QuickAppBase | None" = None,
     ) -> ExitCode:
         """Main entry point. Returns an integer as an error code."""
         # sti.logger.info(f"{type(self).__name__}.main", args=args, parent=parent)

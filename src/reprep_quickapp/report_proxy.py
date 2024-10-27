@@ -64,7 +64,7 @@ def get_node(url: str, r: Report, strict=True) -> Report:
         node = r.resolve_url(url)
     except NotExistent as e:
         if strict:
-            logger.error("Error while getting url %r\n%s" % (url, r.format_tree()))
+            logger.error("Error while getting url {!r}\n{}".format(url, r.format_tree()))
             raise
         else:
             logger.warn("Ignoring error: %s" % e)

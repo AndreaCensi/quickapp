@@ -2,7 +2,7 @@ import logging
 import sys
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from typing import Dict, List, Type
+from typing import Type
 
 from conf_tools.utils import indent, termcolor_colored
 from zuper_commons.cmds import ExitCode
@@ -39,7 +39,7 @@ class QuickMultiCmdApp(QuickAppBase):
 
     # noinspection PyMethodParameters
     @classmethod
-    def get_sub(appcls) -> Type[QuickAppBase]:
+    def get_sub(appcls) -> type[QuickAppBase]:
         """Returns the subclass for the subcommands"""
         # mainly because eclipse does not see ".sub" as valid.
         if not hasattr(appcls, "sub"):
@@ -87,7 +87,7 @@ class QuickMultiCmdApp(QuickAppBase):
 
         sub_inst = sub()
         assert isinstance(sub_inst, QuickAppBase)
-        logger_name = "%s-%s" % (self.get_prog_name(), cmd_name)
+        logger_name = "{}-{}".format(self.get_prog_name(), cmd_name)
         logger = logging.getLogger(logger_name)
         logger.setLevel(logging.DEBUG)
         sub_inst.logger = logger
@@ -131,16 +131,16 @@ class QuickMultiCmdApp(QuickAppBase):
         return possibilities
 
     @classmethod
-    def _get_subs_as_dict(cls) -> dict[str, Type[QuickAppBase]]:
+    def _get_subs_as_dict(cls) -> dict[str, type[QuickAppBase]]:
         """Returns a dict: cmd_name -> cmd"""
-        return dict([(x.cmd, x) for x in cls._get_subs()])
+        return {x.cmd: x for x in cls._get_subs()}
 
     @classmethod
     def _get_subs_names(cls) -> list[str]:
         return [x.cmd for x in cls._get_subs()]
 
     @classmethod
-    def _get_subs(cls) -> list[Type[QuickAppBase]]:
+    def _get_subs(cls) -> list[type[QuickAppBase]]:
         return QuickMultiCmdApp.subs[cls]
 
     # QuickMultiCmdApp subclass -> (list of  QuickAppBase)

@@ -1,7 +1,7 @@
 import os
 import time
 from pprint import pformat
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 import numpy as np
 
@@ -9,7 +9,7 @@ from compmake import Context, Promise
 from conf_tools.utils import friendly_path
 from zuper_commons.fs import DirPath, FilePath, joinf
 from zuper_commons.text import natsorted
-from zuper_commons.types import ZValueError, check_isinstance
+from zuper_commons.types import check_isinstance, ZValueError
 from zuper_commons.ui import duration_compact
 from . import logger
 
@@ -52,7 +52,7 @@ class ReportManager:
             f"{self._report_types_format=}, {self.index_job_created=}, {self.static_dir=})"
         )
 
-    def __init__(self, outdir: DirPath, index_filename: Optional[FilePath] = None):
+    def __init__(self, outdir: DirPath, index_filename: FilePath | None = None):
         self.outdir = outdir
         if index_filename is None:
             index_filename = joinf(self.outdir, "report_index.html")
@@ -84,7 +84,7 @@ class ReportManager:
             if key in self.allreports:
                 selfreport = self.allreports[key]
                 msg = "Found duplicate report %r" % key
-                msg += " jobs %s and %s" % (report, selfreport)
+                msg += " jobs {} and {}".format(report, selfreport)
                 # print(msg)
                 if report.job_id != selfreport.job_id:
                     raise ValueError(msg)
@@ -109,7 +109,7 @@ class ReportManager:
         else:
             keys0 = self._report_types_format[report_type]
             if not keys == keys0:
-                msg = "Report %r %r" % (report_type, keys)
+                msg = "Report {!r} {!r}".format(report_type, keys)
                 msg += "\ndoes not match previous format %r" % keys0
                 raise ZValueError(msg)
 
@@ -392,7 +392,7 @@ def create_links_html(this_report, other_reports_same_type, index_filename, most
         if len(variations) > MAX_VARIATIONS_EXPLICIT:
             id_select = f"select-{field}"
             onchange = f"onchange_{field}"
-            s += "<select id='%s' onChange='%s()'>\n" % (id_select, onchange)
+            s += "<select id='{}' onChange='{}()'>\n".format(id_select, onchange)
 
             for text, link in variations:
                 if link is not None:
@@ -425,7 +425,7 @@ def create_links_html(this_report, other_reports_same_type, index_filename, most
         else:
             for text, link in variations:
                 if link is not None:
-                    s += "<a href='%s'> %s</a> " % (link, text)
+                    s += "<a href='{}'> {}</a> ".format(link, text)
                 else:
                     if add_invalid_links:
                         s += "%s " % (text)
@@ -445,7 +445,7 @@ def create_links_html(this_report, other_reports_same_type, index_filename, most
     if most_similar_other_type:
         s += "<p>Other report: "
         for other_type, _, filename in most_similar_other_type:
-            s += '<a href="%s">%s</a> ' % (rel_link(filename), other_type)
+            s += '<a href="{}">{}</a> '.format(rel_link(filename), other_type)
         s += "</p>"
 
     s = '<div style="margin-left: 1em;">' + s + "</div>"
@@ -602,7 +602,7 @@ def index_reports(reports, index, update=None):  # @UnusedVariable
         return ""
 
     def write_li(k, filename: str, element="li"):
-        desc = ",  ".join("%s = %s" % (a, b) for a, b in list(k.items()))
+        desc = ",  ".join("{} = {}".format(a, b) for a, b in list(k.items()))
         href = os.path.relpath(os.path.realpath(filename), os.path.dirname(os.path.realpath(index)))
         if os.path.exists(filename):
             when = duration_compact(time.time() - mtime(filename))
@@ -629,7 +629,7 @@ def index_reports(reports, index, update=None):  # @UnusedVariable
 
     if False:
         for report_type, r in reports.groups_by_field_value("report"):
-            f.write('<h2 id="%s">%s</h2>\n' % (report_type, report_type))
+            f.write('<h2 id="{}">{}</h2>\n'.format(report_type, report_type))
             f.write("<ul>")
             r = reports.select(report=report_type)
             items = list(r.items())
@@ -668,13 +668,13 @@ def index_reports(reports, index, update=None):  # @UnusedVariable
                 if not bottom["key"]:
                     write_li(k=d, filename=bottom["value"], element="li")
                 else:
-                    f.write('<li> <p id="%s"><a class="self" href="#%s">%s = %s</a></p>\n' % (html_id, html_id, field, value))
+                    f.write('<li> <p id="{}"><a class="self" href="#{}">{} = {}</a></p>\n'.format(html_id, html_id, field, value))
                     f.write("<ul>")
                     write_li(k=bottom["key"], filename=bottom["value"], element="li")
                     f.write("</ul>")
                     f.write("</li>")
             else:
-                f.write('<li> <p id="%s"><a class="self" href="#%s">%s = %s</a></p>\n' % (html_id, html_id, field, value))
+                f.write('<li> <p id="{}"><a class="self" href="#{}">{} = {}</a></p>\n'.format(html_id, html_id, field, value))
 
                 write_sections(bottom, parents)
                 f.write("</li>")

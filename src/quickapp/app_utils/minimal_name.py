@@ -1,5 +1,5 @@
 import os
-from typing import Callable, List, Optional, Sequence, Tuple
+from collections.abc import Callable, Sequence
 
 __all__ = [
     "_context_names_heuristics",
@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-def minimal_names_at_boundaries(objects: list[str], separators: Optional[list[str]] = None) -> tuple[str, list[str], str]:
+def minimal_names_at_boundaries(objects: list[str], separators: list[str] | None = None) -> tuple[str, list[str], str]:
     """
     Converts a list of object IDs to a minimal non-ambiguous list of names.
 
@@ -91,7 +91,7 @@ def minimal_names_at_boundaries(objects: list[str], separators: Optional[list[st
     return prefix, minimal, postfix
 
 
-def _context_names_heuristics(values: List) -> list[str]:
+def _context_names_heuristics(values: list) -> list[str]:
     # print('name heuristics did not work')
 
     names = get_descriptive_names(values)
@@ -102,7 +102,7 @@ def _context_names_heuristics(values: List) -> list[str]:
     return names
 
 
-def get_descriptive_names(values: List) -> list[str]:
+def get_descriptive_names(values: list) -> list[str]:
     x = id_field_heuristics(values)
     if x is not None:
         return x
@@ -114,14 +114,14 @@ def get_descriptive_names(values: List) -> list[str]:
     return list(map(str, values))
 
 
-def name_field(ob: object) -> Optional[str]:
+def name_field(ob: object) -> str | None:
     if hasattr(ob, "__name__"):
         return getattr(ob, "__name__")
     else:
         return None
 
 
-def try_heuristics(objects: list[object], fun: Callable[[object], Optional[str]]) -> Optional[list[str]]:
+def try_heuristics(objects: list[object], fun: Callable[[object], str | None]) -> list[str] | None:
     """
     fun must return either a string or None
     """

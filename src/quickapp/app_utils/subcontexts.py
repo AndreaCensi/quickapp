@@ -1,4 +1,4 @@
-from typing import Iterator, Optional, Sequence
+from collections.abc import Iterator, Sequence
 
 from .minimal_name import _context_names_heuristics
 from .. import QuickAppContext
@@ -15,7 +15,7 @@ __all__ = [
 
 def iterate_context_names[
     X
-](context: QuickAppContext, it1: Sequence[X], key: Optional[str] = None) -> Iterator[tuple[QuickAppContext, X]]:
+](context: QuickAppContext, it1: Sequence[X], key: str | None = None) -> Iterator[tuple[QuickAppContext, X]]:
     """
     Creates child contexts with minimal names.
 
@@ -43,8 +43,8 @@ def iterate_context_names_pair(
     context: QuickAppContext,
     it1: Sequence[str],
     it2: Sequence[str],
-    key1: Optional[str] = None,
-    key2: Optional[str] = None,
+    key1: str | None = None,
+    key2: str | None = None,
 ):
     """
     Yields tuples of (context, s1, s2).
@@ -63,9 +63,9 @@ def iterate_context_names_triplet(
     it1: Sequence,
     it2: Sequence,
     it3: Sequence,
-    key1: Optional[str] = None,
-    key2: Optional[str] = None,
-    key3: Optional[str] = None,
+    key1: str | None = None,
+    key2: str | None = None,
+    key3: str | None = None,
 ):
     """
     Yields tuples of (context, s1, s2, s3).
