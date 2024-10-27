@@ -2,7 +2,7 @@ import os
 import shutil
 import sys
 from abc import abstractmethod
-from typing import cast, Self
+from typing import cast
 
 from compmake import CacheQueryDB, CMJobID, CommandFailed, ContextImp, read_rc_files, ShellExitRequested
 from zuper_params import DecentParams, UserError, wrap_script_entry_point
@@ -35,7 +35,7 @@ class QuickApp(QuickAppBase):
         self._define_options_compmake(params)
         self.define_options(params)
 
-    def get_qapp_parent(self) -> Self | None:
+    def get_qapp_parent(self) -> "QuickApp | None":
         parent = self.parent
         while parent is not None:
             # logger.info('Checking %s' % parent)
