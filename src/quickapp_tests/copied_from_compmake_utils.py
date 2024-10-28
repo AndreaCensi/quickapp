@@ -6,8 +6,6 @@ from tempfile import mkdtemp
 from typing import (
     cast,
     Concatenate,
-    ParamSpec,
-    TypeVar,
 )
 
 from compmake import (
@@ -31,9 +29,6 @@ from zuper_commons.types import ZAssertionError, ZException, ZValueError
 from zuper_utils_asyncio import create_sync_task2, SyncTaskInterface
 from zuper_zapp import async_run_timeout, setup_environment2, with_log_control
 
-X = TypeVar("X")
-PS = ParamSpec("PS")
-
 
 class Env:
     rootd: str
@@ -46,10 +41,10 @@ class Env:
         self.rootd = root
         self.sti = sti
 
-    def comp(self, f: Callable[PS, X], *args: PS.args, **kwargs: PS.kwargs) -> X:
+    def comp[**PS, X](self, f: Callable[PS, X], *args: PS.args, **kwargs: PS.kwargs) -> X:
         return self.cc.comp(f, *args, **kwargs)
 
-    def comp_dynamic(self, fd: Callable[Concatenate[QuickAppContext, PS], X], *args: PS.args, **kwargs: PS.kwargs) -> X:
+    def comp_dynamic[**PS, X](self, fd: Callable[Concatenate[QuickAppContext, PS], X], *args: PS.args, **kwargs: PS.kwargs) -> X:
         return self.cc.comp_dynamic(fd, *args, **kwargs)
 
     async def init(self) -> None:
@@ -83,7 +78,7 @@ class Env:
         res = await self.up_to_date(job_id)
         self.assert_equal(res, status, "Want {!r} uptodate? {}".format(job_id, status))
 
-    def assert_equal(self, first: X, second: X, msg: str | None = None) -> None:
+    def assert_equal[X](self, first: X, second: X, msg: str | None = None) -> None:
         my_assert_equal(first, second, msg)
 
     async def assert_jobs_equal(self, expr: str, jobs, ignore_dyn_reports: bool = True):
@@ -98,7 +93,7 @@ class Env:
             print("differs from %s" % jobs)
             raise
 
-    def assert_equal_set(self, a: Collection[X], b: Collection[X]) -> None:
+    def assert_equal_set[X](self, a: Collection[X], b: Collection[X]) -> None:
         sa = set(a)
         sb = set(b)
         if sa != sb:
