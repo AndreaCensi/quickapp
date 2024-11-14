@@ -137,9 +137,13 @@ class QuickApp(QuickAppBase):
                     await oc.compmake_console(sti)
                     return 0
                 else:
-                    cq = CacheQueryDB(oc.get_compmake_db())
-                    targets = cq.all_jobs()
-                    *closure, todo, done, ready = cq.list_todo_targets(targets)
+                    from compmake import list_todo_targets
+
+                    cq0 = CacheQueryDB(oc.get_compmake_db())
+                    with cq0.session() as cqs:
+                        targets = cqs.all_jobs()
+
+                        *closure, todo, done, ready = list_todo_targets(targets, cqs)
 
                     if not todo and options.command is None:
                         msg = "Note: there is nothing for me to do. "

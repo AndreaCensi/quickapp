@@ -67,12 +67,14 @@ class Env:
     async def get_job(self, job_id: CMJobID) -> Job:
         return get_job(job_id=job_id, db=self.db)
 
-    async def assert_defined_by(self, job_id: str, expected) -> None:
+    async def assert_defined_by(self, job_id: CMJobID, expected) -> None:
         my_assert_equal((await self.get_job(job_id)).defined_by, expected)
 
     async def get_jobs(self, expression: str) -> list[CMJobID]:
         """Returns the list of jobs corresponding to the given expression."""
-        return list(parse_job_list(expression, context=self.cc))
+        cq = CacheQueryDB(db=self.db)
+        with cq.session() as cqs:
+            return list(parse_job_list(expression, cqs))
 
     async def assert_job_uptodate(self, job_id: CMJobID, status: bool) -> None:
         res = await self.up_to_date(job_id)

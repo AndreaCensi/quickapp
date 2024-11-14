@@ -398,7 +398,7 @@ class QuickAppContext(JobInterface):
     def get_report_manager(self) -> ReportManager:
         return self._report_manager
 
-    def add_extra_report_keys(self, **keys):
+    def add_extra_report_keys(self, **keys: Any) -> None:
         for k in keys:
             if k in self.extra_report_keys:
                 msg = "key {!r} already in {}".format(k, list(self.extra_report_keys))
