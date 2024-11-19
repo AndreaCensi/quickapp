@@ -4,7 +4,7 @@ from collections.abc import Callable, Mapping
 from typing import Any, Concatenate
 
 from compmake import CMJobID, Context, load_static_storage, Promise
-from compmake.context import JobInterface
+from compmake.context import JobInterface, SimpleJobInterfaceGen
 from conf_tools import ConfigState, GlobalConfig
 from zuper_commons.fs import DirPath, joind, joinf
 from zuper_commons.types import check_isinstance, ZTypeError, ZValueError
@@ -24,7 +24,7 @@ class QuickAppContext(JobInterface):
     _report_manager: ReportManager
     private_report_manager: bool
     _output_dir: DirPath
-    _extra_dep: list[Promise]
+    _extra_dep: list[CMJobID]
     _promise: Promise | None
     _jobs: dict[CMJobID, Promise] = {}
     children_names: "dict[str, QuickAppContext]"
@@ -33,6 +33,7 @@ class QuickAppContext(JobInterface):
     _job_prefix: str
     ngenerations: int
     cc: Context
+    extra_report_keys: dict[str, int | str]
 
     def __init__(
         self,
@@ -42,7 +43,7 @@ class QuickAppContext(JobInterface):
         output_dir: DirPath,
         extra_dep: list[CMJobID] | None = None,
         resource_manager: ResourceManager | None = None,
-        extra_report_keys=None,
+        extra_report_keys: Mapping[str, int | str] = None,
         report_manager=None,
     ):
         self.ngenerations = 0
@@ -77,7 +78,7 @@ class QuickAppContext(JobInterface):
         self._jobs = {}
         if extra_report_keys is None:
             extra_report_keys = {}
-        self.extra_report_keys = extra_report_keys
+        self.extra_report_keys = dict(extra_report_keys)
 
         self.branched_contexts = []
         self.branched_children = []
@@ -122,13 +123,17 @@ class QuickAppContext(JobInterface):
         job_checkpoint: Promise = self.comp(
             checkpoint, job_name, prev_jobs=list(self._jobs.values()), job_id=job_name
         )  # type: ignore
-        self._extra_dep.append(job_checkpoint)
+        self._extra_dep.append(job_checkpoint.job_id)
         assert isinstance(job_checkpoint, Promise)
         return job_checkpoint
 
     #
     # Wrappers form Compmake's "comp".
     #
+    def with_params(self, job_id: str | None = None, command_name: str | None = None) -> "MySimpleQAInterface":
+        my = MySimpleQAInterface(self, job_id=job_id, command_name=command_name)
+        return my
+
     def comp[
         **P, X
     ](
@@ -154,7 +159,8 @@ class QuickAppContext(JobInterface):
         extra_dep = self._extra_dep + other_extra
         kwargs["extra_dep"] = extra_dep
 
-        promise = self.cc.comp(f, *args, job_id=job_id, command_name=command_name, **kwargs)
+        tags = self.extra_report_keys
+        promise = self.cc.with_params(job_id=job_id, command_name=command_name, tags=tags).comp(f, *args, **kwargs)
         self._jobs[promise.job_id] = promise
         return promise
 
@@ -181,34 +187,33 @@ class QuickAppContext(JobInterface):
                 del kwargs[n]
 
         compmake_args["command_name"] = command_name = compmake_args.get("command_name", None) or f.__name__
+
         #:arg:job_id:   sets the job id (respects job_prefix)
         #:arg:extra_dep: extra dependencies (not passed as arguments)
         #:arg:command_name: used to define job name if job_id not provided.
-
+        tags = self.extra_report_keys
         is_async = inspect.iscoroutinefunction(f)
         both: Promise[X]
         if is_async:
-            both = self.cc.comp_dynamic(
+            both = self.cc.with_params(tags=tags, **compmake_args).comp_dynamic(
                 _dynreports_wrap_dynamic_async,
                 qc=context,
                 function=f,
                 args=args,
                 kw=kwargs,
-                **compmake_args,
             )
         else:
-            both = self.cc.comp_dynamic(
+            both = self.cc.with_params(tags=tags, **compmake_args).comp_dynamic(
                 _dynreports_wrap_dynamic,
                 qc=context,
                 function=f,
                 args=args,
                 kw=kwargs,
-                **compmake_args,
             )
         use_command_name1 = command_name + "-_dynreports_getres"
         use_command_name2 = command_name + "-_dynreports_getbra"
-        result = self.comp(_dynreports_getres, both, command_name=use_command_name1)
-        data = self.comp(_dynreports_getbra, both, command_name=use_command_name2)
+        result = self.comp(_dynreports_getres, both.pretend(), command_name=use_command_name1)
+        data = self.comp(_dynreports_getbra, both.pretend(), command_name=use_command_name2)
         self.branched_contexts.append(data)  # type: ignore
         return result
 
@@ -534,3 +539,21 @@ def context_get_merge_data(context: QuickAppContext) -> Any:
         return context.cc.comp(_dynreports_merge, data)
     else:
         return data[0]
+
+
+class MySimpleQAInterface(SimpleJobInterfaceGen[QuickAppContext]):
+    def __init__(self, master: "QuickAppContext", job_id: str | None = None, command_name: str | None = None):
+        self.master = master
+        self.job_id = job_id
+        self.command_name = command_name
+
+    def comp[
+        **P, X
+    ](self, f: Callable[P, X], *args: P.args, **kwargs: P.kwargs,) -> X:
+        return self.master.comp(f, *args, job_id=self.job_id, command_name=self.command_name, **kwargs)
+
+    def comp_dynamic[
+        **P, X
+    ](self, f: "Callable[Concatenate[QuickAppContext, P], X]", *args: P.args, **kwargs: P.kwargs,) -> X:
+        ...
+        return self.master.comp_dynamic(f, *args, job_id=self.job_id, command_name=self.command_name, **kwargs)
