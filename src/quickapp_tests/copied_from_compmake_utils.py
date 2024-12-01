@@ -142,7 +142,8 @@ class Env:
         # await self.cc.batch_command(self.sti, s)
 
     async def up_to_date(self, job_id: CMJobID) -> bool:
-        up, reason, timestamp = self.cq.up_to_date(cast(CMJobID, job_id))
+        with self.cq.session() as cqs:
+            up, reason, timestamp = cqs.up_to_date(cast(CMJobID, job_id))
         self.sti.logger.info("up_to_date({!r}): {}, {!r}, {}".format(job_id, up, reason, timestamp))
         return up
 
