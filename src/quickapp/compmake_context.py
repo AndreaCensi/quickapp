@@ -120,9 +120,7 @@ class QuickAppContext(JobInterface):
         Returns the checkpoint job (CompmakePromise).
         """
         # noinspection PyTypeChecker
-        job_checkpoint: Promise = self.comp(
-            checkpoint, job_name, prev_jobs=list(self._jobs.values()), job_id=job_name
-        )  # type: ignore
+        job_checkpoint: Promise = self.comp(checkpoint, job_name, prev_jobs=list(self._jobs.values()), job_id=job_name)  # type: ignore
         self._extra_dep.append(job_checkpoint.job_id)
         assert isinstance(job_checkpoint, Promise)
         return job_checkpoint
@@ -134,9 +132,7 @@ class QuickAppContext(JobInterface):
         my = MySimpleQAInterface(self, job_id=job_id, command_name=command_name)
         return my
 
-    def comp[
-        **P, X
-    ](
+    def comp[**P, X](
         self,
         f: Callable[P, X],
         *args: P.args,
@@ -164,9 +160,7 @@ class QuickAppContext(JobInterface):
         self._jobs[promise.job_id] = promise
         return promise
 
-    def comp_dynamic[
-        **P, X
-    ](
+    def comp_dynamic[**P, X](
         self,
         f: "Callable[Concatenate[QuickAppContext, P], X]",
         *args: P.args,
@@ -547,13 +541,19 @@ class MySimpleQAInterface(SimpleJobInterfaceGen[QuickAppContext]):
         self.job_id = job_id
         self.command_name = command_name
 
-    def comp[
-        **P, X
-    ](self, f: Callable[P, X], *args: P.args, **kwargs: P.kwargs,) -> X:
+    def comp[**P, X](
+        self,
+        f: Callable[P, X],
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> X:
         return self.master.comp(f, *args, job_id=self.job_id, command_name=self.command_name, **kwargs)
 
-    def comp_dynamic[
-        **P, X
-    ](self, f: "Callable[Concatenate[QuickAppContext, P], X]", *args: P.args, **kwargs: P.kwargs,) -> X:
+    def comp_dynamic[**P, X](
+        self,
+        f: "Callable[Concatenate[QuickAppContext, P], X]",
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> X:
         ...
         return self.master.comp_dynamic(f, *args, job_id=self.job_id, command_name=self.command_name, **kwargs)

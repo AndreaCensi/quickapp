@@ -13,9 +13,9 @@ __all__ = [
 ]
 
 
-def iterate_context_names[
-    X
-](context: QuickAppContext, it1: Sequence[X], key: str | None = None) -> Iterator[tuple[QuickAppContext, X]]:
+def iterate_context_names[X](
+    context: QuickAppContext, it1: Sequence[X], key: str | None = None
+) -> Iterator[tuple[QuickAppContext, X]]:
     """
     Creates child contexts with minimal names.
 
