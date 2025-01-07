@@ -139,7 +139,7 @@ class QuickAppContext(JobInterface):
         job_id: str | None = None,
         command_name: str | None = None,
         **kwargs: P.kwargs,
-    ) -> X:
+    ) -> Promise[X]:
         # Promise:
         """
         Simple wrapper for Compmake's comp function.
@@ -166,7 +166,7 @@ class QuickAppContext(JobInterface):
         *args: P.args,
         job_id: str | None = None,
         **kwargs: P.kwargs,
-    ) -> X:
+    ) -> Promise[X]:
         # jb = job_id if job_id else f.__name__
         # jn = f'{jb}-context-{id(self)}'
         # context = self.comp(load_static_storage, self, job_id=jn)
