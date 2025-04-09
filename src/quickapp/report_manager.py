@@ -5,13 +5,36 @@ from pprint import pformat
 import numpy as np
 
 from compmake import Context, Promise
-from zuper_commons.ui import duration_compact
+try:
+    from zuper_commons.ui import duration_compact
+except ImportError:
+    from .zuper_commons_patch import duration_compact
+    
 from conf_tools.utils import friendly_path
-from zuper_commons.types import check_isinstance, describe_type, describe_value
-from reprep import Report
 
+try:
+    from zuper_commons.types import check_isinstance, describe_type, describe_value
+except ImportError:
+    # Simple implementation if zuper_commons.types is not available
+    def check_isinstance(obj, expected_type):
+        if not isinstance(obj, expected_type):
+            msg = f"Expected type {expected_type}, got {type(obj)}"
+            raise ValueError(msg)
+        return obj
+    
+    def describe_type(x):
+        return str(type(x).__name__)
+    
+    def describe_value(x):
+        return str(x)
+
+from reprep import Report
 from reprep.utils import frozendict2
-from zuper_commons.text import natsorted
+
+try:
+    from zuper_commons.text import natsorted
+except ImportError:
+    from .zuper_commons_patch import natsorted
 from . import logger
 from .rm import write_report_single
 
