@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
-from quickapp import DecentParams, QuickMultiCmdApp
 from zuper_commons.test_utils import known_failure
-from .copied_from_compmake_utils import Env, run_with_env
+
+from quickapp import DecentParams
+from quickapp import QuickMultiCmdApp
+
+from .copied_from_compmake_utils import Env
+from .copied_from_compmake_utils import run_with_env
 from .quickappbase import run_quickapp
 
 

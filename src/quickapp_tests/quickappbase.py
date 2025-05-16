@@ -1,5 +1,8 @@
+from zuper_commons.types import ZTypeError
+from zuper_commons.types import ZValueError
+
 from quickapp import QuickAppBase
-from zuper_commons.types import ZTypeError, ZValueError
+
 from .copied_from_compmake_utils import Env
 
 

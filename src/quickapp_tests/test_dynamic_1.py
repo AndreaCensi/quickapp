@@ -1,6 +1,11 @@
-from quickapp import DecentParams, QuickApp, QuickAppContext
 from zuper_commons.test_utils import my_assert_equal
-from .copied_from_compmake_utils import Env, run_with_env
+
+from quickapp import DecentParams
+from quickapp import QuickApp
+from quickapp import QuickAppContext
+
+from .copied_from_compmake_utils import Env
+from .copied_from_compmake_utils import run_with_env
 from .quickappbase import run_quickapp
 
 

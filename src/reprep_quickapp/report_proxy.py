@@ -2,9 +2,12 @@ import traceback
 from copy import deepcopy
 
 from compmake import Promise
+from reprep import NotExistent
+from reprep import Report
+from reprep import logger
+
 from quickapp import QuickAppContext
 from quickapp.report_manager import basename_from_key
-from reprep import logger, NotExistent, Report
 
 __all__ = [
     "ReportProxy",

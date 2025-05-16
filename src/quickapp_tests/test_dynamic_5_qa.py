@@ -2,8 +2,11 @@ import asyncio
 import pickle
 import random
 
-from quickapp import QuickApp, QuickAppContext
-from .copied_from_compmake_utils import Env, run_with_env
+from quickapp import QuickApp
+from quickapp import QuickAppContext
+
+from .copied_from_compmake_utils import Env
+from .copied_from_compmake_utils import run_with_env
 from .quickappbase import run_quickapp
 
 

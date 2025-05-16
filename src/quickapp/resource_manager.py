@@ -1,10 +1,12 @@
 import traceback
 from collections import defaultdict
 from collections.abc import Callable
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
+from typing import Any
 
 from compmake import Promise
-from conf_tools.utils import check_is_in, indent
+from conf_tools.utils import check_is_in
+from conf_tools.utils import indent
 
 # from contracts import contract, describe_type
 
@@ -14,8 +16,9 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from .compmake_context import QuickAppContext
     from reprep.report_utils import StoreResults
+
+    from .compmake_context import QuickAppContext
 
 from zuper_commons.types import ZException
 

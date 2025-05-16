@@ -1,13 +1,17 @@
 import logging
 import sys
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from collections import defaultdict
 from typing import Type
 
-from conf_tools.utils import indent, termcolor_colored
+from conf_tools.utils import indent
+from conf_tools.utils import termcolor_colored
 from zuper_commons.cmds import ExitCode
-from zuper_params import DecentParams, UserError
+from zuper_params import DecentParams
+from zuper_params import UserError
 from zuper_utils_asyncio import SyncTaskInterface
+
 from .quick_app_base import QuickAppBase
 
 __all__ = [

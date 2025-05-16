@@ -1,16 +1,21 @@
 import os
 import time
 from pprint import pformat
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
+from typing import Any
 
 import numpy as np
-
-from compmake import Context, Promise
+from compmake import Context
+from compmake import Promise
 from conf_tools.utils import friendly_path
-from zuper_commons.fs import DirPath, FilePath, joinf
+from zuper_commons.fs import DirPath
+from zuper_commons.fs import FilePath
+from zuper_commons.fs import joinf
 from zuper_commons.text import natsorted
-from zuper_commons.types import check_isinstance, ZValueError
+from zuper_commons.types import ZValueError
+from zuper_commons.types import check_isinstance
 from zuper_commons.ui import duration_compact
+
 from . import logger
 
 __all__ = [
@@ -21,6 +26,7 @@ __all__ = [
 
 if TYPE_CHECKING:
     from reprep.report_utils import StoreResults
+
     from .compmake_context import QuickAppContext
 
 
@@ -136,7 +142,7 @@ class ReportManager:
             raise ZValueError(msg, report_type=report_type)
 
         if not isinstance(report, Promise):
-            msg = "ReportManager is mean to be given Promise objects, " "which are the output of comp(). "
+            msg = "ReportManager is mean to be given Promise objects, which are the output of comp(). "
             raise ZValueError(msg, obtained=report)
 
         # check the format is ok

@@ -1,5 +1,6 @@
 import os
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
+from collections.abc import Sequence
 
 __all__ = [
     "_context_names_heuristics",

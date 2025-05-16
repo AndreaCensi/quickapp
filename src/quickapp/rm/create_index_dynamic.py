@@ -4,8 +4,8 @@ __all__ = [
     "write_report_single",
 ]
 
-from zuper_commons.fs import DirPath, FilePath
-
+from zuper_commons.fs import DirPath
+from zuper_commons.fs import FilePath
 from zuper_commons.types import check_isinstance
 
 

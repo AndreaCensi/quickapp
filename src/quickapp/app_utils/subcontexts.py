@@ -1,7 +1,8 @@
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator
+from collections.abc import Sequence
 
+from ..compmake_context import QuickAppContext
 from .minimal_name import _context_names_heuristics
-from .. import QuickAppContext
 
 __all__ = [
     "iterate_context_names",

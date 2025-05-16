@@ -1,7 +1,10 @@
-from quickapp import iterate_context_names, QuickApp, QuickAppContext
 from reprep import Report
 from zuper_params import DecentParams
 from zuper_utils_asyncio import SyncTaskInterface
+
+from quickapp import QuickApp
+from quickapp import QuickAppContext
+from quickapp import iterate_context_names
 
 
 def report_example1(param1: str, param2: int) -> Report:

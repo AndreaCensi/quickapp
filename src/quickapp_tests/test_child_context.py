@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
-from quickapp import iterate_context_names, QuickApp, QuickAppContext
-from .copied_from_compmake_utils import Env, run_with_env
+from quickapp import QuickApp
+from quickapp import QuickAppContext
+from quickapp import iterate_context_names
+
+from .copied_from_compmake_utils import Env
+from .copied_from_compmake_utils import run_with_env
 from .quickappbase import run_quickapp
 
 
