@@ -94,7 +94,7 @@ jobs:
         command: |
           export PIP_INDEX_URL="${PIP_INDEX_URL_SRC}"
           echo PIP_INDEX_URL="${PIP_INDEX_URL}"
-          pipdeptree >  build-stats/pipdeptree.txt
+          #pipdeptree >  build-stats/pipdeptree.txt
           python3 -m pip  list   | sort | tee  build-stats/pip-list.txt
           python3 -m pip  freeze | sort | tee  build-stats/pip-freeze.txt
           python3 -m pip cache list | tee  build-stats/pip-cache.txt
@@ -216,4 +216,4 @@ jobs:
           timeout 1m ./codecov || true
     resource_class: small
 
-# sigil 4ad93a2de132c34040a872f1e5eba155
+# sigil 4782089564ca5bd21c146cf4e9dcca3e
