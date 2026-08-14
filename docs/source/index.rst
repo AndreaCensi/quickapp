@@ -59,7 +59,7 @@ download using git: ::
 
 Install using: ::
 
-    $ python setup.py develop
+    $ python3 -m pip install -e .
     $ python -m nose2 -v quickapp_tests  # run the extensive test suite
 
 
