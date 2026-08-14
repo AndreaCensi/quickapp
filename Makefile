@@ -1,32 +1,67 @@
-package=quickapp
+all:
+	@echo
 
-include pypackage.mk
+out=out
+tested_packages := quickapp_tests
+deployed_packages := quickapp reprep_quickapp
+test_environment := DISABLE_CONTRACTS=1
+
+ifneq ($(filter contracts,$(deployed_packages)),)
+test_environment :=
+endif
+
+.PHONY: all template bump upload black install-deps install-testing-deps test coverage-combine docs
+
+
+template:
+	zuper-cli template
 
 bump:
-	bumpversion patch
+	zuper-cli bump
 
 upload:
-	git push --tags
-	git push --all
-	rm -f dist/*
-	rm -rf src/*.egg-info
-	python3 setup.py sdist
-	devpi use $(TWINE_REPOSITORY_URL)
-	devpi login $(TWINE_USERNAME) --password $(TWINE_PASSWORD)
-	devpi upload --verbose dist/*
-bump-upload:
-	$(MAKE) bump
-	$(MAKE) upload
+	zuper-cli upload
 
-name=quickapp-python3
+black:
+	black -l 110 --target-version py312 src
 
-test-python3:
-	docker stop $(name) || true
-	docker rm $(name) || true
+install-deps:
+	pip3 install --user shyaml
+	shyaml get-values install_requires < project.pp1.yaml > .requirements.txt
+	pip3 install --user --upgrade -r .requirements.txt
+	rm .requirements.txt
 
-	docker run -it -v "$(shell realpath $(PWD)):/quickapp" -w /quickapp --name $(name) python:3 /bin/bash
+install-testing-deps:
+	pip3 install --user shyaml
+	shyaml get-values tests_require < project.pp1.yaml > .requirements_tests.txt
+	pip3 install --user --upgrade -r .requirements_tests.txt
+	rm .requirements_tests.txt
 
-test-python3-install:
-	pip install -r requirements.txt
-	pip install nose
-	python setup.py develop --no-deps
+	pip install \
+		pipdeptree\
+		bumpversion\
+		nose2\
+		nose2-html-report\
+		pre-commit\
+		coverage\
+		codecov\
+		sphinx\
+		sphinx-rtd-theme
+
+test:
+	$(test_environment) python -m nose2 -v $(tested_packages)
+
+coverage-combine:
+	coverage combine
+
+ifneq (1,)
+docs:
+	$(MAKE) -C docs
+else
+docs:
+	sphinx-build src $(out)/docs
+endif
+
+-include extra.mk
+
+# sigil 0a111546e82a562152e5b334dd812260
