@@ -59,8 +59,8 @@ download using git: ::
 
 Install using: ::
 
-    $ python setup.py develop
-    $ nosetests -w src         # run the extensive test suite
+    $ python3 -m pip install -e .
+    $ python -m nose2 -v quickapp_tests  # run the extensive test suite
 
 
 .. _tar:: http://github.com/AndreaCensi/quickapp/tarball/master
